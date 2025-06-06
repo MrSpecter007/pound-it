@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load wagtailimages_tags wagtailcore_tags %}
+
+{% block content %}
+    {% if page.image %}{% image page.image width-1000 %}{% endif %}
+    <div>
+    {{ page.title }}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-7">
+                    <div class="row">
+                        {% if page.introduction %}
+                            <p class="bread-detail__introduction">
+                                {{ page.introduction }}
+                            </p>
+                        {% endif %}
+                        {{ page.body | richtext }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

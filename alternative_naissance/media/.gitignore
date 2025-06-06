@@ -1,0 +1,4 @@
+# The media folder is for uploaded files in production, so should ignore everything
+*
+# Except for .gitignore as needed by git
+!.gitignore
