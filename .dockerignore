@@ -1,5 +1,5 @@
 # Django project
-/media/
+/alternative_naissance/media/
 /static/
 *.sqlite3
 
