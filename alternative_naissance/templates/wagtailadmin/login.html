@@ -1,0 +1,10 @@
+{% extends "wagtailadmin/login.html" %}
+{% load static %}
+{% block branding_login %}Sign in to Alternative Naissance{% endblock %}
+{% block branding_logo %}
+    <img src="{% static 'images/logo/Alt_naissance_Couleur_Full.svg' %}" alt="Alternative Naissance" width="800" />
+{% endblock %}
+
+{% block branding_favicon %}
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+{% endblock %}
