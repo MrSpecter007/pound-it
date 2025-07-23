@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "home",
     "search",
     "core",
+    "servicerequests",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
