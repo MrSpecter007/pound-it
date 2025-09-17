@@ -1,0 +1,114 @@
+{% load static wagtailcore_tags wagtailsettings_tags %}
+
+<header class="main-header-six">
+    <div class="main-header-six__top">
+        <div class="main-header-six__top-inner">
+            <div class="main-header-six__top-shape-1"
+                style="">
+            </div>
+            <div class="main-header-six__top-address">
+                <ul class="list-unstyled main-header-six__top-address-list">
+                    <li>
+                        <i class="icon">
+                            <span class="icon-telephone-call"></span>
+                        </i>
+                        <div class="text">
+                            <p><a href="tel:015142741727">514-274-1727</a></p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="icon">
+                            <span class="fas fa-envelope"></span>
+                        </i>
+                        <span class="text">
+                            <p><a href="mailto:info@alternative-naissance.ca">info@alternative-naissance.ca</a></p>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="text main-header-six__top-social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </span>
+                    </li>
+                    <li>
+                        {% get_settings %}
+                        {% if settings.home.SiteSettings.contact_page %}
+                            <a href="{{ settings.home.SiteSettings.contact_page.url }}" 
+                               class="thm-btn-three main-menu-six__get-quote-btn">
+                                <span>Demande de service</span>
+                                <span class="fas fa-paper-plane"></span>
+                            </a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <nav class="main-menu main-menu-six">
+        <div class="main-menu-six__wrapper">
+            <div class="main-menu-six__wrapper-inner">
+                <div class="main-menu-six__logo-box">
+                    <div class="main-menu-six__logo">
+                        <a href="/"><img
+                                src="{% static 'images/update-17-06-2023/resources/Alt-Naissance-Couleur-small.png' %}"
+                                alt="Logo"></a>
+                    </div>
+                </div>
+                <div class="main-menu-six__left">
+                    <div class="main-menu-six__main-menu-box">
+                        <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
+                        <ul class="main-menu__list">
+                            <li class="dropdown">
+                                <a href="#">À propos</a>
+                                <ul>
+                                    <li><a href="/mission">Mission, valeurs et engagement</a></li>
+                                    <li><a href="/cadre-pratique">Cadre de pratique de l’accompagnant.e</a></li>
+                                    <li><a href="/conseil-administration">Conseil d’administration</a></li>
+                                    <li><a href="#">Partenaires financiers</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#">Services d’accompagnement individuel</a>
+                                <ul>
+                                    <li><a href="/naissance">Naissance</a></li>
+                                    <li><a href="#">Relevailles</a></li>
+                                    <li><a href="#">Virtuel</a></li>
+                                    <li><a href="#">Deuil</a></li>
+                                    <li><a href="#">IG</a></li>
+                                    <li><a href="#">Intervention périnatale</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#">Volet familles</a>
+                                <ul>
+                                    <li><a href="#">Ateliers thématiques périnataux</a></li>
+                                    <li><a href="#">Ateliers deuil périnatal</a></li>
+                                    <li><a href="#">Groupes de soutien</a></li>
+                                    <li><a href="#">Prêt de matériel</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#">Volet professionnel.le.s</a>
+                                <ul>
+                                    <li><a href="#">Formations de base</a></li>
+                                    <li><a href="#">Faire un stage</a></li>
+                                    <li><a href="#">Formation continue</a></li>
+                                    <li><a href="#">Activités de ressourcement</a></li>
+                                    <li><a href="#">Ressources pour les travailleur.euse.s actif.ve.s</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Faire un don</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="stricky-header stricked-menu main-menu main-menu-six">
+    <div class="sticky-header__content"></div>
+</div>
