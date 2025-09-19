@@ -4,8 +4,8 @@ from django.db import models
 class ServiceRequest(models.Model):
     SERVICE_CHOICES = [
         # TODO change this
-        ("service1", "Service 1"),
-        ("service2", "Service 2"),
+        ("accompagnement_a_la_naissance", "Accompagnement à la naissance"),
+        ("soutien_postnatal_a_domicile", "Relevailles - soutien postnatal à domicile"),
     ]
     STATUS_CHOICES = [
         ("pending", "Pending"),
@@ -34,8 +34,8 @@ class Profile(models.Model):
 
     SERVICE_CHOICES = [
         # TODO change this
-        ("service1", "Service 1"),
-        ("service2", "Service 2"),
+        ("accompagnement_a_la_naissance", "Accompagnement à la naissance"),
+        ("soutien_postnatal_a_domicile", "Relevailles - soutien postnatal à domicile"),
     ]
 
     STATUS_CHOICES = [

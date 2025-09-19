@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import ServiceRequestForm, ShareForm
-from django.views.generic import TemplateView
+from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
 from .models import Profile, ServiceRequest
 
 
@@ -25,7 +24,7 @@ def create_service_request_success(request):
 
 def accept_service_request(request, pk):
     """Handles accepting a service request. Provides a page for admin to confirm or cancel the action.
-    If confirmed, a profile enity is created based on the service request content and the service request is deleted."""
+    If confirmed, a profile entity is created based on the service request content and the service request is deleted."""
 
     service_request = get_object_or_404(ServiceRequest, pk=pk)
     if request.method == 'POST':
@@ -42,6 +41,22 @@ def accept_service_request(request, pk):
     return render(request,
                   'servicerequests/admin/accept_servicerequest.html',
                   {'service_request': service_request})
+
+
+def reject_service_request(request, pk):
+    """Handles rejecting a service request. Provides a page for admin to confirm with a Reason for Rejection, or cancel the action.
+    If confirmed, the service request is deleted."""
+
+    service_request = get_object_or_404(ServiceRequest, pk=pk)
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        service_request.delete()
+        return redirect('/admin/snippets/servicerequests/servicerequest/')
+
+    form = RejectRequestForm()
+    return render(request,
+                  'servicerequests/admin/reject_servicerequest.html',
+                  {'service_request': service_request, 'form': form})
 
 
 def share_profile(request, pk):

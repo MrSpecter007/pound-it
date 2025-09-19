@@ -15,6 +15,8 @@ class ServiceRequestForm(forms.ModelForm):
             'service_type': 'Type de service',
         }
 
+class RejectRequestForm(forms.Form):
+    reason = forms.CharField(label='Raison du refus', max_length=255)
 
 class ShareForm(forms.Form):
     email = forms.EmailField(label='Email of the agent to share with')

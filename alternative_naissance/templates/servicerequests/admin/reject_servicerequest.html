@@ -1,0 +1,27 @@
+{% extends "wagtailadmin/base.html" %}
+{% load static %}
+
+{% load wagtailadmin_tags %}
+{% icon name="check" classname="" title="reject-request" %}
+
+{% block titletag %}Refuser le profil{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {% include "wagtailadmin/shared/header.html" with title="Refuser la demande" icon="check" %}
+
+    <div>
+        <form action="{% url 'reject_service_request' service_request.pk %}" method="post" class="nice-padding">
+            {% csrf_token %}
+            <h1>Refuser la demande de service?</h1>
+            {{ form }}
+            <input type="submit" value="Confirmer" class="button">
+            <a class="button serious" href="/admin/snippets/servicerequests/servicerequest/edit/{{ service_request.pk }}">Annuler</a>
+        </form>
+    </div>
+{% endblock %}
+
+

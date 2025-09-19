@@ -7,7 +7,7 @@ from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 from .models import ServiceRequest, Profile
 from wagtail.snippets import widgets
 
-from .views import share_profile, accept_service_request
+from .views import share_profile, accept_service_request, reject_service_request
 
 
 class ServiceRequestViewSet(SnippetViewSet):
@@ -156,4 +156,5 @@ def register_share_profile_urls():
     return [
         path('share/profile/<int:pk>', share_profile, name='share_profile'),
         path('servicerequests/accept/<int:pk>', accept_service_request, name='accept_service_request'),
+        path('servicerequests/reject/<int:pk>', reject_service_request, name='reject_service_request'),
     ]
