@@ -5,8 +5,16 @@ from .models import ServiceRequest
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
         model = ServiceRequest
-        fields = ['name', 'email', 'service_type']
+
+        fields = ['first_name', 'last_name','email', 'service_type']
+
+        labels = {
+            'first_name': 'Prenom',
+            'last_name': 'Nom',
+            'email': 'L\'address Courriel',
+            'service_type': 'Type de service',
+        }
 
 
 class ShareForm(forms.Form):
-    email = forms.EmailField(label='Email of the agen to share with')
+    email = forms.EmailField(label='Email of the agent to share with')

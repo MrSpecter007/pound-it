@@ -2,20 +2,46 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ServiceRequestForm, ShareForm
 from django.views.generic import TemplateView
-from .models import Profile
+from .models import Profile, ServiceRequest
 
 
 # TODO create the user facing page for service request and complete the POST process
-# def create_service_request(request):
-#     if request.method == "POST":
-#         form = ServiceRequestForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('success_page')
-#     else:
-#         form = ServiceRequestForm()
-#     return render(request, 'servicerequests/service_request_form.html', {'form': form})
+def create_service_request(request):
+    if request.method == "POST":
+        form = ServiceRequestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_service_request_success')
+    else:
+        form = ServiceRequestForm()
+    return render(request, 'servicerequests/service_request_form.html', {'form': form})
 
+
+def create_service_request_success(request):
+    return render(request, 'servicerequests/service_request_form_submitted.html')
+
+
+## Endpoints for Admin pages
+
+def accept_service_request(request, pk):
+    """Handles accepting a service request. Provides a page for admin to confirm or cancel the action.
+    If confirmed, a profile enity is created based on the service request content and the service request is deleted."""
+
+    service_request = get_object_or_404(ServiceRequest, pk=pk)
+    if request.method == 'POST':
+        profile = Profile(
+            first_name=service_request.first_name,
+            last_name=service_request.last_name,
+            email=service_request.email,
+            service_type=service_request.service_type,
+        )
+        profile.save()
+        service_request.delete()
+        return redirect('/admin/snippets/servicerequests/servicerequest/')
+
+    return render(request,
+                  'servicerequests/admin/accept_servicerequest.html',
+                  {'service_request': service_request})
 
 
 def share_profile(request, pk):
@@ -31,8 +57,8 @@ def share_profile(request, pk):
         if form.is_valid():
             # TODO implement PDF conversion and email sending logic
             return redirect('success_page')
-    else:
-        form = ShareForm()
+
+    form = ShareForm()
 
     return render(
         request,

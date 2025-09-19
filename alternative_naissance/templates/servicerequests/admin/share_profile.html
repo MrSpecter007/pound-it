@@ -14,14 +14,11 @@
     {% include "wagtailadmin/shared/header.html" with title="Share Profile" icon="shareprofile" %}
 
     <div>
-        <form>
-            <label>
-                <span>Email</span>
-                <input type="text" name="email" placeholder="Email">
-            </label>
+        <form class="nice-padding">
+            {{ form }}
             <input type="submit" value="Send" class="button">
+            <a href="/admin/snippets/servicerequests/profile/edit/{{ profile.pk }}" class="button serious">Cancel</a>
         </form>
-    <button class="button serious">Cancel</button>
     </div>
 {% endblock %}
 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block extra_css %}
+
+    <link rel="stylesheet" href="{% static 'css/service_requests.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+
+    <h1>Service Request Form</h1>
+    <form action="{% url 'create_service_request' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Soumettre">
+    </form>
+
+{% endblock content %}

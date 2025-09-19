@@ -1,32 +1,57 @@
 from django.urls import path
 from wagtail import hooks
+from wagtail.admin.panels import FieldPanel
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 from .models import ServiceRequest, Profile
 from wagtail.snippets import widgets
 
-from .views import share_profile
+from .views import share_profile, accept_service_request
 
 
 class ServiceRequestViewSet(SnippetViewSet):
     """The view set for processing service requests."""
     model = ServiceRequest
+
+    panels = [
+        FieldPanel("first_name"),
+        FieldPanel("last_name"),
+        FieldPanel("email"),
+        FieldPanel("service_type"),
+    ]
+
     menu_label = "Requests"
     icon = "form"
-    list_display = ("name", "email", "service_type", "status", "created_at")
+    list_display = ("email", "first_name", "last_name", "service_type")
     list_filter = ("status", "service_type")
-    search_fields = ("name", "email")
+    search_fields = ("first_name", "last_name", "email")
 
 
 class ProfileViewSet(SnippetViewSet):
     """The view set for the main profiles created from accepting the service request."""
     model = Profile
+
+    panels = [
+        FieldPanel("first_name"),
+        FieldPanel("last_name"),
+        FieldPanel("email"),
+        FieldPanel("service_type"),
+        FieldPanel("address"),
+        FieldPanel("age"),
+        FieldPanel("immigration_status"),
+
+        FieldPanel("status"),
+    ]
+
     menu_label = "Profiles"
     icon = "user"
-    list_display = ("__str__", "status")
-    list_filter = ("status",)
-    search_fields = ("service_request__name", "service_request__email")
+    list_display = ("email", "first_name", "last_name", "service_type", "status")
+    list_filter = ("status", "service_type", "status")
+    search_fields = ("first_name", "last_name", "email")
+
+
+##############################################
 
 
 # Both service requests and profiles under the same parent directory
@@ -38,25 +63,85 @@ class ServiceRequestGroup(SnippetViewSetGroup):
     items = (ServiceRequestViewSet, ProfileViewSet)
 
 
+####################################################
+
 @hooks.register("register_icons")
 def register_icons(icons):
     """Used for adding the share icon for specifically sharing the profile to an agent."""
     return icons + ['servicerequests/shareprofile.svg']
 
 
-@hooks.register('register_admin_urls')
-def register_share_profile_urls():
-    return [
-        path('share/profile/<int:pk>', share_profile, name='share_profile'),
-    ]
+#################### Create and register main custom buttons
+
+class ShareProfileMenuItem(ActionMenuItem):
+    """A custom action menu item for sharing a Profile with an agent."""
+    name = 'action-shareprofile'
+    label = "Partager le profil avec un agent."
+    icon_name = 'shareprofile'
+
+    def get_url(self, context):
+        return f'/admin/share/profile/{context["instance"].pk}'
+
+    def is_shown(self, context):
+        print(context)
+        if context['model'] == Profile and context['view'] == 'edit':
+            return True
+        return False
 
 
-# Both hooks below add the same sharing functionality, for redundancy.
+class AcceptRequestMenuItem(ActionMenuItem):
+    """Extra action menu item in Service Request to accept a request."""
+    name = 'action-acceptrequest'
+    label = "Accepter la demande de service"
+    icon_name = 'check'
+
+    def get_url(self, context):
+        return f'/admin/servicerequests/accept/{context["instance"].pk}'
+
+    def is_shown(self, context):
+        if context['model'] == ServiceRequest and context['view'] == 'edit':
+            return True
+        return False
+
+
+class RejectRequestMenuItem(ActionMenuItem):
+    """Extra action menu item in Service Request to reject a request."""
+    name = 'action-rejectrequest'
+    label = "Refuser la demande de service"
+    icon_name = 'cross'
+
+    def get_url(self, context):
+        return f'/admin/servicerequests/reject/{context["instance"].pk}'
+
+    def is_shown(self, context):
+        if context['model'] == ServiceRequest and context['view'] == 'edit':
+            return True
+        return False
+
+
+@hooks.register('register_snippet_action_menu_item')
+def register_share_profile_menu_item(model):
+    return ShareProfileMenuItem(order=10)
+
+
+@hooks.register('register_snippet_action_menu_item')
+def register_accept_request_menu_item(model):
+    return AcceptRequestMenuItem(order=20)
+
+
+@hooks.register('register_snippet_action_menu_item')
+def register_reject_request_menu_item(model):
+    return RejectRequestMenuItem(order=30)
+
+
+
+########## Create share profile button also in the listing menus.
 @hooks.register('register_snippet_listing_buttons')
 def snippet_listing_buttons(snippet, user, next_url=None):
+    """ For Profiles, add a button to share the profile to an agent."""
     if type(snippet) != Profile:
         return
-    snippet: Profile = snippet # to get type hint
+    snippet: Profile = snippet  # to get type hint
     yield widgets.SnippetListingButton(
         'Share to An Agent',
         icon_name='shareprofile',
@@ -65,22 +150,10 @@ def snippet_listing_buttons(snippet, user, next_url=None):
     )
 
 
-class ShareProfileMenuItem(ActionMenuItem):
-    """A custom action menu item for sharing a Profile with an agent."""
-    name = 'action-shareprofile'
-    label = "Share Profile to An Agent"
-    icon_name = 'shareprofile'
 
-    def get_url(self, context):
-        return "/a url to an admin page"
-
-    def is_shown(self, context):
-        print(context)
-        if context['model'] == Profile and context['view'] == 'edit':
-            return True
-        return False
-
-# Displayed inside the snippet editing page
-@hooks.register('register_snippet_action_menu_item')
-def register_share_profile_menu_item(model):
-    return ShareProfileMenuItem(order=10)
+@hooks.register('register_admin_urls')
+def register_share_profile_urls():
+    return [
+        path('share/profile/<int:pk>', share_profile, name='share_profile'),
+        path('servicerequests/accept/<int:pk>', accept_service_request, name='accept_service_request'),
+    ]
