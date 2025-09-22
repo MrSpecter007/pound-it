@@ -1,60 +1,215 @@
 from django.db import models
-
-from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
-from django.utils.translation import gettext as _
+from wagtail.models import Page, Orderable
+from wagtail.fields import RichTextField
+from wagtail.admin.panels import FieldPanel, InlinePanel
 from modelcluster.fields import ParentalKey
-from modelcluster.models import ClusterableModel
-from wagtail.admin.panels import (
-    FieldPanel,
-    FieldRowPanel,
-    InlinePanel,
-    MultiFieldPanel,
-    PublishingPanel,
-)
-from wagtail.blocks import StreamBlock
-from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
-from wagtail.contrib.forms.panels import FormSubmissionsPanel
-from wagtail.contrib.settings.models import (
-    BaseGenericSetting,
-    BaseSiteSetting,
-    register_setting,
-)
+from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
+
 from wagtail.fields import RichTextField, StreamField
-from wagtail.models import (
-    Collection,
-    DraftStateMixin,
-    LockableMixin,
-    Page,
-    PreviewableMixin,
-    RevisionMixin,
-    Task,
-    TaskState,
-    TranslatableMixin,
-    WorkflowMixin,
-)
-from wagtail.search import index
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
+from wagtail.snippets.models import register_snippet
+from wagtail.images.models import Image
 
-# Create your models here.
+
+
+# --------------------------
+# Page d'accueil principale
+# --------------------------
+class CoreHomePage(Page):
+    """
+    Page d'accueil principale
+    """
+    intro = RichTextField(blank=True)
+
+    # Options d'affichage
+    show_stricky_header = models.BooleanField(default=True, verbose_name="Afficher le header sticky")
+    show_counter = models.BooleanField(default=False, verbose_name="Afficher le compteur")
+    show_tracking = models.BooleanField(default=False, verbose_name="Afficher le tracking")
+    show_footer = models.BooleanField(default=True, verbose_name="Afficher le footer")
+    show_page_header = models.BooleanField(default=False, verbose_name="Afficher le header de page")
+
+    content_panels = Page.content_panels + [
+        FieldPanel("intro"),
+        FieldPanel("show_stricky_header"),
+        FieldPanel("show_counter"),
+        FieldPanel("show_tracking"),
+        FieldPanel("show_footer"),
+        FieldPanel("show_page_header"),
+        InlinePanel("slides", label="Slides"),
+        InlinePanel("features", label="Bloc valeurs (Accompagnement, Autonomie, Confiance)"),
+        InlinePanel("about_sections", label="About sections"),
+    ]
+
+# --------------------------
+# Slide pour la page d'accueil
+# --------------------------
+class CoreHomePageSlide(Orderable):
+    """
+    Slides pour CoreHomePage
+    """
+    page = ParentalKey(CoreHomePage, on_delete=models.CASCADE, related_name="slides")
+
+    background_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+    shape_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+    title = models.CharField(max_length=250, blank=True)
+    subtitle = models.CharField(max_length=250, blank=True)
+    text = RichTextField(blank=True)
+    button_text = models.CharField(max_length=100, blank=True)
+    button_link = models.URLField(blank=True)
+
+    panels = [
+        FieldPanel("background_image"),
+        FieldPanel("shape_image"),
+        FieldPanel("title"),
+        FieldPanel("subtitle"),
+        FieldPanel("text"),
+        FieldPanel("button_text"),
+        FieldPanel("button_link"),
+    ]
+
+# --------------------------
+# Feature Section
+# --------------------------
+class FeatureSection(Orderable):
+    page = ParentalKey(
+        "core.CoreHomePage",  # lié à ta homepage
+        related_name="features",
+        on_delete=models.CASCADE
+    )
+
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("description"),
+    ]
+
+# --------------------------
+# About one section
+# --------------------------
+class AboutSection(Orderable):
+    page = ParentalKey(
+        "core.CoreHomePage",
+        related_name="about_sections",
+        on_delete=models.CASCADE,
+    )
+
+    image_one = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+    image_two = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+
+    subtitle = models.CharField(max_length=255, blank=True)
+    title = models.CharField(max_length=255, blank=True)
+    text_intro = RichTextField(blank=True)
+
+    # points (sous forme de texte multi-ligne ou StreamField si tu veux plus flexible)
+    point1 = models.CharField(max_length=255, blank=True)
+    point2 = models.CharField(max_length=255, blank=True)
+    point3 = models.CharField(max_length=255, blank=True)
+
+    text_outro = RichTextField(blank=True)
+
+    phone_number = models.CharField(max_length=20, blank=True)
+    phone_label = models.CharField(max_length=255, blank=True)
+
+    panels = [
+        FieldPanel("image_one"),
+        FieldPanel("image_two"),
+        FieldPanel("subtitle"),
+        FieldPanel("title"),
+        FieldPanel("text_intro"),
+        FieldPanel("point1"),
+        FieldPanel("point2"),
+        FieldPanel("point3"),
+        FieldPanel("text_outro"),
+        FieldPanel("phone_number"),
+        FieldPanel("phone_label"),
+    ]
+
+
+# --------------------------
+# Page de contact
+# --------------------------
+class ContactPage(Page):
+    intro = RichTextField(blank=True)
+    body = RichTextField(blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel("intro"),
+        FieldPanel("body"),
+    ]
+
+# --------------------------
+# Page générique
+# --------------------------
 class GenericPage(Page):
-    """
-    A generic content page. Could be used "About us", and
-    some other simple content page.
-    """
-
-    introduction = models.TextField(help_text="Text to describe the page", blank=True)
+    introduction = models.TextField(help_text="Texte d’introduction", blank=True)
+    body = RichTextField(blank=True)
     image = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="Landscape mode only; horizontal width between 1000px and 3000px.",
+        help_text="Image en mode paysage (1000px–3000px de large).",
     )
-    body = RichTextField(blank=True)
+
     content_panels = Page.content_panels + [
         FieldPanel("introduction"),
         FieldPanel("body"),
         FieldPanel("image"),
     ]
+
+# --------------------------
+# Paramètres du site
+# --------------------------
+@register_setting
+class SiteSettings(BaseSiteSetting):
+    site_name = models.CharField(max_length=255, default="Mon site")
+
+    # Coordonnées
+    phone_number = models.CharField(max_length=50, blank=True, help_text="Numéro de téléphone principal (ex: 514-274-1727)")
+    email = models.EmailField(blank=True, help_text="Adresse email principale")
+
+    # Réseaux sociaux
+    facebook_url = models.URLField(blank=True, null=True)
+    twitter_url = models.URLField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
+    pinterest_url = models.URLField(blank=True, null=True)
+
+    # Lien vers la page de contact
+    contact_page = models.ForeignKey(
+        Page,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Page de contact à utiliser pour le bouton dans le header"
+    )
+
+    footer_text = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Paramètres du site"

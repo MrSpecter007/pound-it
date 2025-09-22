@@ -14,7 +14,8 @@
             {% include "partials/strickyHeader.html" %}
         {% endif %}
 
-        {% if page.title %}
+        {# on utilise le flag #}
+        {% if page.show_page_header %}
             {% include "partials/pageHeader.html" %}
         {% endif %}
 
@@ -40,6 +41,21 @@
 
     {% block script %}
         <script src="{% static 'js/insur.js' %}"></script>
-    {% endblock %}
+
+    {{ block.super }}
+    <script src="{% static 'vendors/swiper/swiper-bundle.min.js' %}"></script>
+    <script>
+        const swiper = new Swiper('.thm-swiper__slider', {
+            slidesPerView: 1,
+            loop: true,
+            effect: 'fade',
+            autoplay: { delay: 5000 },
+            pagination: { el: '#main-slider-pagination', clickable: true },
+            navigation: { nextEl: '#main-slider__swiper-button-next', prevEl: '#main-slider__swiper-button-prev' },
+        });
+    </script>
+{% endblock %}
+
+
 </body>
 </html>
