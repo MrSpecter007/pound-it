@@ -1,7 +1,7 @@
 from django.db import models
 from wagtail.models import Page, Orderable
 from wagtail.fields import RichTextField
-from wagtail.admin.panels import FieldPanel, InlinePanel
+from wagtail.admin.panels import FieldPanel, InlinePanel, PageChooserPanel
 from modelcluster.fields import ParentalKey
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 
@@ -9,6 +9,7 @@ from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.snippets.models import register_snippet
 from wagtail.images.models import Image
+from modelcluster.models import ClusterableModel
 
 
 
@@ -38,7 +39,12 @@ class CoreHomePage(Page):
         InlinePanel("slides", label="Slides"),
         InlinePanel("features", label="Bloc valeurs (Accompagnement, Autonomie, Confiance)"),
         InlinePanel("about_sections", label="About sections"),
+        InlinePanel("services", label="Services"),
+        InlinePanel("testimonials", label="Testimonials"),
     ]
+
+
+
 
 # --------------------------
 # Slide pour la page d'accueil
@@ -98,6 +104,47 @@ class FeatureSection(Orderable):
     ]
 
 # --------------------------
+# Testimonial Section
+# --------------------------
+class TestimonialSection(Orderable, ClusterableModel):
+    page = ParentalKey(
+        "core.CoreHomePage",
+        related_name="testimonials",
+        on_delete=models.CASCADE
+    )
+    top_text = models.TextField(blank=True)
+
+    panels = [
+        FieldPanel("top_text"),
+        InlinePanel("items", label="Témoignages"),
+    ]
+
+
+class Testimonial(Orderable):
+    section = ParentalKey(
+        "core.TestimonialSection",
+        related_name="items",
+        on_delete=models.CASCADE,
+        null=True, blank=True  # ⚠️ important pour migrations propres
+    )
+    client_name = models.CharField(max_length=150)
+    client_sub_title = models.CharField(max_length=150, blank=True)
+    client_text = models.TextField(blank=True)
+    client_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+
+    panels = [
+        FieldPanel("client_name"),
+        FieldPanel("client_sub_title"),
+        FieldPanel("client_text"),
+        FieldPanel("client_image"),
+    ]
+
+# --------------------------
 # About one section
 # --------------------------
 class AboutSection(Orderable):
@@ -146,6 +193,42 @@ class AboutSection(Orderable):
         FieldPanel("text_outro"),
         FieldPanel("phone_number"),
         FieldPanel("phone_label"),
+    ]
+
+
+# --------------------------
+# Service one section
+# --------------------------
+class ServiceSection(Orderable):
+    page = ParentalKey(
+        "core.CoreHomePage",
+        related_name="services",
+        on_delete=models.CASCADE
+    )
+
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+    title = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
+
+    # Nouveau champ pour lier vers une page interne
+    link_page = models.ForeignKey(
+        Page,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Choisir une page interne vers laquelle rediriger"
+    )
+
+    panels = [
+        FieldPanel("image"),
+        FieldPanel("title"),
+        FieldPanel("description"),
+        PageChooserPanel("link_page"),  # utilisé à la place de link_url
     ]
 
 
