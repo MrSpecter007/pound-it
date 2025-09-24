@@ -9,8 +9,10 @@ from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.snippets.models import register_snippet
 from wagtail.images.models import Image
+from django.utils import timezone
 from modelcluster.models import ClusterableModel
-
+def today():
+    return timezone.localdate()
 
 
 # --------------------------
@@ -41,6 +43,7 @@ class CoreHomePage(Page):
         InlinePanel("about_sections", label="About sections"),
         InlinePanel("services", label="Services"),
         InlinePanel("testimonials", label="Testimonials"),
+        InlinePanel("news_items", label="News Section"),
     ]
 
 
@@ -195,6 +198,35 @@ class AboutSection(Orderable):
         FieldPanel("phone_label"),
     ]
 
+# --------------------------
+# News section
+# --------------------------
+class NewsItem(Orderable):
+    page = ParentalKey(
+        CoreHomePage,
+        on_delete=models.CASCADE,
+        related_name="news_items",
+    )
+    tag = models.CharField(max_length=100, blank=True)
+    url = models.URLField("Lien vers l’article", blank=True)
+    title = models.CharField(max_length=250)
+    text = models.TextField(blank=True)
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+
+    panels = [
+        FieldPanel("tag"),
+        FieldPanel("url"),
+        FieldPanel("title"),
+        FieldPanel("text"),
+        FieldPanel("image"),
+    ]
+
 
 # --------------------------
 # Service one section
@@ -292,7 +324,32 @@ class SiteSettings(BaseSiteSetting):
         help_text="Page de contact à utiliser pour le bouton dans le header"
     )
 
-    footer_text = models.TextField(blank=True, null=True)
+     # Texte du footer (modifiable dans l'admin)
+    footer_text = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Texte affiché dans le footer (class footer-widget__about-text)"
+    )
+
+    # Heures d'ouverture (modifiables)
+    opening_hours = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Texte affiché pour les heures d'ouverture (HTML ou texte avec <br>)"
+    )
+
+    panels = [
+        FieldPanel("site_name"),
+        FieldPanel("phone_number"),
+        FieldPanel("email"),
+        FieldPanel("facebook_url"),
+        FieldPanel("twitter_url"),
+        FieldPanel("instagram_url"),
+        FieldPanel("pinterest_url"),
+        FieldPanel("contact_page"),
+        FieldPanel("footer_text"),
+        FieldPanel("opening_hours"), 
+    ]
 
     class Meta:
         verbose_name = "Paramètres du site"

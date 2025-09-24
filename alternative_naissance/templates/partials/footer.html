@@ -1,5 +1,8 @@
+{% load static wagtailcore_tags wagtailsettings_tags %}
+{% get_settings %}
+
 <footer class="site-footer">
-    <div class="site-footer-bg" style="background-image: url('/static/images/backgrounds/site-footer-bg.png')">
+    <div class="site-footer-bg">
     </div>
     <div class="container">
         <div class="site-footer__top">
@@ -10,14 +13,13 @@
                             <a href="index"><img src="/static/images/update-17-06-2023\resources\Alt-Naissance-Couleur-small.png" alt=""></a>
                         </div>
                         <div class="footer-widget__about-text-box">
-                            <p class="footer-widget__about-text">Aliqua id fugiat nostrud irure ex duis ea quis
-                                id quis ad et. Sunt qui esse pariatur duis deserunt.</p>
+                            <p class="footer-widget__about-text">{{ settings.core.SiteSettings.footer_text }}</p>
                         </div>
                         <div class="site-footer__social">
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-facebook"></i></a>
-                            <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="{{ settings.core.SiteSettings.twitter_url }}"><i class="fab fa-twitter"></i></a>
+                            <a href="{{ settings.core.SiteSettings.facebook_url }}"><i class="fab fa-facebook"></i></a>
+                            <a href="{{ settings.core.SiteSettings.pinterest_url }}"><i class="fab fa-pinterest-p"></i></a>
+                            <a href="{{ settings.core.SiteSettings.instagram_url }}"><i class="fab fa-instagram"></i></a>
                         </div>
                     </div>
                 </div>
@@ -25,27 +27,36 @@
                     <div class="footer-widget__column footer-widget__contact clearfix">
                         <h3 class="footer-widget__title">Contact</h3>
                         <ul class="footer-widget__contact-list list-unstyled clearfix">
+
+                            {% if settings.core.SiteSettings.email %}
                             <li>
-                                <div class="icon">
+                                 <div class="icon">
                                     <span class="icon-email"></span>
                                 </div>
                                 <div class="text">
-                                    <p><a href="mailto:info@alternative-naissance.ca">info@alternative-naissance.ca</a></p>
+                                    <p><a href="mailto:{{ settings.core.SiteSettings.email }}"> {{ settings.core.SiteSettings.email }}</a></p>
                                 </div>
+
                             </li>
+                            {% endif %}
+
+                 
+                            {% if settings.core.SiteSettings.phone_number %}
                             <li>
                                 <div class="icon">
                                     <span class="icon-telephone-call"></span>
                                 </div>
                                 <div class="text">
-                                    <p><a href="tel:015142741727">(514) 274-1727</a></p>
+                                    <p><a href="tel:{{ settings.core.SiteSettings.phone_number }}">{{ settings.core.SiteSettings.phone_number }}</a></p>
                                 </div>
                             </li>
+                             {% endif %}
+
+                             
                         </ul>
                         <div class="footer-widget__open-hour">
                             <h3 class="footer-widget__open-hour-title">Heures d'ouverture</h3>
-                            <h3 class="footer-widget__open-hour-text">Lun – Ven: 08:00 à 17:00 <br> Sam et Dim:
-                                Fermé</h3>
+                            <h3 class="footer-widget__open-hour-text">{{ settings.core.SiteSettings.opening_hours|linebreaks }}</h3>
                         </div>
                     </div>
                 </div>
