@@ -7,8 +7,11 @@ from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
+from wagtail import blocks
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import register_snippet
-from wagtail.images.models import Image
+from wagtail.snippets.blocks import SnippetChooserBlock
+
 from django.utils import timezone
 from modelcluster.models import ClusterableModel
 def today():
@@ -109,6 +112,7 @@ class FeatureSection(Orderable):
 # --------------------------
 # Testimonial Section
 # --------------------------
+@register_snippet
 class TestimonialSection(Orderable, ClusterableModel):
     page = ParentalKey(
         "core.CoreHomePage",
@@ -121,6 +125,10 @@ class TestimonialSection(Orderable, ClusterableModel):
         FieldPanel("top_text"),
         InlinePanel("items", label="Témoignages"),
     ]
+
+    def __str__(self):
+        return f"Section Témoignages ({self.top_text[:30]})"
+    
 
 
 class Testimonial(Orderable):
@@ -275,27 +283,138 @@ class ContactPage(Page):
         FieldPanel("intro"),
         FieldPanel("body"),
     ]
+    
+# --------------------------
+# WHY CHOOSE BLOCK
+# --------------------------
+class WhyChooseBlock(blocks.StructBlock):
+    title = blocks.CharBlock(required=True)
+    subtitle = blocks.CharBlock(required=False)
+    text = blocks.TextBlock(required=False)
+    image = ImageChooserBlock(required=False)
+    layout = blocks.ChoiceBlock(
+        choices=[
+            ('text_left', "Texte à gauche, Image à droite"),
+            ('text_right', "Texte à droite, Image à gauche"),
+        ],
+        default='text_left',
+        required=True
+    )
+
+    class Meta:
+        template = "blocks/why_choose.html"
+        icon = "placeholder"
+        label = "Bloc Pourquoi nous choisir"
+
+# --------------------------
+# TESTIMONIALS CHOOSER BLOCK
+# --------------------------
+class TestimonialChooserBlock(blocks.StructBlock):
+    section = SnippetChooserBlock(TestimonialSection)
+
+    class Meta:
+        icon = "form"
+        label = "Section Témoignages"
+        template = "blocks/testimonial_section.html"
+
+
+# --------------------------
+# BENEFIT POINT BLOCK
+# --------------------------
+class BenefitPointBlock(blocks.StructBlock):
+    text = blocks.CharBlock(required=True, label="Texte du point")
+
+    class Meta:
+        icon = "fa-check"
+        label = "Point"
+
+
+class BenefitsBlock(blocks.StructBlock):
+    image = ImageChooserBlock(required=True, label="Image (benefits-two__img)")
+    title = blocks.CharBlock(required=True, label="Titre (section-title__title)")
+    points = blocks.ListBlock(BenefitPointBlock(), label="Liste des points")
+
+    class Meta:
+        template = "blocks/benefits_block.html"
+        icon = "list-ul"
+        label = "Bloc : Benefits (image + titre + liste)"
+
+# --------------------------
+# PARAGRAPH BLOCK
+# --------------------------
+class ParagraphsBlock(blocks.StructBlock):
+    paragraphs = blocks.ListBlock(
+        blocks.RichTextBlock(
+            features=["bold", "italic", "link"],
+            label="Paragraphe"
+        ),
+        label="Paragraphes",
+        help_text="Ajoutez un ou plusieurs paragraphes. Chaque paragraphe sera affiché dans une nouvelle ligne."
+    )
+
+    class Meta:
+        template = "blocks/paragraphs_block.html"
+        icon = "doc-full"
+        label = "Bloc : Paragraphes multiples"
+
 
 # --------------------------
 # Page générique
 # --------------------------
 class GenericPage(Page):
-    introduction = models.TextField(help_text="Texte d’introduction", blank=True)
-    body = RichTextField(blank=True)
-    image = models.ForeignKey(
+    # Page header modifiable
+    header_title = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Titre affiché dans le page-header"
+    )
+    header_subtitle = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Sous-titre affiché dans le page-header"
+    )
+    header_background = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="Image en mode paysage (1000px–3000px de large).",
+        help_text="Image de fond du page-header"
+    )
+
+    # Contenu principal
+
+    introduction = models.TextField(help_text="Texte d’introduction", blank=True)
+    
+    body = StreamField([
+        ("why_choose", WhyChooseBlock()),
+        ("rich_text", blocks.RichTextBlock()),
+        ("testimonials", TestimonialChooserBlock()),
+        ("benefits", BenefitsBlock()),
+        ("benefitpoint", BenefitPointBlock()),
+        ("paragraphs", ParagraphsBlock()),
+         
+    ], blank=True, use_json_field=True)
+
+
+    show_page_header = models.BooleanField(
+        default=True,
+        verbose_name="Afficher le header de page"
     )
 
     content_panels = Page.content_panels + [
+        FieldPanel("header_title"),
+        FieldPanel("header_subtitle"),
+        FieldPanel("header_background"),
+        FieldPanel("show_page_header"),
         FieldPanel("introduction"),
-        FieldPanel("body"),
-        FieldPanel("image"),
+        FieldPanel('body'),
     ]
+
+    class Meta:
+        verbose_name = "Page générique"
+
+    template = "core/generic_page.html"
 
 # --------------------------
 # Paramètres du site
