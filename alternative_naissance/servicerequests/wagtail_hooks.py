@@ -21,7 +21,7 @@ class ServiceRequestViewSet(SnippetViewSet):
         FieldPanel("service_type"),
     ]
 
-    menu_label = "Requests"
+    menu_label = "Demandes"
     icon = "form"
     list_display = ("email", "first_name", "last_name", "service_type")
     list_filter = ("status", "service_type")
