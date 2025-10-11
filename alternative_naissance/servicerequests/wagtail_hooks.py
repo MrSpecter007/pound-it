@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse
 from wagtail import hooks
 from wagtail.admin.panels import FieldPanel
 from wagtail.snippets.action_menu import ActionMenuItem
@@ -7,7 +7,7 @@ from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 from .models import ServiceRequest, Profile
 from wagtail.snippets import widgets
 
-from .views import share_profile, accept_service_request, reject_service_request
+from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
 
 
 class ServiceRequestViewSet(SnippetViewSet):
@@ -80,7 +80,7 @@ class ShareProfileMenuItem(ActionMenuItem):
     icon_name = 'shareprofile'
 
     def get_url(self, context):
-        return f'/admin/share/profile/{context["instance"].pk}'
+        return reverse("share_profile", args=(context["instance"].pk,))
 
     def is_shown(self, context):
         print(context)
@@ -96,7 +96,7 @@ class AcceptRequestMenuItem(ActionMenuItem):
     icon_name = 'check'
 
     def get_url(self, context):
-        return f'/admin/servicerequests/accept/{context["instance"].pk}'
+        return reverse("accept_service_request", args=(context["instance"].pk,))
 
     def is_shown(self, context):
         if context['model'] == ServiceRequest and context['view'] == 'edit':
@@ -111,7 +111,7 @@ class RejectRequestMenuItem(ActionMenuItem):
     icon_name = 'cross'
 
     def get_url(self, context):
-        return f'/admin/servicerequests/reject/{context["instance"].pk}'
+        return reverse("reject_service_request", args=(context["instance"].pk,))
 
     def is_shown(self, context):
         if context['model'] == ServiceRequest and context['view'] == 'edit':
@@ -145,7 +145,7 @@ def snippet_listing_buttons(snippet, user, next_url=None):
     yield widgets.SnippetListingButton(
         'Share to An Agent',
         icon_name='shareprofile',
-        url=f'/admin/share/profile/{snippet.pk}',
+        url=reverse("share_profile", args=(snippet.pk,)),
         priority=10
     )
 
@@ -154,7 +154,8 @@ def snippet_listing_buttons(snippet, user, next_url=None):
 @hooks.register('register_admin_urls')
 def register_share_profile_urls():
     return [
-        path('share/profile/<int:pk>', share_profile, name='share_profile'),
+        path('serviceprofiles/share/<int:pk>', share_profile, name='share_profile'),
+        path('serviceprofiles/preview/<int:pk>', preview_profile_pdf, name='preview_profile_pdf'),
         path('servicerequests/accept/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject/<int:pk>', reject_service_request, name='reject_service_request'),
     ]

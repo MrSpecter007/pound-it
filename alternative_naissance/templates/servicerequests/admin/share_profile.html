@@ -13,13 +13,16 @@
 {% block content %}
     {% include "wagtailadmin/shared/header.html" with title="Share Profile" icon="shareprofile" %}
 
-    <div>
-        <form class="nice-padding">
-            {{ form }}
+<div>
+    <form class="nice-padding" method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <div style="margin-top: 20px">
             <input type="submit" value="Send" class="button">
+            <a href="{% url 'preview_profile_pdf' profile.pk %}" class="button" target="_blank">Preview PDF</a>
             <a href="/admin/snippets/servicerequests/profile/edit/{{ profile.pk }}" class="button serious">Cancel</a>
-        </form>
-    </div>
+        </div>
+
 {% endblock %}
 
 

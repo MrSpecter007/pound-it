@@ -31,3 +31,4 @@ urllib3==2.4.0
 wagtail==7.0
 Willow==1.10.0
 psycopg2-binary==2.9.10
+reportlab==4.1.0
