@@ -44,7 +44,7 @@ class ProfileViewSet(SnippetViewSet):
         FieldPanel("status"),
     ]
 
-    menu_label = "Profiles"
+    menu_label = "Profils"
     icon = "user"
     list_display = ("email", "first_name", "last_name", "service_type", "status")
     list_filter = ("status", "service_type", "status")
@@ -57,7 +57,7 @@ class ProfileViewSet(SnippetViewSet):
 # Both service requests and profiles under the same parent directory
 @register_snippet
 class ServiceRequestGroup(SnippetViewSetGroup):
-    menu_label = "Service Requests"
+    menu_label = "Demandes de Service"
     menu_icon = "folder-open-inverse"
     add_to_admin_menu = True
     items = (ServiceRequestViewSet, ProfileViewSet)
