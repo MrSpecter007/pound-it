@@ -25,3 +25,7 @@ note: if you are using Nix package manager, install python by running `nix-shell
 - All the template files are under the alternative_naissance/templates directory, when creating new app, there will be template
 files generate in the app specific directory, move it to the main templates directory instead.
 - For workshops, forms, business related documents functionalities, each will be in their separate app (will be created later).
+
+
+**Note**
+Please run `python manage.py collectstatic` before running unit tests, otherwise some tests will fail

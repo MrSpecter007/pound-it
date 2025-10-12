@@ -2,9 +2,11 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
 from .models import Profile, ServiceRequest
+from .security import can_modify_servicerequests
 from .utils import generate_profile_pdf, send_profile_email_to_agent
 
 
@@ -26,6 +28,7 @@ def create_service_request_success(request: WSGIRequest) -> HttpResponse:
 
 ## Endpoints for Admin pages
 
+@user_passes_test(can_modify_servicerequests)
 def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirect | HttpResponse:
     """
     Handles accepting a service request. Provides a page for admin to confirm or cancel the action.
@@ -49,6 +52,7 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
                   {'service_request': service_request})
 
 
+@user_passes_test(can_modify_servicerequests)
 def reject_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirect | HttpResponse:
     """
     Handles rejecting a service request. Provides a page for admin to confirm with a Reason for Rejection, or cancel the action.
@@ -67,6 +71,8 @@ def reject_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
                   {'service_request': service_request, 'form': form})
 
 
+
+@user_passes_test(can_modify_servicerequests)
 def preview_profile_pdf(request: WSGIRequest, pk: int) -> FileResponse:
     """
     Generates and serves a PDF preview of the profile.
@@ -79,6 +85,7 @@ def preview_profile_pdf(request: WSGIRequest, pk: int) -> FileResponse:
     return FileResponse(pdf_buffer, as_attachment=False, filename=f"preview_profile_{profile.first_name}_{profile.last_name}.pdf")
 
 
+@user_passes_test(can_modify_servicerequests)
 def share_profile(request: WSGIRequest, pk: int) -> HttpResponse | HttpResponseRedirect:
     """
     Handles sharing a Profile through a standalone page.
