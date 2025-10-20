@@ -15,10 +15,8 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
      
-    # ✅ Ton app core en premier
     path("", include("core.urls")),
 
-    # ✅ Wagtail ensuite
     path("", include(wagtail_urls)),
 ]
 

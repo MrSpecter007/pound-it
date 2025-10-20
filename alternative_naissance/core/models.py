@@ -52,6 +52,12 @@ class CoreHomePage(Page):
         InlinePanel("news_items", label="News Section"),
     ]
 
+    def get_context(self, request):
+        context = super().get_context(request)
+        # récupère tous les témoignages
+        context['all_testimonials'] = Testimonial.objects.all()
+        return context
+
 
 
 
@@ -299,7 +305,7 @@ class ContactPage(Page):
 class WhyChooseBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=True)
     subtitle = blocks.CharBlock(required=False)
-    text = blocks.TextBlock(required=False)
+    text = blocks.RichTextBlock(required=False, features=['bold', 'italic', 'link', 'h2', 'h3', 'ul', 'ol'])
     image = ImageChooserBlock(required=False)
     layout = blocks.ChoiceBlock(
         choices=[
@@ -493,10 +499,11 @@ class CalendarBlock(blocks.StructBlock):
 # TABLE BLOCK
 # --------------------------
 class TableCellBlock(blocks.StructBlock):
-    content = blocks.CharBlock(required=False, label="Contenu de la cellule")
+    content = blocks.RichTextBlock(required=True, features=['bold', 'italic', 'link'], label="Contenu de la cellule")
+
 
     class Meta:
-        icon = "edit"
+        icon = "doc-full"
         label = "Cellule"
 
 

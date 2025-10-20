@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import InscriptionForm
+from .forms import ProfilForm
+
 
 def inscription_view(request):
     if request.method == "POST":
@@ -9,7 +13,7 @@ def inscription_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Votre inscription a été enregistrée avec succès.")
-            return redirect("/")
+            return redirect("dashboard")
     else:
         form = InscriptionForm()
 
@@ -19,22 +23,48 @@ def inscription_view(request):
 
 def mon_compte_view(request):
     if request.method == "POST":
-        username_or_email = request.POST.get("username_or_email")
-        password = request.POST.get("password")
+        username_or_email = request.POST.get("username_or_email", "").strip()
+        password = request.POST.get("password", "")
 
-        from django.contrib.auth.models import User
-        try:
-            user = User.objects.get(email=username_or_email)
-            username = user.username
-        except User.DoesNotExist:
-            username = username_or_email
+        username = username_or_email
+        # si on détecte un email, essayer de récupérer l'username associé
+        if "@" in username_or_email:
+            try:
+                user_obj = User.objects.get(email__iexact=username_or_email)
+                username = user_obj.username
+            except User.DoesNotExist:
+                username = username_or_email  # conserver, laisser authenticate échouer ensuite
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, "Connexion réussie. Bienvenue dans votre espace membre !")
-            # Reste sur la page et affiche le message
+            return redirect("dashboard")
         else:
             messages.error(request, "Identifiants incorrects. Veuillez réessayer.")
-
     return render(request, "core/mon_compte.html")
+
+
+
+@login_required(login_url="/mon-compte/")
+def dashboard_view(request):
+    user = request.user
+
+    if request.method == "POST":
+        form = ProfilForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Vos informations ont été mises à jour avec succès.")
+            return redirect("dashboard")  # recharge la page proprement
+        else:
+            messages.error(request, "Une erreur est survenue. Veuillez vérifier les champs.")
+    else:
+        form = ProfilForm(instance=user)
+
+    return render(request, "core/dashboard.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("/")  # Redirection vers l’accueil
+
