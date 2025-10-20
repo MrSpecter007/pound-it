@@ -50,31 +50,42 @@
                                 "1200": {"items": 2}
                             }
                          }'>
-                        {% for testimonial in self.section.items.all %}
-                        <div class="item">
-                            <div class="testimonial-one__single">
-                                <div class="testimonial-one__single-inner">
-                                    <div class="testimonial-one__client-info">
-                                        <div class="testimonial-one__client-img-box">
-                                            {% if testimonial.client_image %}
-                                                {% image testimonial.client_image fill-150x150 class="img-fluid" alt=testimonial.client_name %}
-                                            {% endif %}
-                                            <div class="testimonial-one__quote">
-                                                <img src="/static/images/testimonial/testimonial-1-quote.png" alt="">
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-one__client-content">
-                                            <div class="testimonial-one__client-details">
-                                                <h3 class="testimonial-one__client-name">{{ testimonial.client_name }}</h3>
-                                                <p class="testimonial-one__client-sub-title">{{ testimonial.client_sub_title }}</p>
-                                            </div>
+                        {# Si une catégorie est passée dans le contexte, filtre dessus #}
+                        {% if category %}
+                            {% for testimonial in self.section.items.all %}
+                                {% if testimonial.category == category %}
+                                    <div class="item">
+                                        <div class="testimonial-one__single">
+                                            <p><i>"{{ testimonial.client_text }}"</i></p>
+                                            <p><strong>{{ testimonial.client_name }}</strong></p>
                                         </div>
                                     </div>
-                                    <p class="testimonial-one__text">{{ testimonial.client_text }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for testimonial in self.section.items.all %}
+                                <div class="item">
+                          
+                                    <div class="testimonial-one__single">
+                                        <div class="testimonial-one__single-inner">
+
+                                            <div class="testimonial-one__client-info">
+                                                <div class="">
+                                                    {% load static %}
+                                                    <img src="/static/images/icon/user-placeholder.svg" alt="Client" width="100" height="100" class="rounded-circle shadow-sm">                                         
+                                                </div>                               
+                                            </div>
+
+                                            <p class="testimonial-one__text"><i>" {{ testimonial.client_text }} "</i></p>
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+
+                                
+                            {% endfor %}
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

@@ -34,7 +34,7 @@
                 </div>
             {% else %}
                 <!-- Image à gauche -->
-                <div class="col-xl-6 col-lg-6 order-1">
+                <div class="col-xl-6 col-lg-6 order-1 image">
                     {% if self.image %}
                         {% image self.image fill-600x400 as img %}
                         <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid">

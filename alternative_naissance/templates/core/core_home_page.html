@@ -156,7 +156,7 @@
                     <div class="about-one__btn-call">
 
                          <div class="about-one__btn-box">
-                            <a href="about" class="thm-btn about-one__btn">Demande de service</a>
+                            <a href="/" class="thm-btn about-one__btn">Demande de service</a>
                         </div>
                         <div class="about-one__call">
                             <div class="about-one__call-icon">
@@ -241,24 +241,13 @@
                                 <div class="testimonial-one__single-inner">
 
                                     <div class="testimonial-one__client-info">
-                                        <div class="testimonial-one__client-img-box">
-                                            {% if testimonial.client_image %}
-                                                {% image testimonial.client_image fill-150x150 class="img-fluid" alt=testimonial.client_name %}
-                                            {% endif %}
-                                            <div class="testimonial-one__quote">
-                                                <img src="/static/images/testimonial/testimonial-1-quote.png" alt="">
-                                            </div>
-                                        </div>
-
-                                        <div class="testimonial-one__client-content">
-                                            <div class="testimonial-one__client-details">
-                                                <h3 class="testimonial-one__client-name">{{ testimonial.client_name }}</h3>
-                                                <p class="testimonial-one__client-sub-title">{{ testimonial.client_sub_title }}</p>
-                                            </div>
-                                        </div>
+                                        <div class="">
+                                            {% load static %}
+                                            <img src="/static/images/icon/user-placeholder.svg" alt="Client" width="100" height="100" class="rounded-circle shadow-sm">                                         
+                                        </div>                               
                                     </div>
 
-                                    <p class="testimonial-one__text">{{ testimonial.client_text }}</p>
+                                    <p class="testimonial-one__text"><i>" {{ testimonial.client_text }} "</i></p>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +306,7 @@
             </h3>
             <p class="news-one__text">{{ item.text }}</p>
             <div class="news-one__read-more">
-              <a href="{{ item.url }}">Read More <i class="fas fa-angle-double-right"></i></a>
+              <a href="{{ item.url }}">Lire plus <i class="fas fa-angle-double-right"></i></a>
             </div>
           </div>
         </div>
@@ -350,7 +339,7 @@
                 </div>
                 <div class="col-xl-7 col-lg-6">
                     <div class="services-one__top-right">
-                        <p class="services-one__top-text">Alternative Naissance offre un ensemble de service allant de l'accompagnement a la naissance et aux interventions perinatale</p>
+                        <p class="services-one__top-text">Alternative Naissance offre une gamme complète de services couvrant l’accompagnement à la naissance et les interventions périnatales.</p>
                     </div>
                 </div>
             </div>

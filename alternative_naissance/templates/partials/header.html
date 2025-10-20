@@ -1,5 +1,9 @@
-{% load static wagtailcore_tags wagtailsettings_tags %}
-{% get_settings %}
+{% load static wagtailcore_tags wagtailsettings_tags menu_tags %}
+{% if request %}
+    {% get_settings %}
+{% else %}
+    {% get_settings use_default_site=True %}
+{% endif %}
 
 <header class="main-header-six">
     <!-- Top bar -->
@@ -74,46 +78,54 @@
                     <div class="main-menu-six__main-menu-box">
                         <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
                         <ul class="main-menu__list">
-                            <li class="dropdown">
+                            <li class="dropdown {% active_class '/mission' %}{% active_class '/cadre-pratique' %}{% active_class '/conseil-administration' %}{% active_class '/partenaires-financiers' %}">
                                 <a href="#">À propos</a>
                                 <ul>
-                                    <li><a href="/mission">Mission, valeurs et engagement</a></li>
-                                    <li><a href="/cadre-pratique">Cadre de pratique de l’accompagnant.e</a></li>
-                                    <li><a href="/conseil-administration">Conseil d’administration</a></li>
-                                    <li><a href="#">Partenaires financiers</a></li>
+                                    <li class="dropdown {% active_class '/mission' %}"><a href="/mission">Mission, valeurs et engagement</a></li>
+                                    <li class="dropdown {% active_class '/cadre-pratique' %}"><a href="/cadre-pratique">Cadre de pratique de l’accompagnant.e</a></li>
+                                    <li class="dropdown {% active_class '/conseil-administration' %}"><a href="/conseil-administration">Conseil d’administration</a></li>
+                                    <li class="dropdown {% active_class '/partenaires-financiers' %}"><a href="/partenaires-financiers">Partenaires financiers</a></li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown {% active_class '/naissance' %}{% active_class '/relevailles' %}{% active_class '/virtuel' %}{% active_class '/deuil' %}{% active_class '/ig' %}{% active_class '/intervention-périnatale' %}">
                                 <a href="#">Services d’accompagnement individuel</a>
                                 <ul>
-                                    <li><a href="/naissance">Naissance</a></li>
-                                    <li><a href="#">Relevailles</a></li>
-                                    <li><a href="#">Virtuel</a></li>
-                                    <li><a href="#">Deuil</a></li>
-                                    <li><a href="#">IG</a></li>
-                                    <li><a href="#">Intervention périnatale</a></li>
+                                    <li class="dropdown {% active_class '/naissance' %}"><a href="/naissance">Naissance</a></li>
+                                    <li class="dropdown {% active_class '/relevailles' %}"><a href="/relevailles">Relevailles</a></li>
+                                    <li class="dropdown {% active_class '/virtuel' %}"><a href="/virtuel">Virtuel</a></li>
+                                    <li class="dropdown {% active_class '/deuil' %}"><a href="/deuil">Deuil</a></li>
+                                    <li class="dropdown {% active_class '/ig' %}"><a href="/ig">IG</a></li>
+                                    <li class="dropdown {% active_class '/intervention-périnatale' %}"><a href="/intervention-périnatale">Intervention périnatale</a></li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown {% active_class '/ateliers-thématiques' %}{% active_class '/ateliers-deuil-périnatal' %}{% active_class '/groupe-de-soutien' %}{% active_class '/prêt-de-matériel' %}">
                                 <a href="#">Volet familles</a>
                                 <ul>
-                                    <li><a href="#">Ateliers thématiques périnataux </a></li>
-                                    <li><a href="#">Ateliers deuil périnatal </a></li>
-                                    <li><a href="#">Groupes de soutien </a></li>
-                                    <li><a href="#">Prêt de matériel </a></li>
+                                    <li class="dropdown {% active_class '/ateliers-thématiques' %}"><a href="/ateliers-thématiques">Ateliers thématiques périnataux </a></li>
+                                    <li class="dropdown {% active_class '/ateliers-deuil-périnatal' %}"><a href="/ateliers-deuil-périnatal">Ateliers deuil périnatal </a></li>
+                                    <li class="dropdown {% active_class '/groupe-de-soutien' %}"><a href="/groupe-de-soutien">Groupes de soutien </a></li>
+                                    <li class="dropdown {% active_class '/prêt-de-matériel' %}"><a href="/prêt-de-matériel">Prêt de matériel </a></li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown {% active_class '/formations-de-base' %}{% active_class '/faire-un-stage' %}{% active_class '/formation-continue' %}{% active_class '/activités-de-ressourcement' %}{% active_class '/ressources-pour-les-travailleureuses-actifves' %}">
                                 <a href="#">Volet professionnel.le.s</a>
                                 <ul>
-                                    <li><a href="#">Formations de base</a></li>
-                                    <li><a href="#">Faire un stage</a></li>
-                                    <li><a href="#">Formation continue</a></li>
-                                    <li><a href="#">Activités de ressourcement</a></li>
-                                    <li><a href="#">Ressources pour les travailleur.euse.s actif.ve.s</a></li>
+                                    <li class="dropdown {% active_class '/formations-de-base' %}"><a href="/formations-de-base">Formations de base</a></li>
+                                    <li class="dropdown {% active_class '/faire-un-stage' %}"><a href="/faire-un-stage">Faire un stage</a></li>
+                                    <li class="dropdown {% active_class '/formation-continue' %}"><a href="/formation-continue">Formation continue</a></li>
+                                    <li class="dropdown {% active_class '/activités-de-ressourcement' %}"><a href="/activités-de-ressourcement">Activités de ressourcement</a></li>
+                                    <li class="dropdown {% active_class '/ressources-pour-les-travailleureuses-actifves' %}"><a href="/ressources-pour-les-travailleureuses-actifves">Ressources pour les travailleur.euse.s actif.ve.s</a></li>
                                 </ul>
                             </li>
-                            <li><a href="#">Faire un don</a></li>
+                            <li class="dropdown {% active_class '/faire-un-don' %}{% active_class '/inscription/' %}">
+                                <a href="#">Autre</a>
+                                <ul>
+                                    <li class="dropdown {% active_class '/faire-un-don' %}"><a href="/faire-un-don">Faire un don</a></li>
+                                    <li class="dropdown {% active_class '/inscription/' %}"><a href="/inscription">Inscription</a></li>
+                                </ul>
+                            
+                            
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -121,3 +133,38 @@
         </div>
     </nav>
 </header>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const currentPath = window.location.pathname; // Chemin actuel
+  const routes = [
+    "/mission/",
+    "/cadre-pratique/",
+    "/conseil-administration/",
+    "/partenaires-financiers/"
+  ];
+
+  document.querySelectorAll(".main-menu__list li").forEach(li => {
+    if (!li.classList.contains("current")) return;
+
+    const link = li.querySelector("a");
+    if (!link) return;
+
+    const linkText = link.textContent.trim();
+
+    // Si on est sur la page d'accueil, forcer current
+    if (currentPath === "/") {
+      li.classList.add("current");
+      return;
+    }
+
+    // Si le chemin actuel n’est pas dans la liste ET que le lien est "À propos"
+    if (!routes.includes(currentPath) && linkText === "À propos") {
+      li.classList.remove("current");
+    }
+  });
+
+});
+
+</script>
+
