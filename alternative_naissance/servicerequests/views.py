@@ -10,16 +10,29 @@ from .security import can_modify_servicerequests
 from .utils import generate_profile_pdf, send_profile_email_to_agent
 
 
-# TODO create the user facing page for service request and complete the POST process
 def create_service_request(request: WSGIRequest) -> HttpResponseRedirect | HttpResponse:
+    """
+    Handles the creation of a new service request.
+    Displays the form on GET requests and processes form data on POST requests.
+    """
     if request.method == "POST":
-        form = ServiceRequestForm(request.POST)
+        form: ServiceRequestForm = ServiceRequestForm(request.POST)
         if form.is_valid():
-            form.save()
+            service_request: ServiceRequest = form.save()
+            messages.success(
+                request, 
+                "Votre demande de service a été soumise avec succès. Nous vous contacterons bientôt."
+            )
+            # TODO: Send email to user and admin about service request creation
             return redirect('create_service_request_success')
-
-    form = ServiceRequestForm()
-    return render(request, 'servicerequests/service_request_form.html', {'form': form})
+    else:
+        form: ServiceRequestForm = ServiceRequestForm()
+        
+    return render(
+        request, 
+        'servicerequests/service_request_form.html', 
+        {'form': form}
+    )
 
 
 def create_service_request_success(request: WSGIRequest) -> HttpResponse:
@@ -34,22 +47,38 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
     Handles accepting a service request. Provides a page for admin to confirm or cancel the action.
     If confirmed, a profile entity is created based on the service request content, and the service request is deleted.
     """
-
     service_request: ServiceRequest = get_object_or_404(ServiceRequest, pk=pk)
-    if request.method == 'POST':
-        profile = Profile(
-            first_name=service_request.first_name,
-            last_name=service_request.last_name,
-            email=service_request.email,
-            service_type=service_request.service_type,
-        )
-        profile.save()
-        service_request.delete()
-        return redirect('/admin/snippets/servicerequests/servicerequest/')
 
-    return render(request,
-                  'servicerequests/admin/accept_servicerequest.html',
-                  {'service_request': service_request})
+    if request.method == 'POST':
+        # Create a new Profile with all the fields from the ServiceRequest
+        service_request_kwargs: dict = service_request.__dict__.copy() # Making a copy to avoid altering the original service_request
+        # Remove not needed fields
+        service_request_kwargs.pop('id')
+        service_request_kwargs.pop('status')
+        service_request_kwargs.pop('created_at')
+        service_request_kwargs.pop('_state')
+
+        profile: Profile = Profile(**service_request_kwargs)
+
+        # Save the profile
+        profile.save()
+
+        # Add success message
+        messages.success(
+            request,
+            f"La demande de service de {service_request.first_name} {service_request.last_name} a été acceptée avec succès."
+        )
+
+        # Delete the service request
+        service_request.delete()
+        
+        return redirect('/admin/snippets/servicerequests/profile/')
+
+    return render(
+        request,
+        'servicerequests/admin/accept_servicerequest.html',
+        {'service_request': service_request}
+    )
 
 
 @user_passes_test(can_modify_servicerequests)

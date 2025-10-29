@@ -12,20 +12,34 @@ from .views import share_profile, accept_service_request, reject_service_request
 
 class ServiceRequestViewSet(SnippetViewSet):
     """The view set for processing service requests."""
+    
     model = ServiceRequest
 
     panels = [
         FieldPanel("first_name"),
         FieldPanel("last_name"),
-        FieldPanel("email"),
         FieldPanel("service_type"),
+        FieldPanel("expected_delivery_date"),
+        FieldPanel("child_birth_date"),
+        FieldPanel("street_address"), 
+        FieldPanel("city"),
+        FieldPanel("province"),
+        FieldPanel("postal_code"),
+        FieldPanel("no_permanent_address"),
+        FieldPanel("phone"),
+        FieldPanel("no_phone"),
+        FieldPanel("email"),
+        FieldPanel("no_email"),
+        FieldPanel("languages"),
+        FieldPanel("citizenship_status"),
+        FieldPanel("status")
     ]
 
     menu_label = "Demandes"
     icon = "form"
-    list_display = ("email", "first_name", "last_name", "service_type")
+    list_display = ("first_name", "last_name", "service_type", "status")
     list_filter = ("status", "service_type")
-    search_fields = ("first_name", "last_name", "email")
+    search_fields = ("first_name", "last_name", "email", "phone")
 
 
 class ProfileViewSet(SnippetViewSet):
@@ -35,20 +49,28 @@ class ProfileViewSet(SnippetViewSet):
     panels = [
         FieldPanel("first_name"),
         FieldPanel("last_name"),
-        FieldPanel("email"),
-        FieldPanel("service_type"),
-        FieldPanel("address"),
-        FieldPanel("age"),
-        FieldPanel("immigration_status"),
 
-        FieldPanel("status"),
+        FieldPanel("expected_delivery_date"),
+        FieldPanel("child_birth_date"),
+        FieldPanel("street_address"),
+        FieldPanel("city"),
+        FieldPanel("province"),
+        FieldPanel("postal_code"),
+        FieldPanel("no_permanent_address"),
+        FieldPanel("phone"),
+        FieldPanel("no_phone"),
+        FieldPanel("email"),
+        FieldPanel("no_email"),
+        FieldPanel("languages"),
+        FieldPanel("citizenship_status"),
+        FieldPanel("status")
     ]
 
     menu_label = "Profils"
     icon = "user"
-    list_display = ("email", "first_name", "last_name", "service_type", "status")
-    list_filter = ("status", "service_type", "status")
-    search_fields = ("first_name", "last_name", "email")
+    list_display = ("first_name", "last_name", "service_type", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("first_name", "last_name", "email", "phone")
 
 
 ##############################################
