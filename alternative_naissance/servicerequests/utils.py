@@ -48,7 +48,6 @@ def generate_profile_pdf(profile: Profile) -> io.BytesIO:
         [profile._meta.get_field("email").verbose_name, profile.email],
         [profile._meta.get_field("no_email").verbose_name, profile.no_email],
         [profile._meta.get_field("languages").verbose_name, profile.languages],
-        [profile._meta.get_field("other_language").verbose_name, profile.other_language],
         [profile._meta.get_field("citizenship_status").verbose_name,
          dict(profile.CITIZENSHIP_STATUS_CHOICES).get(profile.citizenship_status, profile.citizenship_status)]
     ]

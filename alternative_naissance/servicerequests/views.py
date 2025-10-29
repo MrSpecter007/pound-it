@@ -19,10 +19,6 @@ def create_service_request(request: WSGIRequest) -> HttpResponseRedirect | HttpR
         form: ServiceRequestForm = ServiceRequestForm(request.POST)
         if form.is_valid():
             service_request: ServiceRequest = form.save()
-            messages.success(
-                request, 
-                "Votre demande de service a été soumise avec succès. Nous vous contacterons bientôt."
-            )
             # TODO: Send email to user and admin about service request creation
             return redirect('create_service_request_success')
     else:
