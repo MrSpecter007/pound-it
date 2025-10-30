@@ -5,7 +5,12 @@
 <section class="py-5">
   <div class="container">
     <h1>{{ page.title }}</h1>
-    <p>{{ page.date }} — {{ page.location }}</p>
+  
+      {% if page.date %}
+    <p> 📅 {{ page.date }} — {{ page.location }}</p>
+      {% elif page.recurrence %}
+      <p>🔁 {{ page.recurrence }}</p>
+    {% endif %}
     <div>{{ page.description|richtext }}</div>
     {% if page.lien %}
       <a href="{{ page.lien }}" class="btn btn-primary mt-3">S'inscrire</a>

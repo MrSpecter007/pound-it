@@ -532,12 +532,19 @@ class AtelierPage(Page):
     date = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=255, blank=True)
     lien = models.URLField(blank=True)
+    recurrence = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Indiquez la récurrence de l’atelier (ex: 'Tous les 2 mois')"
+    )
+    
     
     content_panels = Page.content_panels + [
         FieldPanel("description"),
         FieldPanel("date"),
         FieldPanel("location"),
         FieldPanel("lien"),
+        FieldPanel("recurrence"),
     ]
     subpage_types = []
 
@@ -576,6 +583,7 @@ class AtelierListBlock(blocks.StructBlock):
                 "date": getattr(page, "date", None),
                 "location": getattr(page, "location", ""),
                 "url": getattr(page, "url", "#"),
+                "recurrence": getattr(page, "recurrence", ""),
             })
 
         context["title"] = value.get("title")
