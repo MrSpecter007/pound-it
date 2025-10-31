@@ -20869,7 +20869,9 @@ body.boxed-wrapper {
 }
 
 .policy-proposal__input-box input[type="text"],
-.policy-proposal__input-box input[type="email"] {
+.policy-proposal__input-box input[type="email"],
+.policy-proposal__input-box input[type="password"],
+.policy-proposal__input-box select{
   height: 60px;
   width: 100%;
   border: none;
