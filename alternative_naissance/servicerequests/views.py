@@ -68,7 +68,7 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
         # Delete the service request
         service_request.delete()
         
-        return redirect('/admin/snippets/servicerequests/profile/')
+        return redirect('/admin/snippets/servicerequests/servicerequest/')
 
     return render(
         request,
