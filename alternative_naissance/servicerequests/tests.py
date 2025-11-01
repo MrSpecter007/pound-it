@@ -48,16 +48,26 @@ class ServiceRequestTests(TestCase):
         """
 
         response = self.client.post(reverse('create_service_request'),
-                         {
-                             'first_name': 'John',
-                             'last_name': 'Doe',
-                             'email': 'john@example.com',
-                             'service_type': 'accompagnement_a_la_naissance'
-                         })
+                                    {
+                                        'first_name': 'Daisy',
+                                        'last_name': 'Doe',
+                                        'email': 'daisy@example.com',
+                                        'service_type': 'accompagnement_a_la_naissance',
+                                        'expected_delivery_date': '2026-01-01',
+                                        'street_address': '123 Test St',
+                                        'city': 'Montreal',
+                                        'province': 'Quebec',
+                                        'postal_code': 'A1A1A1',
+                                        'languages_choices': ['anglais'],
+                                        'citizenship_status': 'autre',
+                                        'no_permanent_address': False,
+                                        'no_phone': True,
+                                        'no_email': False
+                                    })
 
         self.assertEqual(ServiceRequest.objects.count(), 2)  # Including the one from setUp
-        service_request = ServiceRequest.objects.get(email="john@example.com")
-        self.assertEqual(service_request.first_name, "John")
+        service_request = ServiceRequest.objects.get(email="daisy@example.com")
+        self.assertEqual(service_request.first_name, "Daisy")
         self.assertEqual(service_request.last_name, "Doe")
         self.assertEqual(service_request.service_type, "accompagnement_a_la_naissance")
         self.assertEqual(response.status_code, 302)
