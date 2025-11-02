@@ -253,4 +253,6 @@ def register_share_profile_urls():
         path('serviceprofiles/preview/<int:pk>', preview_profile_pdf, name='preview_profile_pdf'),
         path('servicerequests/accept/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject/<int:pk>', reject_service_request, name='reject_service_request'),
+        path('servicerequests/accept-request/<int:pk>', accept_service_request, name='accept_service_request'),
+        path('servicerequests/reject-request/<int:pk>', reject_service_request, name='reject_service_request'),
     ]
