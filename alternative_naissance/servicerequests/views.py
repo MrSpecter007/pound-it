@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse
@@ -7,7 +7,11 @@ from django.contrib import messages
 from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
-from .models import Profile, ServiceRequest, Deuil, Naissance
+from .models import BaseServiceProfile, ServiceRequest, Deuil, Naissance, ServiceProfile, ProfileCodePrefix
+from .models.interruption_grossesse import InterruptionGrossesse
+from .models.intervention_perinatale import InterventionPerinatale
+from .models.relevailles import Relevailles
+from .models.rencontres_virtuelle import RencontresVirtuelles
 from .security import can_modify_servicerequests
 from .utils import generate_profile_pdf, send_profile_email_to_agent
 
@@ -57,17 +61,27 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
         service_request_kwargs.pop('_state')
 
         # profile: Profile = Profile(**service_request_kwargs)
-        profile: Optional[Profile] = None
-        match service_request.get_service_class_name():
-            case "Deuil":
-                profile = Deuil(**service_request_kwargs)
-            case "Naissance":
+        profile: Optional[ServiceProfile] = None
+        match service_request.service_type.lower():
+            #         case "accompagnement_a_la_naissance":
+            #             class_name = "Naissance"
+
+            case "accompagnement_a_la_naissance":
                 profile = Naissance(**service_request_kwargs)
-            # TODO Add other cases
+            case "accompagnement_aux_relevailles":
+                profile = Relevailles(**service_request_kwargs)
+            case "accompagnement_au_deuil_perinatal":
+                profile = Deuil(**service_request_kwargs)
+            case "accompagnement_a_interruption_grossesse":
+                profile = InterruptionGrossesse(**service_request_kwargs)
+            case "accompagnement_virtuel_perinatal":
+                profile = RencontresVirtuelles(**service_request_kwargs)
+            case "intervention_perinatale":
+                profile = InterventionPerinatale(**service_request_kwargs)
             case _:
                 # TODO for now just create a profile instead, but after implementing all the Profile subclasses, should raise error instead
-                profile = Profile(**service_request_kwargs)
-                # raise ValueError(f"Unknown service class: {service_request.get_service_class_name()}")
+                raise ValueError(f"Unknown service class: {service_request.get_service_class_name()}")
+
         # Save the profile
         profile.save()
 
@@ -110,13 +124,13 @@ def reject_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
 
 
 @user_passes_test(can_modify_servicerequests)
-def preview_profile_pdf(request: WSGIRequest, pk: int) -> FileResponse:
+def preview_profile_pdf(request: WSGIRequest, prefix: str, sub_id: int) -> FileResponse:
     """
     Generates and serves a PDF preview of the profile.
     This allows admins to view the PDF before sending it to an agent.
     """
     # TODO Change the function to handle any subclass of Profile
-    profile = get_object_or_404(Profile, pk=pk)
+    profile = _get_service_profile_or_404(prefix, sub_id)
 
     pdf_buffer = generate_profile_pdf(profile)
 
@@ -124,13 +138,13 @@ def preview_profile_pdf(request: WSGIRequest, pk: int) -> FileResponse:
 
 
 @user_passes_test(can_modify_servicerequests)
-def share_profile(request: WSGIRequest, pk: int) -> HttpResponse | HttpResponseRedirect:
+def share_profile(request: WSGIRequest, prefix:str, sub_id: int) -> HttpResponse | HttpResponseRedirect:
     """
     Handles sharing a Profile through a standalone page.
     Allows admin to input the agent info, and it will send the PDF version
     of the profile to the agent email.
     """
-    profile = get_object_or_404(Profile, pk=pk)
+    profile = _get_service_profile_or_404(prefix, sub_id)
 
     if request.method == 'POST':
         form = ShareForm(request.POST)
@@ -147,7 +161,7 @@ def share_profile(request: WSGIRequest, pk: int) -> HttpResponse | HttpResponseR
                 
                 if email_sent:
                     messages.success(request, f"Profil partagé avec {agent_email}")
-                    return redirect('/admin/snippets/servicerequests/profile/')
+                    return redirect('/admin/snippets/servicerequests/servicerequest/')
                 else:
                     messages.error(request, f"Échec de 'envoi du courriel á {agent_email}. Veuillez réessayer.")
             except Exception as e:
@@ -164,3 +178,23 @@ def share_profile(request: WSGIRequest, pk: int) -> HttpResponse | HttpResponseR
             'form': form,
         }
     )
+
+
+def _get_service_profile_or_404(prefix: str, sub_id: int) -> ServiceProfile | HttpResponse:
+    profile: ServiceProfile
+    if prefix == ProfileCodePrefix.NAISSANCE.value:
+        profile = get_object_or_404(Naissance, pk=sub_id)
+    elif prefix == ProfileCodePrefix.DEUIL.value:
+        profile = get_object_or_404(Deuil, pk=sub_id)
+    elif prefix == ProfileCodePrefix.RELEVAILLES.value:
+        profile = get_object_or_404(Relevailles, pk=sub_id)
+    elif prefix == ProfileCodePrefix.INTERRUPTION_GROSSESSE.value:
+        profile = get_object_or_404(InterruptionGrossesse, pk=sub_id)
+    elif prefix == ProfileCodePrefix.RENCONTRES_VIRTUELLES.value:
+        profile = get_object_or_404(RencontresVirtuelles, pk=sub_id)
+    elif prefix == ProfileCodePrefix.INTERVENTION_PERINATALE.value:
+        profile = get_object_or_404(InterventionPerinatale, pk=sub_id)
+    else:
+        return HttpResponse(status=404)
+
+    return profile

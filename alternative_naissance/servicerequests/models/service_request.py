@@ -57,29 +57,6 @@ class ServiceRequest(models.Model):
         return dict(self.SERVICE_CHOICES).get(self.service_type, self.service_type)
     service_full_name.fget.short_description = "Nom du service" # Will be used by Wagtail snippet listing view (equivalent to verbose_name)
 
-    def get_service_class_name(self) -> str:
-        """
-        Get the string of class name for the service type. Used for pattern matching when accepting a ServiceRequest.
-        """
-        class_name: Optional[str] = None
-
-        match self.service_type:
-            case "accompagnement_a_la_naissance":
-                class_name = "Naissance"
-            case "accompagnement_aux_relevailles":
-                class_name = "Relevailles"
-            case "accompagnement_au_deuil_perinatal":
-                class_name = "Deuil"
-            case "accompagnement_a_interruption_grossesse":
-                class_name = "InterruptionGrossesse"
-            case "accompagnement_virtuel_perinatal":
-                class_name = "VirtuelPerinatal"
-            case "intervention_perinatale":
-                class_name = "Perinatal"
-
-        if class_name is None:
-            raise ValueError(f"Service class name not found for service type: {self.service_type}")
-        return class_name
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email}) - {self.service_full_name}"

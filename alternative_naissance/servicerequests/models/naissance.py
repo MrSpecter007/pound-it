@@ -1,20 +1,24 @@
-from typing import Any, Final
+from typing import Any
 
-from .profile import Profile
+from .base_service_profile import BaseServiceProfile
 from django.db import models
 
+from .shared_properties import ProfileCodePrefix
 
-class Naissance(Profile):
-    PROFILE_CODE_PREFIX: Final[str] = "N"
 
+class Naissance(BaseServiceProfile):
     sub_id = models.AutoField(primary_key=True)
 
     # TODO Replace the placeholder fields after getting the complete form field list
     birth_name = models.CharField(max_length=100, null=True, blank=True, verbose_name="Nom de la personne naissante")
 
     @property
+    def profile_code_prefix(self) -> ProfileCodePrefix:
+        return ProfileCodePrefix.NAISSANCE
+
+    @property
     def profile_code(self) -> str:
-        return self.PROFILE_CODE_PREFIX + str(self.sub_id).zfill(6)
+        return self.profile_code_prefix.value + str(self.sub_id).zfill(6)
 
     @property
     def fields_needed_for_agent(self) -> list[list[str | Any]]:

@@ -1,12 +1,11 @@
 from typing import Any, Final
 
-from .profile import Profile
+from . import ProfileCodePrefix
+from .base_service_profile import BaseServiceProfile
 from django.db import models
 
 
-class Deuil(Profile):
-    PROFILE_CODE_PREFIX: Final[str] = "D"
-
+class Deuil(BaseServiceProfile):
     sub_id = models.AutoField(primary_key=True)
 
     # TODO Replace placeholder fields after getting the complete form field list
@@ -16,8 +15,12 @@ class Deuil(Profile):
                                         verbose_name="Notes supplémentaires")
 
     @property
+    def profile_code_prefix(self) -> ProfileCodePrefix:
+        return ProfileCodePrefix.DEUIL
+
+    @property
     def profile_code(self) -> str:
-        return self.PROFILE_CODE_PREFIX + str(self.sub_id).zfill(6)
+        return self.profile_code_prefix.value + str(self.sub_id).zfill(6)
 
     @property
     def fields_needed_for_agent(self):

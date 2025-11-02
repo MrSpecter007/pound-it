@@ -1,4 +1,6 @@
 # Setting it as private global variable as it is used by both classes
+from enum import Enum
+
 _SERVICE_CHOICES = [
     ("accompagnement_a_la_naissance", "Accompagnement à la naissance"),
     ("accompagnement_aux_relevailles", "Accompagnement aux relevailles/postnatal"),
@@ -36,3 +38,12 @@ _CITIZENSHIP_STATUS_CHOICES = [
     ("autre", "Autre"),
     ("prefere_ne_pas_repondre", "Préfère ne pas répondre"),
 ]
+
+class ProfileCodePrefix(Enum):
+    NAISSANCE = "N"
+    DEUIL = "D"
+    INTERRUPTION_GROSSESSE = "IG"
+    RENCONTRES_VIRTUELLES = "V"
+    INTERVENTION_PERINATALE = "I"
+    RELEVAILLES = "R"
+    BASE_PROFILE = ""

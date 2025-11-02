@@ -6,10 +6,35 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
-from .models import ServiceRequest, Profile, Naissance, Deuil
+
+from servicerequests.models.interruption_grossesse import InterruptionGrossesse
+from servicerequests.models.relevailles import Relevailles
+from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile
 from wagtail.snippets import widgets
 
+from .models.intervention_perinatale import InterventionPerinatale
+from .models.rencontres_virtuelle import RencontresVirtuelles
 from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
+
+_BASE_PROFILE_PANELS: list[FieldPanel] = [
+    FieldPanel("first_name"),
+    FieldPanel("last_name"),
+
+    FieldPanel("expected_delivery_date"),
+    FieldPanel("child_birth_date"),
+    FieldPanel("street_address"),
+    FieldPanel("city"),
+    FieldPanel("province"),
+    FieldPanel("postal_code"),
+    FieldPanel("no_permanent_address"),
+    FieldPanel("phone"),
+    FieldPanel("no_phone"),
+    FieldPanel("email"),
+    FieldPanel("no_email"),
+    FieldPanel("languages"),
+    FieldPanel("citizenship_status"),
+    FieldPanel("status")
+]
 
 
 class ServiceRequestViewSet(SnippetViewSet):
@@ -46,27 +71,9 @@ class ServiceRequestViewSet(SnippetViewSet):
 
 class ProfileViewSet(SnippetViewSet):
     """The view set for the main profiles created from accepting the service request."""
-    model = Profile
+    model = BaseServiceProfile
 
-    panels = [
-        FieldPanel("first_name"),
-        FieldPanel("last_name"),
-
-        FieldPanel("expected_delivery_date"),
-        FieldPanel("child_birth_date"),
-        FieldPanel("street_address"),
-        FieldPanel("city"),
-        FieldPanel("province"),
-        FieldPanel("postal_code"),
-        FieldPanel("no_permanent_address"),
-        FieldPanel("phone"),
-        FieldPanel("no_phone"),
-        FieldPanel("email"),
-        FieldPanel("no_email"),
-        FieldPanel("languages"),
-        FieldPanel("citizenship_status"),
-        FieldPanel("status")
-    ]
+    panels = [] + _BASE_PROFILE_PANELS
 
     menu_label = "Profils"
     icon = "user"
@@ -79,25 +86,7 @@ class NaissanceModelViewSet(SnippetViewSet):
     """The view set for the Naissance model."""
     model = Naissance
 
-    panels = [
-        FieldPanel("first_name"),
-        FieldPanel("last_name"),
-
-        FieldPanel("expected_delivery_date"),
-        FieldPanel("child_birth_date"),
-        FieldPanel("street_address"),
-        FieldPanel("city"),
-        FieldPanel("province"),
-        FieldPanel("postal_code"),
-        FieldPanel("no_permanent_address"),
-        FieldPanel("phone"),
-        FieldPanel("no_phone"),
-        FieldPanel("email"),
-        FieldPanel("no_email"),
-        FieldPanel("languages"),
-        FieldPanel("citizenship_status"),
-        FieldPanel("status"),
-
+    panels = _BASE_PROFILE_PANELS + [
         FieldPanel("birth_name")
     ]
 
@@ -111,25 +100,7 @@ class DeuilModelViewSet(SnippetViewSet):
     """The view set for the Deuil model."""
     model = Deuil
 
-    panels = [
-        FieldPanel("first_name"),
-        FieldPanel("last_name"),
-
-        FieldPanel("expected_delivery_date"),
-        FieldPanel("child_birth_date"),
-        FieldPanel("street_address"),
-        FieldPanel("city"),
-        FieldPanel("province"),
-        FieldPanel("postal_code"),
-        FieldPanel("no_permanent_address"),
-        FieldPanel("phone"),
-        FieldPanel("no_phone"),
-        FieldPanel("email"),
-        FieldPanel("no_email"),
-        FieldPanel("languages"),
-        FieldPanel("citizenship_status"),
-        FieldPanel("status"),
-
+    panels = _BASE_PROFILE_PANELS + [
         FieldPanel("deceased_name"),
         FieldPanel("deceased_date"),
         FieldPanel("additional_notes")
@@ -140,16 +111,78 @@ class DeuilModelViewSet(SnippetViewSet):
     list_filter = ("status", "service_type")
     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
+class RelevaillesModelViewSet(SnippetViewSet):
+    """The view set for the Relevailles model."""
+    model = Relevailles
+
+    panels = _BASE_PROFILE_PANELS + [
+        FieldPanel("relevailles_note")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
+
+class InterruptionGrossesseViewSet(SnippetViewSet):
+    """The view set for the InterruptionGrossesse model."""
+
+    model = InterruptionGrossesse
+
+    panels = _BASE_PROFILE_PANELS + [
+        FieldPanel("grossesse_note")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
+class InterventionPerinataleViewSet(SnippetViewSet):
+    """The view set for the InterventionPerinatale model."""
+    model = InterventionPerinatale
+
+    panels = _BASE_PROFILE_PANELS + [
+        FieldPanel("intervention_perinatal_note")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
+class RencontresVirtuellesViewSet(SnippetViewSet):
+    """The view set for the RencontresVirtuelles model."""
+    model = RencontresVirtuelles
+
+    panels = _BASE_PROFILE_PANELS + [
+        FieldPanel("rencontre_virtuelle_note")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
 ##############################################
 
 
-# Both service requests and profiles under the same parent directory
 @register_snippet
 class ServiceRequestGroup(SnippetViewSetGroup):
     menu_label = "Demandes de Service"
     menu_icon = "folder-open-inverse"
     add_to_admin_menu = True
-    items = (ServiceRequestViewSet, ProfileViewSet, NaissanceModelViewSet, DeuilModelViewSet)
+    items = (
+        ServiceRequestViewSet,
+        ProfileViewSet,
+        NaissanceModelViewSet,
+        DeuilModelViewSet,
+        RelevaillesModelViewSet,
+        InterruptionGrossesseViewSet,
+        InterventionPerinataleViewSet,
+        RencontresVirtuellesViewSet,
+    )
 
 
 ####################################################
@@ -170,12 +203,13 @@ class ShareProfileMenuItem(ActionMenuItem):
 
     @override
     def get_url(self, context):
-        return reverse("share_profile", args=(context["instance"].pk,))
+        instance: ServiceProfile = context["instance"]
+        profile_prefix: str = instance.profile_code_prefix.value
+        return reverse("share_profile", args=(profile_prefix,context["instance"].sub_id,))
 
     @override
     def is_shown(self, context):
-        print(context)
-        if issubclass(context['model'], Profile) and context['view'] == 'edit':
+        if issubclass(context['model'], BaseServiceProfile) and context['view'] == 'edit':
             return True
         return False
 
@@ -234,13 +268,13 @@ def register_reject_request_menu_item(model):
 @hooks.register('register_snippet_listing_buttons')
 def snippet_listing_buttons(snippet, user, next_url=None):
     """ For Profiles, add a button to share the profile to an agent."""
-    if not issubclass(type(snippet),Profile):
+    if not issubclass(type(snippet), BaseServiceProfile):
         return
-    snippet: Profile = snippet  # to get type hint
+    snippet: ServiceProfile = snippet  # to get type hint
     yield widgets.SnippetListingButton(
         'Share to An Agent',
         icon_name='shareprofile',
-        url=reverse("share_profile", args=(snippet.pk,)),
+        url=reverse("share_profile", args=(snippet.profile_code_prefix.value, snippet.sub_id,)),
         priority=10
     )
 
@@ -249,10 +283,8 @@ def snippet_listing_buttons(snippet, user, next_url=None):
 @hooks.register('register_admin_urls')
 def register_share_profile_urls():
     return [
-        path('serviceprofiles/share/<int:pk>', share_profile, name='share_profile'),
-        path('serviceprofiles/preview/<int:pk>', preview_profile_pdf, name='preview_profile_pdf'),
-        path('servicerequests/accept/<int:pk>', accept_service_request, name='accept_service_request'),
-        path('servicerequests/reject/<int:pk>', reject_service_request, name='reject_service_request'),
+        path('serviceprofiles/share/<str:prefix>/<int:sub_id>', share_profile, name='share_profile'),
+        path('serviceprofiles/preview/<str:prefix>/<int:sub_id>', preview_profile_pdf, name='preview_profile_pdf'),
         path('servicerequests/accept-request/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject-request/<int:pk>', reject_service_request, name='reject_service_request'),
     ]

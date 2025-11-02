@@ -19,7 +19,8 @@
         {{ form }}
         <div style="margin-top: 20px">
             <input type="submit" value="Send" class="button">
-            <a href="{% url 'preview_profile_pdf' profile.pk %}" class="button" target="_blank">Preview PDF</a>
+            <a href="{% url 'preview_profile_pdf' profile.profile_code_prefix.value profile.sub_id %}" class="button" target="_blank">Preview PDF</a>
+            {# TODO Dynamic path#}
             <a href="/admin/snippets/servicerequests/profile/edit/{{ profile.pk }}" class="button serious">Cancel</a>
         </div>
 
