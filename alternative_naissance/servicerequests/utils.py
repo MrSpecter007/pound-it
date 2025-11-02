@@ -1,5 +1,6 @@
 import io
 import datetime
+
 from django.core.mail import EmailMessage
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
@@ -31,26 +32,27 @@ def generate_profile_pdf(profile: Profile) -> io.BytesIO:
     elements.append(Spacer(1, 20))
     
     # Add profile information as a table
-    data = [
-        [profile._meta.get_field("first_name").verbose_name, profile.first_name],
-        [profile._meta.get_field("last_name").verbose_name, profile.last_name],
-        [profile._meta.get_field("service_type").verbose_name,
-         dict(profile.SERVICE_CHOICES).get(profile.service_type, profile.service_type)],
-        [profile._meta.get_field("expected_delivery_date").verbose_name, profile.expected_delivery_date],
-        [profile._meta.get_field("child_birth_date").verbose_name, profile.child_birth_date],
-        [profile._meta.get_field("street_address").verbose_name, profile.street_address],
-        [profile._meta.get_field("city").verbose_name, profile.city],
-        [profile._meta.get_field("province").verbose_name, profile.province],
-        [profile._meta.get_field("postal_code").verbose_name, profile.postal_code],
-        [profile._meta.get_field("no_permanent_address").verbose_name, profile.no_permanent_address],
-        [profile._meta.get_field("phone").verbose_name, profile.phone],
-        [profile._meta.get_field("no_phone").verbose_name, profile.no_phone],
-        [profile._meta.get_field("email").verbose_name, profile.email],
-        [profile._meta.get_field("no_email").verbose_name, profile.no_email],
-        [profile._meta.get_field("languages").verbose_name, profile.languages],
-        [profile._meta.get_field("citizenship_status").verbose_name,
-         dict(profile.CITIZENSHIP_STATUS_CHOICES).get(profile.citizenship_status, profile.citizenship_status)]
-    ]
+    data = profile.fields_needed_for_agent
+    # data = [
+    #     [profile._meta.get_field("first_name").verbose_name, profile.first_name],
+    #     [profile._meta.get_field("last_name").verbose_name, profile.last_name],
+    #     [profile._meta.get_field("service_type").verbose_name,
+    #      dict(profile.SERVICE_CHOICES).get(profile.service_type, profile.service_type)],
+    #     [profile._meta.get_field("expected_delivery_date").verbose_name, profile.expected_delivery_date],
+    #     [profile._meta.get_field("child_birth_date").verbose_name, profile.child_birth_date],
+    #     [profile._meta.get_field("street_address").verbose_name, profile.street_address],
+    #     [profile._meta.get_field("city").verbose_name, profile.city],
+    #     [profile._meta.get_field("province").verbose_name, profile.province],
+    #     [profile._meta.get_field("postal_code").verbose_name, profile.postal_code],
+    #     [profile._meta.get_field("no_permanent_address").verbose_name, profile.no_permanent_address],
+    #     [profile._meta.get_field("phone").verbose_name, profile.phone],
+    #     [profile._meta.get_field("no_phone").verbose_name, profile.no_phone],
+    #     [profile._meta.get_field("email").verbose_name, profile.email],
+    #     [profile._meta.get_field("no_email").verbose_name, profile.no_email],
+    #     [profile._meta.get_field("languages").verbose_name, profile.languages],
+    #     [profile._meta.get_field("citizenship_status").verbose_name,
+    #      dict(profile.CITIZENSHIP_STATUS_CHOICES).get(profile.citizenship_status, profile.citizenship_status)]
+    # ]
 
     table = Table(data, colWidths=[200, 300])
     table.setStyle(TableStyle([

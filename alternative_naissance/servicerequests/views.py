@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -5,7 +7,7 @@ from django.contrib import messages
 from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
-from .models import Profile, ServiceRequest
+from .models import Profile, ServiceRequest, Deuil, Naissance
 from .security import can_modify_servicerequests
 from .utils import generate_profile_pdf, send_profile_email_to_agent
 
@@ -54,8 +56,18 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
         service_request_kwargs.pop('created_at')
         service_request_kwargs.pop('_state')
 
-        profile: Profile = Profile(**service_request_kwargs)
-
+        # profile: Profile = Profile(**service_request_kwargs)
+        profile: Optional[Profile] = None
+        match service_request.get_service_class_name():
+            case "Deuil":
+                profile = Deuil(**service_request_kwargs)
+            case "Naissance":
+                profile = Naissance(**service_request_kwargs)
+            # TODO Add other cases
+            case _:
+                # TODO for now just create a profile instead, but after implementing all the Profile subclasses, should raise error instead
+                profile = Profile(**service_request_kwargs)
+                # raise ValueError(f"Unknown service class: {service_request.get_service_class_name()}")
         # Save the profile
         profile.save()
 
@@ -103,6 +115,7 @@ def preview_profile_pdf(request: WSGIRequest, pk: int) -> FileResponse:
     Generates and serves a PDF preview of the profile.
     This allows admins to view the PDF before sending it to an agent.
     """
+    # TODO Change the function to handle any subclass of Profile
     profile = get_object_or_404(Profile, pk=pk)
 
     pdf_buffer = generate_profile_pdf(profile)

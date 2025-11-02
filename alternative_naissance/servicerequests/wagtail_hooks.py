@@ -1,10 +1,12 @@
+from typing import override
+
 from django.urls import path, reverse
 from wagtail import hooks
 from wagtail.admin.panels import FieldPanel
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
-from .models import ServiceRequest, Profile
+from .models import ServiceRequest, Profile, Naissance, Deuil
 from wagtail.snippets import widgets
 
 from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
@@ -37,7 +39,7 @@ class ServiceRequestViewSet(SnippetViewSet):
 
     menu_label = "Demandes"
     icon = "form"
-    list_display = ("first_name", "last_name", "service_type", "status")
+    list_display = ("first_name", "last_name", "service_full_name", "status")
     list_filter = ("status", "service_type")
     search_fields = ("first_name", "last_name", "email", "phone")
 
@@ -68,10 +70,75 @@ class ProfileViewSet(SnippetViewSet):
 
     menu_label = "Profils"
     icon = "user"
-    list_display = ("first_name", "last_name", "service_type", "status")
+    list_display = ("profile_code", "first_name", "last_name", "service_type", "status")
     list_filter = ("status", "service_type")
-    search_fields = ("first_name", "last_name", "email", "phone")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
+
+class NaissanceModelViewSet(SnippetViewSet):
+    """The view set for the Naissance model."""
+    model = Naissance
+
+    panels = [
+        FieldPanel("first_name"),
+        FieldPanel("last_name"),
+
+        FieldPanel("expected_delivery_date"),
+        FieldPanel("child_birth_date"),
+        FieldPanel("street_address"),
+        FieldPanel("city"),
+        FieldPanel("province"),
+        FieldPanel("postal_code"),
+        FieldPanel("no_permanent_address"),
+        FieldPanel("phone"),
+        FieldPanel("no_phone"),
+        FieldPanel("email"),
+        FieldPanel("no_email"),
+        FieldPanel("languages"),
+        FieldPanel("citizenship_status"),
+        FieldPanel("status"),
+
+        FieldPanel("birth_name")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
+
+class DeuilModelViewSet(SnippetViewSet):
+    """The view set for the Deuil model."""
+    model = Deuil
+
+    panels = [
+        FieldPanel("first_name"),
+        FieldPanel("last_name"),
+
+        FieldPanel("expected_delivery_date"),
+        FieldPanel("child_birth_date"),
+        FieldPanel("street_address"),
+        FieldPanel("city"),
+        FieldPanel("province"),
+        FieldPanel("postal_code"),
+        FieldPanel("no_permanent_address"),
+        FieldPanel("phone"),
+        FieldPanel("no_phone"),
+        FieldPanel("email"),
+        FieldPanel("no_email"),
+        FieldPanel("languages"),
+        FieldPanel("citizenship_status"),
+        FieldPanel("status"),
+
+        FieldPanel("deceased_name"),
+        FieldPanel("deceased_date"),
+        FieldPanel("additional_notes")
+    ]
+
+    icon = "user"
+    list_display = ("profile_code", "first_name", "last_name", "status")
+    list_filter = ("status", "service_type")
+    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
 ##############################################
 
@@ -82,7 +149,7 @@ class ServiceRequestGroup(SnippetViewSetGroup):
     menu_label = "Demandes de Service"
     menu_icon = "folder-open-inverse"
     add_to_admin_menu = True
-    items = (ServiceRequestViewSet, ProfileViewSet)
+    items = (ServiceRequestViewSet, ProfileViewSet, NaissanceModelViewSet, DeuilModelViewSet)
 
 
 ####################################################
@@ -101,12 +168,14 @@ class ShareProfileMenuItem(ActionMenuItem):
     label = "Partager le profil avec un agent."
     icon_name = 'shareprofile'
 
+    @override
     def get_url(self, context):
         return reverse("share_profile", args=(context["instance"].pk,))
 
+    @override
     def is_shown(self, context):
         print(context)
-        if context['model'] == Profile and context['view'] == 'edit':
+        if issubclass(context['model'], Profile) and context['view'] == 'edit':
             return True
         return False
 
@@ -117,9 +186,11 @@ class AcceptRequestMenuItem(ActionMenuItem):
     label = "Accepter la demande de service"
     icon_name = 'check'
 
+    @override
     def get_url(self, context):
         return reverse("accept_service_request", args=(context["instance"].pk,))
 
+    @override
     def is_shown(self, context):
         if context['model'] == ServiceRequest and context['view'] == 'edit':
             return True
@@ -132,9 +203,11 @@ class RejectRequestMenuItem(ActionMenuItem):
     label = "Refuser la demande de service"
     icon_name = 'cross'
 
+    @override
     def get_url(self, context):
         return reverse("reject_service_request", args=(context["instance"].pk,))
 
+    @override
     def is_shown(self, context):
         if context['model'] == ServiceRequest and context['view'] == 'edit':
             return True
@@ -161,7 +234,7 @@ def register_reject_request_menu_item(model):
 @hooks.register('register_snippet_listing_buttons')
 def snippet_listing_buttons(snippet, user, next_url=None):
     """ For Profiles, add a button to share the profile to an agent."""
-    if type(snippet) != Profile:
+    if not issubclass(type(snippet),Profile):
         return
     snippet: Profile = snippet  # to get type hint
     yield widgets.SnippetListingButton(
