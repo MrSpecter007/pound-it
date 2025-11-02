@@ -9,7 +9,7 @@ from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
 from wagtail.snippets import widgets
 
-from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, RencontresVirtuelles
+from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, RencontresVirtuelles, Relevailles
 from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
 
 _BASE_PROFILE_PANELS: list[FieldPanel] = [
