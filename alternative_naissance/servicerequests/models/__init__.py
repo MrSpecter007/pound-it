@@ -3,4 +3,8 @@ from .service_request import ServiceRequest
 from .base_service_profile import BaseServiceProfile
 from .deuil import Deuil
 from .naissance import Naissance
+from .relevailles import Relevailles
+from .interruption_grossesse import InterruptionGrossesse
+from .intervention_perinatale import InterventionPerinatale
+from .rencontres_virtuelle import RencontresVirtuelles
 from .typing import ServiceProfile

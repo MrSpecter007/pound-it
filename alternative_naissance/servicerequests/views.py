@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse
@@ -7,9 +7,7 @@ from django.contrib import messages
 from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
-from .models import BaseServiceProfile, ServiceRequest, Deuil, Naissance, ServiceProfile, ProfileCodePrefix
-from .models.interruption_grossesse import InterruptionGrossesse
-from .models.intervention_perinatale import InterventionPerinatale
+from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, ProfileCodePrefix
 from .models.relevailles import Relevailles
 from .models.rencontres_virtuelle import RencontresVirtuelles
 from .security import can_modify_servicerequests
@@ -80,7 +78,7 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
                 profile = InterventionPerinatale(**service_request_kwargs)
             case _:
                 # TODO for now just create a profile instead, but after implementing all the Profile subclasses, should raise error instead
-                raise ValueError(f"Unknown service class: {service_request.get_service_class_name()}")
+                raise ValueError(f"Unknown service class: {service_request.service_type.lower()}")
 
         # Save the profile
         profile.save()

@@ -7,13 +7,9 @@ from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
-from servicerequests.models.interruption_grossesse import InterruptionGrossesse
-from servicerequests.models.relevailles import Relevailles
-from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile
 from wagtail.snippets import widgets
 
-from .models.intervention_perinatale import InterventionPerinatale
-from .models.rencontres_virtuelle import RencontresVirtuelles
+from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, RencontresVirtuelles
 from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
 
 _BASE_PROFILE_PANELS: list[FieldPanel] = [
