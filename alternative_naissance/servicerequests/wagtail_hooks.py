@@ -65,17 +65,17 @@ class ServiceRequestViewSet(SnippetViewSet):
     search_fields = ("first_name", "last_name", "email", "phone")
 
 
-class ProfileViewSet(SnippetViewSet):
-    """The view set for the main profiles created from accepting the service request."""
-    model = BaseServiceProfile
-
-    panels = [] + _BASE_PROFILE_PANELS
-
-    menu_label = "Profils"
-    icon = "user"
-    list_display = ("profile_code", "first_name", "last_name", "service_type", "status")
-    list_filter = ("status", "service_type")
-    search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+# class ProfileViewSet(SnippetViewSet):
+#     """The view set for the main profiles created from accepting the service request."""
+#     model = BaseServiceProfile
+#
+#     panels = [] + _BASE_PROFILE_PANELS
+#
+#     menu_label = "Profils"
+#     icon = "user"
+#     list_display = ("profile_code", "first_name", "last_name", "service_type", "status")
+#     list_filter = ("status", "service_type")
+#     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
 
 class NaissanceModelViewSet(SnippetViewSet):
@@ -171,7 +171,7 @@ class ServiceRequestGroup(SnippetViewSetGroup):
     add_to_admin_menu = True
     items = (
         ServiceRequestViewSet,
-        ProfileViewSet,
+        # ProfileViewSet,
         NaissanceModelViewSet,
         DeuilModelViewSet,
         RelevaillesModelViewSet,
@@ -200,8 +200,8 @@ class ShareProfileMenuItem(ActionMenuItem):
     @override
     def get_url(self, context):
         instance: ServiceProfile = context["instance"]
-        profile_prefix: str = instance.profile_code_prefix.value
-        return reverse("share_profile", args=(profile_prefix,context["instance"].sub_id,))
+        profile_cls_lc: str = instance.__class__.__name__.lower()
+        return reverse("share_profile", args=(profile_cls_lc, context["instance"].sub_id,))
 
     @override
     def is_shown(self, context):
@@ -267,10 +267,11 @@ def snippet_listing_buttons(snippet, user, next_url=None):
     if not issubclass(type(snippet), BaseServiceProfile):
         return
     snippet: ServiceProfile = snippet  # to get type hint
+    profile_cls_lc: str = snippet.__class__.__name__.lower()
     yield widgets.SnippetListingButton(
         'Share to An Agent',
         icon_name='shareprofile',
-        url=reverse("share_profile", args=(snippet.profile_code_prefix.value, snippet.sub_id,)),
+        url=reverse("share_profile", args=(profile_cls_lc, snippet.sub_id,)),
         priority=10
     )
 
@@ -279,8 +280,8 @@ def snippet_listing_buttons(snippet, user, next_url=None):
 @hooks.register('register_admin_urls')
 def register_share_profile_urls():
     return [
-        path('serviceprofiles/share/<str:prefix>/<int:sub_id>', share_profile, name='share_profile'),
-        path('serviceprofiles/preview/<str:prefix>/<int:sub_id>', preview_profile_pdf, name='preview_profile_pdf'),
+        path('serviceprofiles/share/<str:profile_cls_lc>/<int:sub_id>', share_profile, name='share_profile'),
+        path('serviceprofiles/preview/<str:profile_cls_lc>/<int:sub_id>', preview_profile_pdf, name='preview_profile_pdf'),
         path('servicerequests/accept-request/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject-request/<int:pk>', reject_service_request, name='reject_service_request'),
     ]

@@ -58,12 +58,8 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
         service_request_kwargs.pop('created_at')
         service_request_kwargs.pop('_state')
 
-        # profile: Profile = Profile(**service_request_kwargs)
         profile: Optional[ServiceProfile] = None
         match service_request.service_type.lower():
-            #         case "accompagnement_a_la_naissance":
-            #             class_name = "Naissance"
-
             case "accompagnement_a_la_naissance":
                 profile = Naissance(**service_request_kwargs)
             case "accompagnement_aux_relevailles":
@@ -122,13 +118,13 @@ def reject_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
 
 
 @user_passes_test(can_modify_servicerequests)
-def preview_profile_pdf(request: WSGIRequest, prefix: str, sub_id: int) -> FileResponse:
+def preview_profile_pdf(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> FileResponse:
     """
     Generates and serves a PDF preview of the profile.
     This allows admins to view the PDF before sending it to an agent.
     """
     # TODO Change the function to handle any subclass of Profile
-    profile = _get_service_profile_or_404(prefix, sub_id)
+    profile = _get_service_profile_or_404(profile_cls_lc, sub_id)
 
     pdf_buffer = generate_profile_pdf(profile)
 
@@ -136,13 +132,13 @@ def preview_profile_pdf(request: WSGIRequest, prefix: str, sub_id: int) -> FileR
 
 
 @user_passes_test(can_modify_servicerequests)
-def share_profile(request: WSGIRequest, prefix:str, sub_id: int) -> HttpResponse | HttpResponseRedirect:
+def share_profile(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> HttpResponse | HttpResponseRedirect:
     """
     Handles sharing a Profile through a standalone page.
     Allows admin to input the agent info, and it will send the PDF version
     of the profile to the agent email.
     """
-    profile = _get_service_profile_or_404(prefix, sub_id)
+    profile = _get_service_profile_or_404(profile_cls_lc, sub_id)
 
     if request.method == 'POST':
         form = ShareForm(request.POST)
@@ -174,23 +170,24 @@ def share_profile(request: WSGIRequest, prefix:str, sub_id: int) -> HttpResponse
         {
             'profile': profile,
             'form': form,
+            'profile_cls_lc': profile_cls_lc,
         }
     )
 
 
-def _get_service_profile_or_404(prefix: str, sub_id: int) -> ServiceProfile | HttpResponse:
+def _get_service_profile_or_404(profile_cls_lc: str, sub_id: int) -> ServiceProfile | HttpResponse:
     profile: ServiceProfile
-    if prefix == ProfileCodePrefix.NAISSANCE.value:
+    if profile_cls_lc == Naissance.__name__.lower():
         profile = get_object_or_404(Naissance, pk=sub_id)
-    elif prefix == ProfileCodePrefix.DEUIL.value:
+    elif profile_cls_lc == Deuil.__name__.lower():
         profile = get_object_or_404(Deuil, pk=sub_id)
-    elif prefix == ProfileCodePrefix.RELEVAILLES.value:
+    elif profile_cls_lc == Relevailles.__name__.lower():
         profile = get_object_or_404(Relevailles, pk=sub_id)
-    elif prefix == ProfileCodePrefix.INTERRUPTION_GROSSESSE.value:
+    elif profile_cls_lc == InterruptionGrossesse.__name__.lower():
         profile = get_object_or_404(InterruptionGrossesse, pk=sub_id)
-    elif prefix == ProfileCodePrefix.RENCONTRES_VIRTUELLES.value:
+    elif profile_cls_lc == RencontresVirtuelles.__name__.lower():
         profile = get_object_or_404(RencontresVirtuelles, pk=sub_id)
-    elif prefix == ProfileCodePrefix.INTERVENTION_PERINATALE.value:
+    elif profile_cls_lc == InterventionPerinatale.__name__.lower():
         profile = get_object_or_404(InterventionPerinatale, pk=sub_id)
     else:
         return HttpResponse(status=404)

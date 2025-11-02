@@ -165,7 +165,7 @@ class ServiceRequestTests(TestCase):
         self.client.force_login(self.admin_user)
         # Call the PDF preview endpoint
         response = self.client.get(
-            reverse('preview_profile_pdf', kwargs={'prefix': self.test_profile.profile_code_prefix.value, 'sub_id': self.test_profile.sub_id})
+            reverse('preview_profile_pdf', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower(), 'sub_id': self.test_profile.sub_id})
         )
 
         # Check response is successful
@@ -183,13 +183,13 @@ class ServiceRequestTests(TestCase):
 
         self.client.force_login(self.guest_user)
         response = self.client.get(
-            reverse('preview_profile_pdf', kwargs={'prefix': self.test_profile.profile_code_prefix.value ,'sub_id': self.test_profile.sub_id})
+            reverse('preview_profile_pdf', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower() ,'sub_id': self.test_profile.sub_id})
         )
         self.assertEqual(response.status_code, 302)
 
         self.client.force_login(self.staff_user)
         response = self.client.get(
-            reverse('preview_profile_pdf', kwargs={'prefix': self.test_profile.profile_code_prefix.value ,'sub_id': self.test_profile.sub_id})
+            reverse('preview_profile_pdf', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower() ,'sub_id': self.test_profile.sub_id})
         )
         self.assertEqual(response.status_code, 302)
 
@@ -207,7 +207,7 @@ class ServiceRequestTests(TestCase):
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
-            reverse('share_profile', kwargs={'prefix': self.test_profile.profile_code_prefix.value, 'sub_id': self.test_profile.sub_id}),
+            reverse('share_profile', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower(), 'sub_id': self.test_profile.sub_id}),
             {'email': agent_email}
         )
 
@@ -230,14 +230,14 @@ class ServiceRequestTests(TestCase):
 
         self.client.force_login(self.guest_user)
         self.client.post(
-            reverse('share_profile', kwargs={'prefix': self.test_profile.profile_code_prefix.value, 'sub_id': self.test_profile.sub_id}),
+            reverse('share_profile', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower(), 'sub_id': self.test_profile.sub_id}),
             {'email': agent_email}
         )
         self.assertEqual(mock_send_profile_email_to_agent.call_count, 0)
 
         self.client.force_login(self.staff_user)
         self.client.post(
-            reverse('share_profile', kwargs={'prefix': self.test_profile.profile_code_prefix.value, 'sub_id': self.test_profile.sub_id}),
+            reverse('share_profile', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower(), 'sub_id': self.test_profile.sub_id}),
             {'email': agent_email}
         )
         self.assertEqual(mock_send_profile_email_to_agent.call_count, 0)
@@ -254,7 +254,7 @@ class ServiceRequestTests(TestCase):
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
-            reverse('share_profile', kwargs={'prefix': self.test_profile.profile_code_prefix.value ,'sub_id': self.test_profile.pk}),
+            reverse('share_profile', kwargs={'profile_cls_lc': self.test_profile.__class__.__name__.lower() ,'sub_id': self.test_profile.pk}),
             {'email': "agent@example.com"}
         )
 
