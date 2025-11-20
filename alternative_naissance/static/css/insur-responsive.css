@@ -1,4 +1,10 @@
 /* Medium screen  */
+@media (max-width: 1199px) and (min-width: 992px) { /* little hack for the footer from large to medium screen. lg screens */
+    .site-footer .row > .col-lg-6:nth-child(n+3) {
+        margin-top: 30px; /* espace entre les 2 lignes */
+    }
+}
+
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
     .about-one__left {
         max-width: 600px;
@@ -827,8 +833,8 @@
     }
 
     .footer-widget__contact {
-        margin-top: 47px;
-        margin-bottom: 39px;
+        margin-top: 40px;
+        margin-bottom: 0px;
     }
 
     .footer-widget__newsletter {

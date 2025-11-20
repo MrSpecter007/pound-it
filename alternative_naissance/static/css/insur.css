@@ -107,6 +107,9 @@ section h2 {
 section p.text-muted {
   color: #7a6f77;
 }
+.rich-text-content{
+  padding-bottom: 100px;
+}
 
 /* ===== Atelier Card ===== */
 .card {
@@ -154,9 +157,6 @@ section p.text-muted {
 
 /* ===== Responsive spacing ===== */
 @media (max-width: 768px) {
-  section {
-    padding: 2rem 0;
-  }
 
   .card {
     margin-bottom: 1rem;
@@ -228,6 +228,7 @@ a:hover,
 a:focus,
 a:visited {
   text-decoration: none;
+  color:#97a2b7
 }
 
 ::-webkit-input-placeholder {
@@ -5064,8 +5065,8 @@ ul {
 .footer-widget__logo {
   position: relative;
   display: inline-block;
-  margin-bottom: 33px;
-  margin-top: -8px;
+  margin-bottom: 0px;
+  margin-top: -34px;
 }
 
 .footer-widget__about {
@@ -5168,6 +5169,7 @@ ul {
   letter-spacing: var(--insur-letter-spacing);
   line-height: 20px;
   margin-bottom: 40px;
+  padding-top: 0;
 }
 
 .footer-widget__contact {
@@ -9534,6 +9536,9 @@ ul {
 @media (max-width: 991px) {
   .sidebar {
     margin-top: 50px;
+  }
+  .footer-widget__title {
+    padding-top: 60px;
   }
 }
 
@@ -23749,7 +23754,6 @@ ul li ul .is-new-menu>a>span::after {
 }
 
 .footer-widget__about-text {
-  color: var(--insur-white);
   line-height: 30px;
   font-size: 16px;
 }
