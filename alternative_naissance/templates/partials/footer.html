@@ -80,12 +80,17 @@
                     <div class="footer-widget__column footer-widget__newsletter">
                         <h3 class="footer-widget__title">Infolettre</h3>
                         <p class="footer-widget__newsletter-text">Abonnez-vous à notre lettre d'information pour recevoir nos <br> dernières mises à jour et nouvelles.</p>
-                        <form class="footer-widget__newsletter-form">
+                        
+                        <form action="{% url 'subscribe_newsletter' %}" method="POST" class="footer-widget__newsletter-form">
+                            {% csrf_token %}
                             <div class="footer-widget__newsletter-input-box">
-                                <input type="email" placeholder="Adresse courriel" name="email">
-                                <button type="submit" class="footer-widget__newsletter-btn"><i class="far fa-paper-plane"></i></button>
+                                <input type="email" placeholder="Adresse courriel" name="email" required>
+                                <button type="submit" class="footer-widget__newsletter-btn">
+                                    <i class="far fa-paper-plane"></i>
+                                </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
 
@@ -103,3 +108,5 @@
         </div>
     </div>
 </footer>
+
+

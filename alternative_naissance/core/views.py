@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import InscriptionForm
 from .forms import ProfilForm
+from .models import NewsletterSubscription
 
 
 def inscription_view(request):
@@ -67,4 +68,21 @@ def dashboard_view(request):
 def logout_view(request):
     logout(request)
     return redirect("/")  # Redirection vers l’accueil
+
+
+
+def subscribe_newsletter(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        if email:
+            # éviter les doublons
+            obj, created = NewsletterSubscription.objects.get_or_create(email=email)
+            if created:
+                messages.success(request, "Merci! Vous êtes inscrit(e) à notre infolettre.")
+            else:
+                messages.info(request, "Vous êtes déjà inscrit(e).")
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
 

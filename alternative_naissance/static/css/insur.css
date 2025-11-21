@@ -309,6 +309,60 @@ ul {
   padding-right: 15px;
 }
 
+/* --- Wrapper responsive 16/9 --- */
+.map-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* ratio 16:9 */
+    height: 0;
+    overflow: hidden;
+}
+
+.map-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+}
+
+
+/* --- Nettoyage du rendu Wagtail StructBlock (<dl><dt><dd>) --- */
+.block-map dl, 
+.block-map dl dd {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* --- Wrapper type container pour limiter la largeur --- */
+.block-map dl dd {
+  max-width: 1200px;     /* largeur max comme container (ajuste si besoin) */
+  margin: 0 auto;        /* centre horizontalement */
+  padding-left: 15px;    /* marges internes comme container */
+  padding-right: 15px;
+  text-align: left;    /* centre les éléments inline */
+}
+
+/* --- dt custom: remplacer “iframe” par “Nous trouver” --- */
+.block-map dt {
+    padding-bottom: 15px;
+    max-width: 1200px;     
+    margin: 0 auto;       
+    padding-left: 15px; 
+    padding-right: 15px;
+    text-align: left;
+    color: transparent;
+}
+
+/* texte personnalisé */
+.block-map dt::before {
+    content: "Nous trouver";
+    color: #000;
+}
+
+
 @media (min-width: 1200px) {
   .container {
     max-width: 1200px;

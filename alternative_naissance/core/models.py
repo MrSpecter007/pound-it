@@ -595,7 +595,22 @@ class AtelierListBlock(blocks.StructBlock):
             context["request"] = parent_context["request"]
 
         return context
-    
+
+# --------------------------
+# MAP BLOCK
+# --------------------------
+
+class GoogleMapBlock(blocks.StructBlock):
+    iframe = blocks.RawHTMLBlock(
+        help_text="Colle ici le code embed (iframe) de Google Maps"
+    )
+
+class Meta:
+    template = "blocks/google_map.html"
+    icon = "site"
+    label = "Carte Google Maps"
+
+
 
 class Inscription(models.Model):
     prenom = models.CharField(max_length=100)
@@ -621,7 +636,28 @@ class Inscription(models.Model):
 
     def __str__(self):
         return f"{self.prenom} {self.nom} ({self.courriel})"
-    
+
+
+# --------------------------
+# News letter
+# --------------------------
+@register_snippet
+class NewsletterSubscription(models.Model):
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    panels = [
+        FieldPanel("email"),
+    ]
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Inscription à l’infolettre"
+
+
 # --------------------------
 # Page générique
 # --------------------------
@@ -663,6 +699,7 @@ class GenericPage(Page):
         ("calendar_events", CalendarBlock()),
         ("dynamic_table", DynamicTableBlock()),
         ("atelier", AtelierListBlock()),
+        ('map', GoogleMapBlock()),
     ], 
     blank=True,
     null=True,

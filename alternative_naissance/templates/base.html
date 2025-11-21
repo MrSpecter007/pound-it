@@ -35,6 +35,17 @@
     {% include "partials/searchPopUp.html" %}
     {% include "partials/script.html" %}
 
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
     {% block script %}
         <script src="{% static 'js/insur.js' %}"></script>
 
