@@ -1,6 +1,6 @@
 from typing import Any
 
-from . import ProfileCodePrefix
+from .shared_properties import ProfileCodePrefix
 from .base_service_profile import BaseServiceProfile
 from django.db import models
 
@@ -26,4 +26,3 @@ class InterruptionGrossesse(BaseServiceProfile):
     class Meta:
         verbose_name = "Profil Interruption de Grossesse"
         verbose_name_plural = "Profils Interruption de Grossesse"
-
