@@ -124,7 +124,7 @@ def preview_profile_pdf(request: WSGIRequest, profile_cls_lc: str, sub_id: int) 
     This allows admins to view the PDF before sending it to an agent.
     """
     # TODO Change the function to handle any subclass of Profile
-    profile = _get_service_profile_or_404(profile_cls_lc, sub_id)
+    profile = _get_service_profile_or_404_raise(profile_cls_lc, sub_id)
 
     pdf_buffer = generate_profile_pdf(profile)
 
@@ -138,7 +138,10 @@ def share_profile(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> Htt
     Allows admin to input the agent info, and it will send the PDF version
     of the profile to the agent email.
     """
-    profile = _get_service_profile_or_404(profile_cls_lc, sub_id)
+    try:
+        profile = _get_service_profile_or_404_raise(profile_cls_lc, sub_id)
+    except ValueError:
+        return HttpResponse(status=404)
 
     if request.method == 'POST':
         form = ShareForm(request.POST)
@@ -175,7 +178,7 @@ def share_profile(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> Htt
     )
 
 
-def _get_service_profile_or_404(profile_cls_lc: str, sub_id: int) -> ServiceProfile | HttpResponse:
+def _get_service_profile_or_404_raise(profile_cls_lc: str, sub_id: int) -> ServiceProfile:
     profile: ServiceProfile
     if profile_cls_lc == Naissance.__name__.lower():
         profile = get_object_or_404(Naissance, pk=sub_id)
@@ -190,6 +193,5 @@ def _get_service_profile_or_404(profile_cls_lc: str, sub_id: int) -> ServiceProf
     elif profile_cls_lc == InterventionPerinatale.__name__.lower():
         profile = get_object_or_404(InterventionPerinatale, pk=sub_id)
     else:
-        return HttpResponse(status=404)
-
+        raise ValueError("Corresponding profile subclass not found")
     return profile
