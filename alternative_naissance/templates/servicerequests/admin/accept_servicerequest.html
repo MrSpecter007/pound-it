@@ -14,6 +14,7 @@
     {% include "wagtailadmin/shared/header.html" with title="Accepter la demande" icon="check" %}
 
     <div>
+      {{ service_request }}
         <form action="{% url 'accept_service_request' service_request.pk %}" method="post" class="nice-padding">
             {% csrf_token %}
             <h1>Accepter la demande de service?</h1>
