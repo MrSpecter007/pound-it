@@ -1,16 +1,46 @@
 from typing import override
 
+from django.shortcuts import redirect
 from django.urls import path, reverse
 from wagtail import hooks
 from wagtail.admin.panels import FieldPanel
+from wagtail.snippets import widgets
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
-from wagtail.snippets import widgets
-
-from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, RencontresVirtuelles, Relevailles
+from .models import ServiceRequest, BaseServiceProfile, Naissance, Deuil, ServiceProfile, InterruptionGrossesse, \
+    InterventionPerinatale, RencontresVirtuelles, Relevailles
 from .views import share_profile, accept_service_request, reject_service_request, preview_profile_pdf
+
+
+class PendingByDefaultIndexView(SnippetViewSet.index_view_class):
+    """
+    The custom index view used by ServiceRequest to show only pending requests by default but allow the showing
+    of rejected requests as well.
+    """
+
+    def get(self, request, *args, **kwargs):
+        # If user did not specify that it is NOT pending in url path, redirect to path with pending enabled
+        if not "status" in request.GET:
+            params = request.GET.copy()
+            params["status"] = "pending"
+            return redirect(f"{request.path}?{params.urlencode()}")
+
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        request = getattr(self, "request", None)
+        # If user explicitly applied a filter then let it be
+        if request and "status" in request.GET:
+            return qs
+
+        # Otherwise, apply the default "pending" filter
+        return qs.filter(status="pending")
+
 
 _BASE_PROFILE_PANELS: list[FieldPanel] = [
     FieldPanel("first_name"),
@@ -35,7 +65,7 @@ _BASE_PROFILE_PANELS: list[FieldPanel] = [
 
 class ServiceRequestViewSet(SnippetViewSet):
     """The view set for processing service requests."""
-    
+
     model = ServiceRequest
 
     panels = [
@@ -44,7 +74,7 @@ class ServiceRequestViewSet(SnippetViewSet):
         FieldPanel("service_type"),
         FieldPanel("expected_delivery_date"),
         FieldPanel("child_birth_date"),
-        FieldPanel("street_address"), 
+        FieldPanel("street_address"),
         FieldPanel("city"),
         FieldPanel("province"),
         FieldPanel("postal_code"),
@@ -55,27 +85,17 @@ class ServiceRequestViewSet(SnippetViewSet):
         FieldPanel("no_email"),
         FieldPanel("languages"),
         FieldPanel("citizenship_status"),
-        FieldPanel("status")
+        FieldPanel("status", read_only=True),
+        FieldPanel("refusal_date", read_only=True),
+        FieldPanel("refusal_reason"),
     ]
 
     menu_label = "Demandes"
     icon = "form"
     list_display = ("first_name", "last_name", "service_full_name", "status")
-    list_filter = ("status", "service_type")
+    list_filter = ("service_type", "status")
     search_fields = ("first_name", "last_name", "email", "phone")
-
-
-# class ProfileViewSet(SnippetViewSet):
-#     """The view set for the main profiles created from accepting the service request."""
-#     model = BaseServiceProfile
-#
-#     panels = [] + _BASE_PROFILE_PANELS
-#
-#     menu_label = "Profils"
-#     icon = "user"
-#     list_display = ("profile_code", "first_name", "last_name", "service_type", "status")
-#     list_filter = ("status", "service_type")
-#     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+    index_view_class = PendingByDefaultIndexView
 
 
 class NaissanceModelViewSet(SnippetViewSet):
@@ -107,6 +127,7 @@ class DeuilModelViewSet(SnippetViewSet):
     list_filter = ("status", "service_type")
     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
+
 class RelevaillesModelViewSet(SnippetViewSet):
     """The view set for the Relevailles model."""
     model = Relevailles
@@ -135,6 +156,7 @@ class InterruptionGrossesseViewSet(SnippetViewSet):
     list_filter = ("status", "service_type")
     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
+
 class InterventionPerinataleViewSet(SnippetViewSet):
     """The view set for the InterventionPerinatale model."""
     model = InterventionPerinatale
@@ -148,6 +170,7 @@ class InterventionPerinataleViewSet(SnippetViewSet):
     list_filter = ("status", "service_type")
     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
 
+
 class RencontresVirtuellesViewSet(SnippetViewSet):
     """The view set for the RencontresVirtuelles model."""
     model = RencontresVirtuelles
@@ -160,6 +183,7 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
     list_display = ("profile_code", "first_name", "last_name", "status")
     list_filter = ("status", "service_type")
     search_fields = ("profile_code", "first_name", "last_name", "email", "phone")
+
 
 ##############################################
 
@@ -259,7 +283,6 @@ def register_reject_request_menu_item(model):
     return RejectRequestMenuItem(order=30)
 
 
-
 ########## Create share profile button also in the listing menus.
 @hooks.register('register_snippet_listing_buttons')
 def snippet_listing_buttons(snippet, user, next_url=None):
@@ -276,12 +299,12 @@ def snippet_listing_buttons(snippet, user, next_url=None):
     )
 
 
-
 @hooks.register('register_admin_urls')
 def register_share_profile_urls():
     return [
         path('serviceprofiles/share/<str:profile_cls_lc>/<int:sub_id>', share_profile, name='share_profile'),
-        path('serviceprofiles/preview/<str:profile_cls_lc>/<int:sub_id>', preview_profile_pdf, name='preview_profile_pdf'),
+        path('serviceprofiles/preview/<str:profile_cls_lc>/<int:sub_id>', preview_profile_pdf,
+             name='preview_profile_pdf'),
         path('servicerequests/accept-request/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject-request/<int:pk>', reject_service_request, name='reject_service_request'),
     ]

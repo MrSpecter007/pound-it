@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from django.core.handlers.wsgi import WSGIRequest
@@ -7,7 +8,8 @@ from django.contrib import messages
 from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
-from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, ProfileCodePrefix
+from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, \
+    ProfileCodePrefix
 from .models.relevailles import Relevailles
 from .models.rencontres_virtuelle import RencontresVirtuelles
 from .security import can_modify_servicerequests
@@ -27,10 +29,10 @@ def create_service_request(request: WSGIRequest) -> HttpResponseRedirect | HttpR
             return redirect('create_service_request_success')
     else:
         form: ServiceRequestForm = ServiceRequestForm()
-        
+
     return render(
-        request, 
-        'servicerequests/service_request_form.html', 
+        request,
+        'servicerequests/service_request_form.html',
         {'form': form}
     )
 
@@ -51,7 +53,7 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
 
     if request.method == 'POST':
         # Create a new Profile with all the fields from the ServiceRequest
-        service_request_kwargs: dict = service_request.__dict__.copy() # Making a copy to avoid altering the original service_request
+        service_request_kwargs: dict = service_request.__dict__.copy()  # Making a copy to avoid altering the original service_request
         # Remove not needed fields
         service_request_kwargs.pop('id')
         service_request_kwargs.pop('status')
@@ -87,7 +89,7 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
 
         # Delete the service request
         service_request.delete()
-        
+
         return redirect('/admin/snippets/servicerequests/servicerequest/')
 
     return render(
@@ -106,15 +108,17 @@ def reject_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
 
     service_request = get_object_or_404(ServiceRequest, pk=pk)
     if request.method == 'POST':
-        service_request.delete()
-        #TODO add statistic recording the rejected requests
+        service_request.refusal_reason = request.POST.get('reason')
+        service_request.refusal_date = datetime.date.today()
+        service_request.status = "rejected"
+        service_request.save()
+        # TODO add statistic recording the rejected requests
         return redirect('/admin/snippets/servicerequests/servicerequest/')
 
     form = RejectRequestForm()
     return render(request,
                   'servicerequests/admin/reject_servicerequest.html',
                   {'service_request': service_request, 'form': form})
-
 
 
 @user_passes_test(can_modify_servicerequests)
@@ -128,7 +132,8 @@ def preview_profile_pdf(request: WSGIRequest, profile_cls_lc: str, sub_id: int) 
 
     pdf_buffer = generate_profile_pdf(profile)
 
-    return FileResponse(pdf_buffer, as_attachment=False, filename=f"preview_profile_{profile.first_name}_{profile.last_name}.pdf")
+    return FileResponse(pdf_buffer, as_attachment=False,
+                        filename=f"preview_profile_{profile.first_name}_{profile.last_name}.pdf")
 
 
 @user_passes_test(can_modify_servicerequests)
@@ -148,14 +153,14 @@ def share_profile(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> Htt
         if form.is_valid():
             # Get the email from the form
             agent_email = form.cleaned_data['email']
-            
+
             try:
                 # Generate PDF
                 pdf_buffer = generate_profile_pdf(profile)
-                
+
                 # Send email with PDF attachment
                 email_sent = send_profile_email_to_agent(agent_email, profile, pdf_buffer)
-                
+
                 if email_sent:
                     messages.success(request, f"Profil partagé avec {agent_email}")
                     return redirect('/admin/snippets/servicerequests/servicerequest/')
@@ -163,7 +168,7 @@ def share_profile(request: WSGIRequest, profile_cls_lc: str, sub_id: int) -> Htt
                     messages.error(request, f"Échec de 'envoi du courriel á {agent_email}. Veuillez réessayer.")
             except Exception as e:
                 messages.error(request, f"An error occurred: {str(e)}")
-            
+
     else:
         form = ShareForm()
 

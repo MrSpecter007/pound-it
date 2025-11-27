@@ -1,16 +1,17 @@
 from typing import Optional
 
 from django.db import models
-from .shared_properties import _SERVICE_CHOICES,_LANGUAGE_CHOICES,_CITIZENSHIP_STATUS_CHOICES
+from .shared_properties import _SERVICE_CHOICES, _LANGUAGE_CHOICES, _CITIZENSHIP_STATUS_CHOICES
+
 
 class ServiceRequest(models.Model):
     SERVICE_CHOICES = _SERVICE_CHOICES
     LANGUAGE_CHOICES = _LANGUAGE_CHOICES
     CITIZENSHIP_STATUS_CHOICES = _CITIZENSHIP_STATUS_CHOICES
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("accepted", "Accepted"),
-        ("rejected", "Rejected"),
+        ("pending", "En attente"),
+        # ("accepted", "Accepted"),
+        ("rejected", "Réfusé"),
     ]
 
     # Basic information
@@ -51,12 +52,15 @@ class ServiceRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Statut")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    refusal_reason = models.TextField(null=True, blank=True, verbose_name="Raison du refus")
+    refusal_date = models.DateTimeField(null=True, blank=True, verbose_name="Date du refus")
+
     @property
     def service_full_name(self) -> str:
         """Used to get the more human-readable name of the service type."""
         return dict(self.SERVICE_CHOICES).get(self.service_type, self.service_type)
-    service_full_name.fget.short_description = "Nom du service" # Will be used by Wagtail snippet listing view (equivalent to verbose_name)
 
+    service_full_name.fget.short_description = "Nom du service"  # Will be used by Wagtail snippet listing view (equivalent to verbose_name)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email}) - {self.service_full_name}"

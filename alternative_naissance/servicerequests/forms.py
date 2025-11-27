@@ -5,6 +5,9 @@ from .models import ServiceRequest
 
 
 class ServiceRequestForm(forms.ModelForm):
+    """
+    The public facing form for requesting a service.
+    """
     # Create MultipleChoiceField for languages, will be stored as comma separated strings in db
     languages_choices: forms.MultipleChoiceField = forms.MultipleChoiceField(
         choices=ServiceRequest.LANGUAGE_CHOICES,
@@ -112,7 +115,9 @@ class ServiceRequestForm(forms.ModelForm):
         return instance
 
 class RejectRequestForm(forms.Form):
+    """The Admin facing form for rejecting a service request."""
     reason = forms.CharField(label='Raison du refus', max_length=255)
 
 class ShareForm(forms.Form):
+    """The Admin facing form for sharing a service request with an agent."""
     email = forms.EmailField(label='Email of the agent to share with')
