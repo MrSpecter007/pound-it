@@ -63,23 +63,7 @@ class ServiceRequestViewSet(SnippetViewSet):
 
     model = ServiceRequest
 
-    panels = [
-        FieldPanel("first_name"),
-        FieldPanel("last_name"),
-        FieldPanel("service_type"),
-        FieldPanel("expected_delivery_date"),
-        FieldPanel("child_birth_date"),
-        FieldPanel("street_address"),
-        FieldPanel("city"),
-        FieldPanel("province"),
-        FieldPanel("postal_code"),
-        FieldPanel("no_permanent_address"),
-        FieldPanel("phone"),
-        FieldPanel("no_phone"),
-        FieldPanel("email"),
-        FieldPanel("no_email"),
-        FieldPanel("languages"),
-        FieldPanel("citizenship_status"),
+    panels = [FieldPanel("service_type")] + _BASE_PROFILE_PANELS + [
         FieldPanel("status", read_only=True),
         FieldPanel("refusal_date", read_only=True),
         FieldPanel("refusal_reason"),
@@ -128,10 +112,10 @@ class RejectRequestMenuItem(ActionMenuItem):
 
 
 @hooks.register('register_snippet_action_menu_item')
-def register_accept_request_menu_item(model):
+def register_accept_request_menu_item(_model):
     return AcceptRequestMenuItem(order=20)
 
 
 @hooks.register('register_snippet_action_menu_item')
-def register_reject_request_menu_item(model):
+def register_reject_request_menu_item(_model):
     return RejectRequestMenuItem(order=30)
