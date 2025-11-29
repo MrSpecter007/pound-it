@@ -1,0 +1,41 @@
+{% extends 'wagtailadmin/reports/base_report_results.html' %}
+
+{% block results %}
+    <table class="listing {% block table_classname %}{% endblock %}">
+        <col width="35%"/>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col/>
+        <thead>
+        {% block post_parent_page_headers %}
+            <tr class="table-headers">
+                <th>
+                    Année fiscale
+                </th>
+                <th>
+                    Demandes refusé
+                </th>
+                <th class="type">
+                    Demandes en attente
+                </th>
+                {% block extra_columns %}
+                {% endblock %}
+            </tr>
+        {% endblock %}
+        </thead>
+        <tbody>
+        {% for obj in object_list %}
+            <tr>
+                <td>{{ obj.tax_year_display }}</td>
+                <td>{{ obj.rejected_count }}</td>
+                <td>{{ obj.pending_count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block no_results_message %}
+    <p>Pas de demandes de service refuśe ou en attente.</p>
+{% endblock %}

@@ -7,6 +7,7 @@ from servicerequests.views import share_profile, accept_service_request, reject_
 from .profile_hooks import InterventionPerinataleViewSet, DeuilModelViewSet, NaissanceModelViewSet, \
     InterruptionGrossesseViewSet, RencontresVirtuellesViewSet, RelevaillesModelViewSet
 from .service_request_hooks import ServiceRequestViewSet
+from .service_request_report_hook import TaxYearServiceRequestReport
 
 
 @register_snippet
@@ -26,13 +27,17 @@ class ServiceRequestGroup(SnippetViewSetGroup):
     ]
 
 
-
 @hooks.register('register_admin_urls')
-def register_share_profile_urls():
+def register_servicerequests_urls():
     return [
         path('serviceprofiles/share/<str:profile_cls_lc>/<int:sub_id>', share_profile, name='share_profile'),
         path('serviceprofiles/preview/<str:profile_cls_lc>/<int:sub_id>', preview_profile_pdf,
              name='preview_profile_pdf'),
         path('servicerequests/accept-request/<int:pk>', accept_service_request, name='accept_service_request'),
         path('servicerequests/reject-request/<int:pk>', reject_service_request, name='reject_service_request'),
+        path(
+            'reports/servicerequests/', TaxYearServiceRequestReport.as_view(), name='service_request_report'),
+        path(
+            'reports/servicerequests/results/', TaxYearServiceRequestReport.as_view(results_only=True),
+            name='service_request_report_results'),
     ]

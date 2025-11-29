@@ -1,21 +1,21 @@
 import datetime
 from typing import Optional
 
+from django.contrib import messages
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
 from wagtail.admin.auth import user_passes_test
 
 from .forms import ServiceRequestForm, ShareForm, RejectRequestForm
-from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, InterruptionGrossesse, InterventionPerinatale, \
-    ProfileCodePrefix
+from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, InterruptionGrossesse, InterventionPerinatale
 from .models.relevailles import Relevailles
 from .models.rencontres_virtuelle import RencontresVirtuelles
 from .security import can_modify_servicerequests
 from .utils import generate_profile_pdf, send_profile_email_to_agent
 
 
+############ Public view endpoints #############
 def create_service_request(request: WSGIRequest) -> HttpResponseRedirect | HttpResponse:
     """
     Handles the creation of a new service request.
@@ -41,8 +41,7 @@ def create_service_request_success(request: WSGIRequest) -> HttpResponse:
     return render(request, 'servicerequests/service_request_form_submitted.html')
 
 
-## Endpoints for Admin pages
-
+################ Admin view endpoints ##############
 @user_passes_test(can_modify_servicerequests)
 def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirect | HttpResponse:
     """
@@ -58,6 +57,8 @@ def accept_service_request(request: WSGIRequest, pk: int) -> HttpResponseRedirec
         service_request_kwargs.pop('id')
         service_request_kwargs.pop('status')
         service_request_kwargs.pop('created_at')
+        service_request_kwargs.pop('refusal_reason')
+        service_request_kwargs.pop('refusal_date')
         service_request_kwargs.pop('_state')
 
         profile: Optional[ServiceProfile] = None
