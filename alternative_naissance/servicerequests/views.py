@@ -12,7 +12,7 @@ from .models import ServiceRequest, Deuil, Naissance, ServiceProfile, Interrupti
 from .models.relevailles import Relevailles
 from .models.rencontres_virtuelle import RencontresVirtuelles
 from .security import can_modify_servicerequests
-from .utils import generate_profile_pdf, send_profile_email_to_agent
+from .utils import generate_profile_pdf, send_profile_email_to_agent, send_service_request_emails
 
 
 ############ Public view endpoints #############
@@ -25,7 +25,21 @@ def create_service_request(request: WSGIRequest) -> HttpResponseRedirect | HttpR
         form: ServiceRequestForm = ServiceRequestForm(request.POST)
         if form.is_valid():
             service_request: ServiceRequest = form.save()
-            # TODO: Send email to user and admin about service request creation
+            
+            # Send confirmation emails to user and admin
+            email_results = send_service_request_emails(service_request)
+            
+            # Log email sending results
+            if email_results["user_email_sent"]:
+                print(f"Confirmation email sent to {service_request.email}")
+            else:
+                print(f"Failed to send confirmation email to {service_request.email}")
+                
+            if email_results["admin_email_sent"]:
+                print("Admin notification email sent")
+            else:
+                print("Failed to send admin notification email")
+                
             return redirect('create_service_request_success')
     else:
         form: ServiceRequestForm = ServiceRequestForm()
