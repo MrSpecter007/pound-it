@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "search",
     "core",
     "servicerequests",
+    "emails",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",

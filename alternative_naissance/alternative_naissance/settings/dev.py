@@ -15,6 +15,8 @@ EMAIL_PORT = 21025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@alternative-naissance.ca')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@example.com')
 
 try:
     from .local import *
