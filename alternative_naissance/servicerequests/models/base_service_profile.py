@@ -124,7 +124,7 @@ class BaseServiceProfile(models.Model):
 
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email if self.email is not None else self.phone}) - {self.service_type}"
+        return f"{self.profile_code} - {self.first_name} {self.last_name} ({self.email if self.email is not None else self.phone}) - {self.service_type}"
 
     class Meta:
         verbose_name = "Profil"

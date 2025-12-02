@@ -15,7 +15,7 @@ class Relevailles(BaseServiceProfile):
 
     @property
     def profile_code(self) -> str:
-        return self.profile_code_prefix.value + str(self.sub_id).zfill(6)
+        return self.profile_code_prefix.value + str(self.sub_id).zfill(7)
 
     @property
     def fields_needed_for_agent(self) -> list[list[str | Any]]:
