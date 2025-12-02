@@ -56,6 +56,29 @@ class BaseServiceProfile(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+    ################# Shared fields that are not from service request ######################
+    ######## INFORMATIONS SUR LE.LA CLIENT.E à tous les formulaires #######
+    country_of_origin = models.CharField(max_length=255, null=True, blank=True, verbose_name="Pays d'origine")
+    quebec_arrival_date = models.DateField(null=True, blank=True, verbose_name="Date d'arrivée au Québec")
+    age = models.IntegerField(null=True, blank=True, verbose_name="Âge")
+    occupation = models.CharField(max_length=255, null=True, blank=True, verbose_name="Occupation")
+    pronouns_preferred_name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Pronoms ou nom de préférence")
+
+    ####### INFORMATIONS SUR LE CO-PARENT à tous les formulaires #######
+    is_monoparental = models.BooleanField(default=False, verbose_name="Monoparentale")
+    is_soloparental = models.BooleanField(default=False, verbose_name="Soloparentale")
+    is_couple = models.BooleanField(default=False, verbose_name="Couple")
+
+    # Partner information (only used if is_couple=True)
+    partner_full_name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Prénom, nom du partenaire")
+    partner_email = models.EmailField(null=True, blank=True, verbose_name="Courriel du partenaire")
+    partner_occupation = models.CharField(max_length=255, null=True, blank=True,
+                                          verbose_name="Occupation du partenaire")
+    partner_absent_from_quebec = models.BooleanField(default=False, verbose_name="Partenaire absent(e) du Québec")
+
+
+
     @property
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
@@ -83,7 +106,19 @@ class BaseServiceProfile(models.Model):
         implementation in the Profile class should never be called in theory.
         """
         # TODO Should probably remove default implementation and use `pass` instead
-        return str(self.id).zfill(6)
+        return str(self.id).zfill(7)
+
+    @property
+    def tax_year(self) -> str:
+        """The tax year which the profile belongs to. NOT SENT TO THE AGENT."""
+        date = self.created_at.date()
+        # Note that in edge case of a request was made at exactly April 1st 0h0m0s0ms, is supposed to be in the previous tax year (how it works in the report functionality).
+        # But here it would've been categorized as the current tax year. This is so unlikely to happen that it is left as is for now.
+        if date.month < 4:
+            return str(date.year - 1) + " - " + str(date.year)
+        else:
+            return str(date.year) + " - " + str(date.year + 1)
+
 
     @property
     def fields_needed_for_agent(self) -> list[list[str | Any]]:
@@ -95,6 +130,7 @@ class BaseServiceProfile(models.Model):
         ALL MODELS that extend the Profile model MUST implement this method as add additional fields to the PDF.
         """
         return [
+            ["Numero du dossier", self.profile_code],
             [self._meta.get_field("first_name").verbose_name, self.first_name],
             [self._meta.get_field("last_name").verbose_name, self.last_name],
 
@@ -120,6 +156,23 @@ class BaseServiceProfile(models.Model):
 
             [self._meta.get_field("citizenship_status").verbose_name,
              dict(self.CITIZENSHIP_STATUS_CHOICES).get(self.citizenship_status, self.citizenship_status)],
+
+            ##### INFORMATION SUR LE CLIENT
+            [self._meta.get_field("country_of_origin").verbose_name, self.country_of_origin],
+            [self._meta.get_field("quebec_arrival_date").verbose_name, self.quebec_arrival_date],
+            [self._meta.get_field("age").verbose_name, self.age],
+            [self._meta.get_field("occupation").verbose_name, self.occupation],
+            [self._meta.get_field("pronouns_preferred_name").verbose_name, self.pronouns_preferred_name],
+
+            #### INFORMATIONS SUR LE CO-PARENT
+            [self._meta.get_field("is_monoparental").verbose_name, self.is_monoparental],
+            [self._meta.get_field("is_soloparental").verbose_name, self.is_soloparental],
+            [self._meta.get_field("is_couple").verbose_name, self.is_couple],
+
+            [self._meta.get_field("partner_full_name").verbose_name, self.partner_full_name],
+            [self._meta.get_field("partner_email").verbose_name, self.partner_email],
+            [self._meta.get_field("partner_occupation").verbose_name, self.partner_occupation],
+            [self._meta.get_field("partner_absent_from_quebec").verbose_name, self.partner_absent_from_quebec],
         ]
 
 

@@ -9,7 +9,8 @@ from wagtail.snippets.views.snippets import SnippetViewSet
 
 from servicerequests.models import ServiceRequest
 
-_BASE_PROFILE_PANELS: list[FieldPanel] = [
+_BASE_REQUEST_PANELS: list[FieldPanel] = [
+    FieldPanel("status"),
     FieldPanel("first_name"),
     FieldPanel("last_name"),
 
@@ -25,8 +26,7 @@ _BASE_PROFILE_PANELS: list[FieldPanel] = [
     FieldPanel("email"),
     FieldPanel("no_email"),
     FieldPanel("languages"),
-    FieldPanel("citizenship_status"),
-    FieldPanel("status")
+    FieldPanel("citizenship_status")
 ]
 
 
@@ -63,7 +63,7 @@ class ServiceRequestViewSet(SnippetViewSet):
 
     model = ServiceRequest
 
-    panels = [FieldPanel("service_type")] + _BASE_PROFILE_PANELS + [
+    panels = [FieldPanel("service_type")] + _BASE_REQUEST_PANELS + [
         FieldPanel("status", read_only=True),
         FieldPanel("refusal_date", read_only=True),
         FieldPanel("refusal_reason"),
