@@ -1,8 +1,10 @@
 from typing import override
 
+from django import forms
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from wagtail import hooks
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.snippets import widgets
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.views.snippets import SnippetViewSet
@@ -42,15 +44,86 @@ _BASE_PROFILE_MIDDLE_PANELS: list[FieldPanel | MultiFieldPanel] = [
 _BASE_PROFILE_LIST_DISPLAY: list[str] = ["profile_code", "first_name", "last_name", "status", "tax_year"]
 _BASE_PROFILE_SEARCH_FIELDS: list[str] = ["profile_code", "first_name", "last_name", "email", "phone", "tax_year"]
 
+PLACE_OF_DELIVERY_CHOICE = [  # Used by DatalistTextField widget
+    "CHUM",
+    "Glen / Victoria / Children's",
+    "Hôpital Juif",
+    "Lakeshore",
+    "Lasalle",
+    "Maisonneuve-Rosemont",
+    "Sacré-Coeur",
+    "Ste-Justine",
+    "Ste-Mary's",
+    "MDN Marie-Paule-Lanthier",
+    "MDN Côte-des-Neiges",
+    "MDN Anne-Courtemanche",
+    "MDN Jeanne-Mance"
+]
+
+PERSON_SCHEDULED_FOR_BIRTH_CHOICE = [  # Used by DatalistTextField widget
+    "Ami.e",
+    "Co-parent",
+    "Co-parent absent à l’accouchement",
+    "Membre de la famille",
+    "Peut-être co-parent absent",
+    "Peut-être membre de la famille",
+]
+
+
+class DatalistInput(forms.TextInput):
+    """
+    Custom text widget that shows autocomplete suggestion using <datalist> tag in HTML.
+    Used for situation where the client wants a list of predefined input but also
+    want a "Autre" field that  will allow custom input. So instead of having a "Choice field"
+    and an extra text field that shows when picked "Autre", we will just use a simple text field
+    that shows predefined suggestions.
+
+    Note: for strings inside data_list, make sure to escape any double quotation marks
+    """
+
+    def __init__(self, data_list: list[str], name: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._name = name
+        self._list = data_list
+        self.attrs.update({'list': f'list__{self._name}'})
+
+    @override
+    def render(self, name, value, attrs=None, renderer=None):
+        text_html = super().render(name, value, attrs, renderer)
+        data_list = f'<datalist id="list__{self._name}">'
+        for item in self._list:
+            data_list += f'<option value="{item}">'
+        data_list += '</datalist>'
+
+        return mark_safe(text_html + data_list)
+
 
 class NaissanceModelViewSet(SnippetViewSet):
     """The view set for the Naissance model."""
     model = Naissance
 
     panels = (_BASE_PROFILE_HEAD_PANELS + _BASE_REQUEST_PANELS + _BASE_PROFILE_MIDDLE_PANELS + [
-        FieldPanel("birth_name")
+        MultiFieldPanel(heading="INFORMATIONS SUR LA/LES GROSSESSE/S ET LE/LES ACCOUCHEMENT.S", children=(
+            FieldPanel("number_of_pregnancies"),
+            FieldPanel("number_of_children"),
+            InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
+            FieldPanel("anticipated_new_born_delivery_date"),
+            FieldPanel("place_of_delivery",
+                       widget=DatalistInput(PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
+            FieldPanel("follow_up_by"),
+            FieldPanel("referred_by"),
+            FieldPanel("Persons_scheduled_for_childbirth",
+                       widget=DatalistInput(PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
+            FieldPanel("comments_on_childbirth"),
+            FieldPanel("service_expectations"),
+            FieldPanel("pregnancy_conditions"),
+            FieldPanel("pregnancy_concerns"),
+            FieldPanel("birth_concerns"),
+            FieldPanel("baby_arrival_concerns"),
+            FieldPanel("has_prenatal_classes"),
+            FieldPanel("prenatal_classes_notes"),
+        )),
     ])
-
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
@@ -120,17 +193,36 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
     """The view set for the RencontresVirtuelles model."""
     model = RencontresVirtuelles
 
-    panels = _BASE_REQUEST_PANELS + [
-        FieldPanel("rencontre_virtuelle_note")
-    ]
+    panels = (_BASE_PROFILE_HEAD_PANELS + _BASE_REQUEST_PANELS + _BASE_PROFILE_MIDDLE_PANELS + [
+        MultiFieldPanel(heading="INFORMATIONS SUR LA/LES GROSSESSE/S ET LE/LES ACCOUCHEMENT.S", children=(
+            FieldPanel("number_of_pregnancies"),
+            FieldPanel("number_of_children"),
+            InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
+            FieldPanel("anticipated_new_born_delivery_date"),
+            FieldPanel("place_of_delivery",
+                       widget=DatalistInput(PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
+            FieldPanel("follow_up_by"),
+            FieldPanel("referred_by"),
+            FieldPanel("Persons_scheduled_for_childbirth",
+                       widget=DatalistInput(PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
+            FieldPanel("comments_on_childbirth"),
+            FieldPanel("service_expectations"),
+            FieldPanel("pregnancy_conditions"),
+            FieldPanel("pregnancy_concerns"),
+            FieldPanel("birth_concerns"),
+            FieldPanel("baby_arrival_concerns"),
+            FieldPanel("has_prenatal_classes"),
+            FieldPanel("prenatal_classes_notes"),
+        )),
+    ])
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
     search_fields = _BASE_PROFILE_SEARCH_FIELDS
 
+    #################### Create and register main custom buttons
 
-#################### Create and register main custom buttons
 
 class ShareProfileMenuItem(ActionMenuItem):
     """A custom action menu item for sharing a Profile with an agent."""
@@ -151,12 +243,9 @@ class ShareProfileMenuItem(ActionMenuItem):
         return False
 
 
-
-
 @hooks.register('register_snippet_action_menu_item')
 def register_share_profile_menu_item(model):
     return ShareProfileMenuItem(order=10)
-
 
 
 ########## Create share profile button also in the listing menus.

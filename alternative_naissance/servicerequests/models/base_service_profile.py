@@ -1,10 +1,14 @@
 from typing import Any
 
 from django.db import models
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
+from wagtail.admin.panels import FieldPanel
+from wagtail.models import Orderable
 
 from .shared_properties import _SERVICE_CHOICES,_LANGUAGE_CHOICES,_CITIZENSHIP_STATUS_CHOICES, ProfileCodePrefix
 
-class BaseServiceProfile(models.Model):
+class BaseServiceProfile(ClusterableModel, models.Model):
     """The Profile model mirrors all the information in the ServiceRequest model, and adds additional fields."""
     SERVICE_CHOICES = _SERVICE_CHOICES
     LANGUAGE_CHOICES = _LANGUAGE_CHOICES
@@ -182,3 +186,16 @@ class BaseServiceProfile(models.Model):
     class Meta:
         verbose_name = "Profil"
         verbose_name_plural = "Profils"
+
+
+
+class ChildInfo(Orderable):
+    """Model representing a child for some profiles (like Naissance)."""
+    profile = ParentalKey("BaseServiceProfile", related_name="children", on_delete=models.CASCADE)
+
+    # Fields for the child. You can add more fields (Age, etc.) here.
+    info = models.CharField(max_length=255, verbose_name="Information enfant")
+
+    panels = [
+        FieldPanel("info"),
+    ]
