@@ -44,7 +44,7 @@ _BASE_PROFILE_MIDDLE_PANELS: list[FieldPanel | MultiFieldPanel] = [
 _BASE_PROFILE_LIST_DISPLAY: list[str] = ["profile_code", "first_name", "last_name", "status", "tax_year"]
 _BASE_PROFILE_SEARCH_FIELDS: list[str] = ["profile_code", "first_name", "last_name", "email", "phone", "tax_year"]
 
-PLACE_OF_DELIVERY_CHOICE = [  # Used by DatalistTextField widget
+_PLACE_OF_DELIVERY_CHOICE = [  # Used by DatalistTextField widget
     "CHUM",
     "Glen / Victoria / Children's",
     "Hôpital Juif",
@@ -60,13 +60,20 @@ PLACE_OF_DELIVERY_CHOICE = [  # Used by DatalistTextField widget
     "MDN Jeanne-Mance"
 ]
 
-PERSON_SCHEDULED_FOR_BIRTH_CHOICE = [  # Used by DatalistTextField widget
+_PERSON_SCHEDULED_FOR_BIRTH_CHOICE = [  # Used by DatalistTextField widget
     "Ami.e",
     "Co-parent",
     "Co-parent absent à l’accouchement",
     "Membre de la famille",
     "Peut-être co-parent absent",
     "Peut-être membre de la famille",
+]
+
+_CHILD_CARE_PROVIDER_CHOICE = [
+    "CPE",
+    "Ecole",
+    "Garderie privée",
+    "Halte-garderie",
 ]
 
 
@@ -109,11 +116,11 @@ class NaissanceModelViewSet(SnippetViewSet):
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("place_of_delivery",
-                       widget=DatalistInput(PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
+                       widget=DatalistInput(_PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
             FieldPanel("follow_up_by"),
             FieldPanel("referred_by"),
             FieldPanel("Persons_scheduled_for_childbirth",
-                       widget=DatalistInput(PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
+                       widget=DatalistInput(_PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
             FieldPanel("comments_on_childbirth"),
             FieldPanel("service_expectations"),
             FieldPanel("pregnancy_conditions"),
@@ -151,9 +158,21 @@ class RelevaillesModelViewSet(SnippetViewSet):
     model = Relevailles
 
     panels = _BASE_REQUEST_PANELS + [
-        FieldPanel("relevailles_note")
+        MultiFieldPanel(heading="INFORMATIONS SUR LA/LES GROSSESSE/S ET LE/LES ACCOUCHEMENT.S (Relevailles)", children=(
+            FieldPanel("number_of_pregnancies"),
+            FieldPanel("number_of_children"),
+            InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
+            FieldPanel("child_care_provider", widget=DatalistInput(_CHILD_CARE_PROVIDER_CHOICE, "child_care_provider")),
+            FieldPanel("new_born_delivery_date"),
+            FieldPanel("pregnancy_and_child_birth_progress"),
+            FieldPanel("place_of_delivery",
+                       widget=DatalistInput(_PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
+            FieldPanel("breastfeeding"),
+            FieldPanel("referred_by"),
+            FieldPanel("postnatal_condition"),
+            FieldPanel("service_expectations"),
+        ))
     ]
-
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
@@ -200,11 +219,11 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("place_of_delivery",
-                       widget=DatalistInput(PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
+                       widget=DatalistInput(_PLACE_OF_DELIVERY_CHOICE, "place_of_delivery")),
             FieldPanel("follow_up_by"),
             FieldPanel("referred_by"),
             FieldPanel("Persons_scheduled_for_childbirth",
-                       widget=DatalistInput(PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
+                       widget=DatalistInput(_PERSON_SCHEDULED_FOR_BIRTH_CHOICE, "persons_scheduled_for_childbirth")),
             FieldPanel("comments_on_childbirth"),
             FieldPanel("service_expectations"),
             FieldPanel("pregnancy_conditions"),
@@ -221,7 +240,8 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
     list_filter = ("status", "service_type")
     search_fields = _BASE_PROFILE_SEARCH_FIELDS
 
-    #################### Create and register main custom buttons
+
+#################### Create and register main custom buttons
 
 
 class ShareProfileMenuItem(ActionMenuItem):
