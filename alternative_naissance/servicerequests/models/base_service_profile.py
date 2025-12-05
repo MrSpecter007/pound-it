@@ -6,7 +6,8 @@ from modelcluster.models import ClusterableModel
 from wagtail.admin.panels import FieldPanel
 from wagtail.models import Orderable
 
-from .shared_properties import _SERVICE_CHOICES,_LANGUAGE_CHOICES,_CITIZENSHIP_STATUS_CHOICES, ProfileCodePrefix
+from .shared_properties import _SERVICE_CHOICES, _LANGUAGE_CHOICES, _CITIZENSHIP_STATUS_CHOICES, ProfileCodePrefix
+
 
 class BaseServiceProfile(ClusterableModel, models.Model):
     """The Profile model mirrors all the information in the ServiceRequest model, and adds additional fields."""
@@ -21,7 +22,13 @@ class BaseServiceProfile(ClusterableModel, models.Model):
         ("finished", "Dossier terminé"),
         ("canceled", "Dossier annulé")
     ]
-    # Basic information
+
+    ############### START OF PART NOT SHARED WITH AGENT !! ###############
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
+    created_at = models.DateTimeField(auto_now_add=True)
+    ############### END OF PART NOT SHARED WITH AGENT !! ###############
+
+    ########## Basic information
     first_name = models.CharField(max_length=255, verbose_name="Prénom")
     last_name = models.CharField(max_length=255, verbose_name="Nom")
 
@@ -57,17 +64,14 @@ class BaseServiceProfile(ClusterableModel, models.Model):
     citizenship_status = models.CharField(max_length=100, choices=CITIZENSHIP_STATUS_CHOICES,
                                           verbose_name="Statut de citoyenneté")
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
     ################# Shared fields that are not from service request ######################
     ######## INFORMATIONS SUR LE.LA CLIENT.E à tous les formulaires #######
     country_of_origin = models.CharField(max_length=255, null=True, blank=True, verbose_name="Pays d'origine")
     quebec_arrival_date = models.DateField(null=True, blank=True, verbose_name="Date d'arrivée au Québec")
     age = models.IntegerField(null=True, blank=True, verbose_name="Âge")
     occupation = models.CharField(max_length=255, null=True, blank=True, verbose_name="Occupation")
-    pronouns_preferred_name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Pronoms ou nom de préférence")
+    pronouns_preferred_name = models.CharField(max_length=255, null=True, blank=True,
+                                               verbose_name="Pronoms ou nom de préférence")
 
     ####### INFORMATIONS SUR LE CO-PARENT à tous les formulaires #######
     is_monoparental = models.BooleanField(default=False, verbose_name="Monoparentale")
@@ -75,13 +79,33 @@ class BaseServiceProfile(ClusterableModel, models.Model):
     is_couple = models.BooleanField(default=False, verbose_name="Couple")
 
     # Partner information (only used if is_couple=True)
-    partner_full_name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Prénom, nom du partenaire")
+    partner_full_name = models.CharField(max_length=255, null=True, blank=True,
+                                         verbose_name="Prénom, nom du partenaire")
     partner_email = models.EmailField(null=True, blank=True, verbose_name="Courriel du partenaire")
     partner_occupation = models.CharField(max_length=255, null=True, blank=True,
                                           verbose_name="Occupation du partenaire")
     partner_absent_from_quebec = models.BooleanField(default=False, verbose_name="Partenaire absent(e) du Québec")
 
+    ############### START OF PART NOT SHARED WITH AGENT !! ###############
+    ##### CONFIDENTIALITÉ ET STATISTIQUES
+    consent_share_personal_info = models.BooleanField(null=True, blank=True,
+                                                      verbose_name="Consentement sur le partage des informations personnelles",
+                                                      help_text="Acceptez-vous qu’Alternative Naissance partage les informations recueillies pour cette demande de service avec l’accompagnant.e qui sera responsable de votre suivi, ainsi que sa relève? ")
 
+    consent_statistic_collection = models.BooleanField(null=True, blank=True, verbose_name="Statistiques", help_text="""
+    Acceptez-vous qu’Alternative Naissance compile certaines données relatives à votre suivi et à votre accouchement, de manière anonyme et confidentielle, pour des fins statistiques? 
+
+    Ces données pourraient ensuite être utilisées pour évaluer les effets de notre pratique et avoir un portrait de certaines pratiques obstétricales et de leurs effets.
+    """)
+
+    #### AUTRES INFORMATIONS
+    vulnerability_criteria_for_program_admission = models.TextField(null=True, blank=True,
+                                                                    verbose_name="Critères de vulnérabilité pour admissibilité aux programmes")
+    other_notes = models.TextField(null=True, blank=True, verbose_name="Autres notes (Coordo services")
+    ############### END OF PART NOT SHARED WITH AGENT !! ###############
+
+    ####### PROGRAMME à tous les formulaires #######
+    program = models.CharField(max_length=255, null=True, blank=True, verbose_name="Programme")
 
     @property
     def full_name(self) -> str:
@@ -122,7 +146,6 @@ class BaseServiceProfile(ClusterableModel, models.Model):
             return str(date.year - 1) + " - " + str(date.year)
         else:
             return str(date.year) + " - " + str(date.year + 1)
-
 
     @property
     def fields_needed_for_agent(self) -> list[list[str | Any]]:
@@ -177,8 +200,10 @@ class BaseServiceProfile(ClusterableModel, models.Model):
             [self._meta.get_field("partner_email").verbose_name, self.partner_email],
             [self._meta.get_field("partner_occupation").verbose_name, self.partner_occupation],
             [self._meta.get_field("partner_absent_from_quebec").verbose_name, self.partner_absent_from_quebec],
-        ]
 
+            ##### PROGRAMME
+            [self._meta.get_field("program").verbose_name, self.program],
+        ]
 
     def __str__(self):
         return f"{self.profile_code} - {self.first_name} {self.last_name} ({self.email if self.email is not None else self.phone}) - {self.service_type}"
@@ -186,7 +211,6 @@ class BaseServiceProfile(ClusterableModel, models.Model):
     class Meta:
         verbose_name = "Profil"
         verbose_name_plural = "Profils"
-
 
 
 class ChildInfo(Orderable):

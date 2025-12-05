@@ -13,37 +13,6 @@ from .service_request_hooks import _BASE_REQUEST_PANELS
 from servicerequests.models import Naissance, Deuil, Relevailles, InterventionPerinatale, InterruptionGrossesse, \
     RencontresVirtuelles, ServiceProfile, BaseServiceProfile
 
-_BASE_PROFILE_HEAD_PANELS: list[FieldPanel] = [
-    FieldPanel("created_at", read_only=True, help_text="Date de la accéptance de la demande de profil.")
-]
-
-_BASE_PROFILE_MIDDLE_PANELS: list[FieldPanel | MultiFieldPanel] = [
-    MultiFieldPanel(heading="INFORMATIONS SUR LE.LA CLIENT.E", children=(
-        FieldPanel("country_of_origin"),
-        FieldPanel("quebec_arrival_date"),
-        FieldPanel("age"),
-        FieldPanel("occupation"),
-        FieldPanel("pronouns_preferred_name"),
-    )),
-
-    MultiFieldPanel(heading="INFORMATIONS SUR LE CO_PARENT", children=(
-        FieldPanel("is_monoparental"),
-        FieldPanel("is_soloparental"),
-        FieldPanel("is_couple"),
-    )),
-
-    # TODO: maybe make it a conditional field instead
-    MultiFieldPanel(heading="INFORMATIONS SUR LE/LA PARTENAIRE (Si applicable)", children=(
-        FieldPanel("partner_full_name"),
-        FieldPanel("partner_email"),
-        FieldPanel("partner_occupation"),
-        FieldPanel("partner_absent_from_quebec"),
-    )),
-]
-
-_BASE_PROFILE_LIST_DISPLAY: list[str] = ["profile_code", "first_name", "last_name", "status", "tax_year"]
-_BASE_PROFILE_SEARCH_FIELDS: list[str] = ["profile_code", "first_name", "last_name", "email", "phone", "tax_year"]
-
 _PLACE_OF_HOSPITAL_CHOICE = [  # Used by DatalistTextField widget
     "CHUM",
     "Glen / Victoria / Children's",
@@ -90,6 +59,22 @@ _BEGINNING_OF_FOLLOW_UP_CHOICE = [
     "Prénatale",
 ]
 
+_PROGRAM_CHOICE = [
+    "Mesure 3.1 Faubourgs",
+    "Mesure 3.1 Petite-Patrie",
+    "Mesure 3.1 Villeray",
+    "Mesure 3.1 Saint-Léonard",
+    "Mesure 3.1 Rosemont",
+    "Périnatalité",
+    "Prévention Négligence CENTRE-SUD",
+    "Prévention Négligence EST",
+    "Prévention Négligence NIM",
+    "Régulier",
+    "Compte 2140 (année fiscale antérieure)",
+    "Stage",
+    "Marrainage",
+]
+
 
 class DatalistInput(forms.TextInput):
     """
@@ -119,6 +104,54 @@ class DatalistInput(forms.TextInput):
         return mark_safe(text_html + data_list)
 
 
+_BASE_PROFILE_HEAD_PANELS: list[FieldPanel] = [
+    FieldPanel("created_at", read_only=True, help_text="Date de la accéptance de la demande de profil.")
+]
+
+_BASE_PROFILE_MIDDLE_PANELS: list[FieldPanel | MultiFieldPanel] = [
+    MultiFieldPanel(heading="INFORMATIONS SUR LE.LA CLIENT.E", children=(
+        FieldPanel("country_of_origin"),
+        FieldPanel("quebec_arrival_date"),
+        FieldPanel("age"),
+        FieldPanel("occupation"),
+        FieldPanel("pronouns_preferred_name"),
+    )),
+
+    MultiFieldPanel(heading="INFORMATIONS SUR LE CO_PARENT", children=(
+        FieldPanel("is_monoparental"),
+        FieldPanel("is_soloparental"),
+        FieldPanel("is_couple"),
+    )),
+
+    # TODO: maybe make it a conditional field instead
+    MultiFieldPanel(heading="INFORMATIONS SUR LE/LA PARTENAIRE (Si applicable)", children=(
+        FieldPanel("partner_full_name"),
+        FieldPanel("partner_email"),
+        FieldPanel("partner_occupation"),
+        FieldPanel("partner_absent_from_quebec"),
+    )),
+]
+
+_BASE_PROFILE_END_PANELS: list[FieldPanel] = [
+    MultiFieldPanel(heading="CONFIDENTIALITÉ ET STATISTIQUES", children=(
+        FieldPanel("consent_share_personal_info"),
+        FieldPanel("consent_statistic_collection"),
+    )),
+
+    MultiFieldPanel(heading="AUTRES INFORMATIONS", children=(
+        FieldPanel("vulnerability_criteria_for_program_admission"),
+        FieldPanel("other_notes"),
+    )),
+
+    # Since program is a standalone field that appears in all forms, 
+    # it can be its own panel without a MultiFieldPanel wrapper
+    FieldPanel("program", widget=DatalistInput(_PROGRAM_CHOICE, "program")),
+]
+
+_BASE_PROFILE_LIST_DISPLAY: list[str] = ["profile_code", "first_name", "last_name", "status", "tax_year"]
+_BASE_PROFILE_SEARCH_FIELDS: list[str] = ["profile_code", "first_name", "last_name", "email", "phone", "tax_year"]
+
+
 class NaissanceModelViewSet(SnippetViewSet):
     """The view set for the Naissance model."""
     model = Naissance
@@ -144,7 +177,7 @@ class NaissanceModelViewSet(SnippetViewSet):
             FieldPanel("has_prenatal_classes"),
             FieldPanel("prenatal_classes_notes"),
         )),
-    ])
+    ] + _BASE_PROFILE_END_PANELS)
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
@@ -168,6 +201,7 @@ class DeuilModelViewSet(SnippetViewSet):
             FieldPanel("referred_by"),
         ))
     ])
+    ] + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -179,7 +213,7 @@ class RelevaillesModelViewSet(SnippetViewSet):
     """The view set for the Relevailles model."""
     model = Relevailles
 
-    panels = _BASE_REQUEST_PANELS + [
+    panels = (_BASE_PROFILE_HEAD_PANELS + _BASE_REQUEST_PANELS + _BASE_PROFILE_MIDDLE_PANELS + [
         MultiFieldPanel(heading="INFORMATIONS SUR LA/LES GROSSESSE/S ET LE/LES ACCOUCHEMENT.S (Relevailles)", children=(
             FieldPanel("number_of_pregnancies"),
             FieldPanel("number_of_children"),
@@ -194,7 +228,8 @@ class RelevaillesModelViewSet(SnippetViewSet):
             FieldPanel("postnatal_condition"),
             FieldPanel("service_expectations"),
         ))
-    ]
+    ] + _BASE_PROFILE_END_PANELS)
+
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
@@ -221,7 +256,7 @@ class InterruptionGrossesseViewSet(SnippetViewSet):
             FieldPanel("service_expectations"),
             FieldPanel("referred_by"),
         ))
-    ])
+    ] + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -238,7 +273,8 @@ class InterventionPerinataleViewSet(SnippetViewSet):
             FieldPanel("number_of_pregnancies"),
             FieldPanel("number_of_children"),
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
-            FieldPanel("beginning_of_follow_up", widget=DatalistInput(_BEGINNING_OF_FOLLOW_UP_CHOICE, "beginning_of_follow_up")),
+            FieldPanel("beginning_of_follow_up",
+                       widget=DatalistInput(_BEGINNING_OF_FOLLOW_UP_CHOICE, "beginning_of_follow_up")),
             FieldPanel("referred_by"),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("birth_date"),
@@ -255,7 +291,7 @@ class InterventionPerinataleViewSet(SnippetViewSet):
             FieldPanel("community_resources"),
             FieldPanel("support_network"),
         )),
-    ])
+    ] + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -288,7 +324,7 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
             FieldPanel("has_prenatal_classes"),
             FieldPanel("prenatal_classes_notes"),
         )),
-    ])
+    ] + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
