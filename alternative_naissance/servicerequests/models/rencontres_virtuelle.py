@@ -20,8 +20,8 @@ class RencontresVirtuelles(BaseServiceProfile):
     place_of_delivery = models.CharField(max_length=255, null=True, blank=True, verbose_name="Lieu d'accouchement")
     follow_up_by = models.CharField(max_length=255, null=True, blank=True, verbose_name="Suivi effectué par")
     referred_by = models.CharField(max_length=255, null=True, blank=True, verbose_name="Référé par")
-    Persons_scheduled_for_childbirth = models.CharField(max_length=255, null=True, blank=True,
-                                                        verbose_name="Personnes prévues à l'accouchement")
+    expected_people_at_childbirth = models.CharField(max_length=255, null=True, blank=True,
+                                                     verbose_name="Personnes prévues à l'accouchement")
     comments_on_childbirth = models.TextField(null=True, blank=True,
                                               verbose_name="Commentaires sur les présences à l'accouchement")
     service_expectations = models.TextField(null=True, blank=True,
@@ -69,7 +69,7 @@ class RencontresVirtuelles(BaseServiceProfile):
                     [self._meta.get_field("place_of_delivery").verbose_name, self.place_of_delivery],
                     [self._meta.get_field("follow_up_by").verbose_name, self.follow_up_by],
                     [self._meta.get_field("referred_by").verbose_name, self.referred_by],
-                    [self._meta.get_field("Persons_scheduled_for_childbirth").verbose_name, self.Persons_scheduled_for_childbirth],
+                    [self._meta.get_field("expected_people_at_childbirth").verbose_name, self.expected_people_at_childbirth],
                     [self._meta.get_field("comments_on_childbirth").verbose_name, self.comments_on_childbirth],
                     [self._meta.get_field("service_expectations").verbose_name, self.service_expectations],
                     [self._meta.get_field("pregnancy_conditions").verbose_name, self.pregnancy_conditions],
