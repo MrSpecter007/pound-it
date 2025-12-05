@@ -1,6 +1,5 @@
-from typing import Optional
-
 from django.db import models
+
 from .shared_properties import _SERVICE_CHOICES, _LANGUAGE_CHOICES, _CITIZENSHIP_STATUS_CHOICES
 
 

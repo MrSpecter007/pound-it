@@ -1,10 +1,9 @@
 from typing import Any
 
 from django.core.validators import MinValueValidator, MaxValueValidator
-
-from servicerequests.models import BaseServiceProfile, ProfileCodePrefix
 from django.db import models
 
+from servicerequests.models import BaseServiceProfile, ProfileCodePrefix
 from servicerequests.models.base_service_profile import ChildInfo
 
 
@@ -19,12 +18,12 @@ class Relevailles(BaseServiceProfile):
     child_care_provider = models.CharField(max_length=255, null=True, blank=True, verbose_name="Milieu de garde")
     new_born_delivery_date = models.DateField(null=True, blank=True,
                                               verbose_name="Date de naissance du/des nouveau/x-né/s ")
-    pregnancy_and_child_birth_progress = models.CharField(max_length=255, null=True, blank=True,
+    pregnancy_and_child_birth_progress = models.TextField(null=True, blank=True,
                                                           verbose_name="Déroulement de la grossesse et de l’accouchement")
     place_of_delivery = models.CharField(max_length=255, null=True, blank=True, verbose_name="Lieu d'accouchement")
-    breastfeeding = models.CharField(max_length=255, null=True, blank=True, verbose_name="Allaitement")
+    breastfeeding = models.TextField(null=True, blank=True, verbose_name="Allaitement")
     referred_by = models.CharField(max_length=255, null=True, blank=True, verbose_name="Référé par")
-    postnatal_condition = models.CharField(max_length=255, null=True, blank=True,
+    postnatal_condition = models.TextField(null=True, blank=True,
                                            verbose_name="Conditions particulières reliées au postnatal")
     service_expectations = models.TextField(null=True, blank=True,
                                             verbose_name="Attentes reliées au service d'accompagnement")
