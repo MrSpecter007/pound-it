@@ -23,8 +23,16 @@ class BaseServiceProfile(ClusterableModel, models.Model):
         ("canceled", "Dossier annulé")
     ]
 
+    PAYMENT_METHOD_CHOICES = [
+        ('cheque', 'Chèque'),
+        ('comptant', 'Comptant'),
+        ('credit', 'Crédit'),
+        ('depot_direct', 'Dépôt direct'),
+        ('paypal', 'Paypal'),
+        ('virement_interac', 'Virement interac')
+    ]
+
     ############### START OF PART NOT SHARED WITH AGENT !! ###############
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
     created_at = models.DateTimeField(auto_now_add=True)
     ############### END OF PART NOT SHARED WITH AGENT !! ###############
 
@@ -106,6 +114,28 @@ class BaseServiceProfile(ClusterableModel, models.Model):
 
     ####### PROGRAMME à tous les formulaires #######
     program = models.CharField(max_length=255, null=True, blank=True, verbose_name="Programme")
+
+
+    ########## DON ET EVALUATION #################
+    solicited_for_donation = models.BooleanField(null=True, blank=True, verbose_name="Sollicité.e pour don")
+    solicited_for_evaluation = models.BooleanField(null=True, blank=True, verbose_name="Sollicité.e pour évaluation")
+    donation_date = models.DateField(null=True, blank=True, verbose_name="Date du don")
+    donation_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                          verbose_name="Montant du don")
+    donation_receipt_number = models.CharField(max_length=255, null=True, blank=True,
+                                               verbose_name="Numéro de reçu pour le don")
+    donation_payment_method = models.CharField(
+        max_length=50,
+        choices=PAYMENT_METHOD_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name="Mode de paiement du don"
+    )
+
+    ############### START OF PART NOT SHARED WITH AGENT !! ###############
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete", verbose_name="Statut")
+    general_notes = models.TextField(null=True, blank=True, verbose_name="Notes générales du dossier")
+    ############### END OF PART NOT SHARED WITH AGENT !! ###############
 
     @property
     def full_name(self) -> str:

@@ -3,7 +3,7 @@ from typing import Any
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from . import ProfileCodePrefix
+from .shared_properties import ProfileCodePrefix
 from .base_service_profile import BaseServiceProfile, ChildInfo
 
 

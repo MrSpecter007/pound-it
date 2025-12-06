@@ -3,13 +3,13 @@ from typing import Any
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from servicerequests.models import BaseServiceProfile, ProfileCodePrefix
-from servicerequests.models.base_service_profile import ChildInfo
+from .shared_properties import ProfileCodePrefix
+from .base_service_profile import ChildInfo, BaseServiceProfile
 
 
 class Relevailles(BaseServiceProfile):
     sub_id = models.AutoField(primary_key=True)
-    # TODO
+
     number_of_pregnancies = models.IntegerField(null=True, blank=True,
                                                 verbose_name="Nombre de grossesses incluant celle-ci",
                                                 validators=[MinValueValidator(1), MaxValueValidator(10)])
@@ -33,11 +33,12 @@ class Relevailles(BaseServiceProfile):
                                                      verbose_name="Accompagnant.e principal.e")
     principle_status = models.CharField(max_length=255, null=True, blank=True,
                                         verbose_name="Statut de l'accompagnant.e principal.e")
-    principle_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+    principle_trainee_paid_amount = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2,
                                                         verbose_name="Montant payé par stagiaire (Si applicable)")
     principle_balance_sheet_submission_date = models.DateField(null=True, blank=True,
                                                                verbose_name="Date de remise du bilan")
-    principle_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    principle_amount_paid = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2,
+                                                verbose_name="Montant payé")
     principle_payment_method = models.CharField(max_length=255, null=True, blank=True,
                                                 verbose_name="Méthod de paiement")
 
@@ -46,11 +47,12 @@ class Relevailles(BaseServiceProfile):
                                                      verbose_name="Accompagnant.e secondaire")
     secondary_status = models.CharField(max_length=255, null=True, blank=True,
                                         verbose_name="Statut de l'accompagnant.e secondaire")
-    secondary_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+    secondary_trainee_paid_amount = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2,
                                                         verbose_name="Montant payé par stagiaire (Si applicable)")
     secondary_balance_sheet_submission_date = models.DateField(null=True, blank=True,
                                                                verbose_name="Date de remise du bilan")
-    secondary_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    secondary_amount_paid = models.DecimalField(null=True, blank=True, verbose_name="Montant payé", max_digits=10,
+                                                decimal_places=2)
     secondary_payment_method = models.CharField(max_length=255, null=True, blank=True,
                                                 verbose_name="Méthod de paiement")
 

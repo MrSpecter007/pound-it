@@ -166,9 +166,18 @@ _BASE_PROFILE_END_PANELS: list[FieldPanel] = [
         FieldPanel("other_notes"),
     )),
 
-    # Since program is a standalone field that appears in all forms, 
-    # it can be its own panel without a MultiFieldPanel wrapper
     FieldPanel("program", widget=DatalistInput(_PROGRAM_CHOICE, "program")),
+
+    MultiFieldPanel(heading="DON ET EVALUATION", children=(
+        FieldPanel("solicited_for_donation"),
+        FieldPanel("solicited_for_evaluation"),
+        FieldPanel("donation_date"),
+        FieldPanel("donation_amount"),
+        FieldPanel("donation_receipt_number"),
+        FieldPanel("donation_payment_method"),
+    )),
+
+    FieldPanel("general_notes"),
 ]
 
 _ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
