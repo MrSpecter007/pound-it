@@ -13,7 +13,7 @@ from servicerequests.models import Naissance, Deuil, Relevailles, InterventionPe
     RencontresVirtuelles, ServiceProfile, BaseServiceProfile, ServiceStaff
 from .service_request_hooks import _BASE_REQUEST_PANELS
 
-_PLACE_OF_HOSPITAL_CHOICE = [  # Used by DatalistTextField widget
+_PLACE_OF_HOSPITAL_CHOICES = [  # Used by DatalistTextField widget
     "CHUM",
     "Glen / Victoria / Children's",
     "Hôpital Juif",
@@ -29,7 +29,7 @@ _PLACE_OF_HOSPITAL_CHOICE = [  # Used by DatalistTextField widget
     "MDN Jeanne-Mance"
 ]
 
-_EXPECTED_PEOPLE_AT_BIRTH_CHOICE = [  # Used by DatalistTextField widget
+_EXPECTED_PEOPLE_AT_BIRTH_CHOICES = [  # Used by DatalistTextField widget
     "Ami.e",
     "Co-parent",
     "Co-parent absent à l’accouchement",
@@ -38,28 +38,28 @@ _EXPECTED_PEOPLE_AT_BIRTH_CHOICE = [  # Used by DatalistTextField widget
     "Peut-être membre de la famille",
 ]
 
-_CHILD_CARE_PROVIDER_CHOICE = [
+_CHILD_CARE_PROVIDER_CHOICES = [
     "CPE",
     "Ecole",
     "Garderie privée",
     "Halte-garderie",
 ]
 
-_PREGNANCY_TERMINATION_METHOD_CHOICE = [
+_PREGNANCY_TERMINATION_METHOD_CHOICES = [
     "Anesthésie générale",
     "Anesthésie locale",
     "Chirurgicale",
     "Médicamenteuse",
 ]
 
-_BEGINNING_OF_FOLLOW_UP_CHOICE = [
+_BEGINNING_OF_FOLLOW_UP_CHOICES = [
     "Bébé arc-en-ciel",
     "Deuil périnatal",
     "Postnatale",
     "Prénatale",
 ]
 
-_PROGRAM_CHOICE = [
+_PROGRAM_CHOICES = [
     "Mesure 3.1 Faubourgs",
     "Mesure 3.1 Petite-Patrie",
     "Mesure 3.1 Villeray",
@@ -75,13 +75,20 @@ _PROGRAM_CHOICE = [
     "Marrainage",
 ]
 
-ACCOMPAGNANT_STATUS_CHOICE = [
+_ACCOMPAGNANT_STATUS_CHOICES = [
     "Accompagnant.e",
     "Marraine",
     "Marrainé.e",
     "Relève",
     "Stagiaire",
     "Superviseur.e",
+]
+
+_PAYMENT_METHOD_CHOICES = [
+    "Chèque",
+    "Comptant",
+    "Dépôt direct",
+    "Visa",
 ]
 
 
@@ -166,7 +173,7 @@ _BASE_PROFILE_END_PANELS: list[FieldPanel] = [
         FieldPanel("other_notes"),
     )),
 
-    FieldPanel("program", widget=DatalistInput(_PROGRAM_CHOICE, "program")),
+    FieldPanel("program", widget=DatalistInput(_PROGRAM_CHOICES, "program")),
 
     MultiFieldPanel(heading="DON ET EVALUATION", children=(
         FieldPanel("solicited_for_donation"),
@@ -186,11 +193,11 @@ _ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
                    widget=DatalistInput(_get_accompagnant_service_staff_names(), "principle_accompanying_person",
                                         _get_accompagnant_service_staff_names)),
         FieldPanel("principle_status",
-                   widget=DatalistInput(ACCOMPAGNANT_STATUS_CHOICE, "principle_status")),
+                   widget=DatalistInput(_ACCOMPAGNANT_STATUS_CHOICES, "principle_status")),
         FieldPanel("principle_trainee_paid_amount"),
         FieldPanel("principle_balance_sheet_submission_date"),
         FieldPanel("principle_amount_paid"),
-        FieldPanel("principle_payment_method"),
+        FieldPanel("principle_payment_method", widget=DatalistInput(_PAYMENT_METHOD_CHOICES, "principle_payment_method")),
     )),
 
     MultiFieldPanel(heading="ACCOMPAGNANT.E SECONDAIRE", children=(
@@ -198,11 +205,11 @@ _ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
                    widget=DatalistInput(_get_accompagnant_service_staff_names(), "secondary_accompanying_person",
                                         _get_accompagnant_service_staff_names)),
         FieldPanel("secondary_status",
-                   widget=DatalistInput(ACCOMPAGNANT_STATUS_CHOICE, "secondary_status")),
+                   widget=DatalistInput(_ACCOMPAGNANT_STATUS_CHOICES, "secondary_status")),
         FieldPanel("secondary_trainee_paid_amount"),
         FieldPanel("secondary_balance_sheet_submission_date"),
         FieldPanel("secondary_amount_paid"),
-        FieldPanel("secondary_payment_method"),
+        FieldPanel("secondary_payment_method", widget=DatalistInput(_PAYMENT_METHOD_CHOICES, "secondary_payment_method")),
     )),
 
 ]
@@ -222,11 +229,11 @@ class NaissanceModelViewSet(SnippetViewSet):
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("place_of_delivery",
-                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "place_of_delivery")),
+                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "place_of_delivery")),
             FieldPanel("follow_up_by"),
             FieldPanel("referred_by"),
             FieldPanel("expected_people_at_childbirth",
-                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICE, "expected_people_at_childbirth")),
+                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICES, "expected_people_at_childbirth")),
             FieldPanel("comments_on_childbirth"),
             FieldPanel("service_expectations"),
             FieldPanel("pregnancy_conditions"),
@@ -253,7 +260,7 @@ class DeuilModelViewSet(SnippetViewSet):
             FieldPanel("number_of_children_exclude_deceased"),
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("date_or_expected_date_of_event"),
-            FieldPanel("place", widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "place")),
+            FieldPanel("place", widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "place")),
             FieldPanel("event_description"),
             FieldPanel("special_condition"),
             FieldPanel("service_expectations"),
@@ -277,11 +284,12 @@ class RelevaillesModelViewSet(SnippetViewSet):
             FieldPanel("number_of_pregnancies"),
             FieldPanel("number_of_children"),
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
-            FieldPanel("child_care_provider", widget=DatalistInput(_CHILD_CARE_PROVIDER_CHOICE, "child_care_provider")),
+            FieldPanel("child_care_provider",
+                       widget=DatalistInput(_CHILD_CARE_PROVIDER_CHOICES, "child_care_provider")),
             FieldPanel("new_born_delivery_date"),
             FieldPanel("pregnancy_and_child_birth_progress"),
             FieldPanel("place_of_delivery",
-                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "place_of_delivery")),
+                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "place_of_delivery")),
             FieldPanel("breastfeeding"),
             FieldPanel("referred_by"),
             FieldPanel("postnatal_condition"),
@@ -306,10 +314,10 @@ class InterruptionGrossesseViewSet(SnippetViewSet):
             FieldPanel("number_of_children_exclude_deceased"),
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("date_or_expected_date_of_event"),
-            FieldPanel("place", widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "place")),
+            FieldPanel("place", widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "place")),
             FieldPanel("gestational_age"),
             FieldPanel("pregnancy_termination_method",
-                       widget=DatalistInput(_PREGNANCY_TERMINATION_METHOD_CHOICE, "pregnancy_termination_method")),
+                       widget=DatalistInput(_PREGNANCY_TERMINATION_METHOD_CHOICES, "pregnancy_termination_method")),
             FieldPanel("event_description"),
             FieldPanel("special_condition"),
             FieldPanel("service_expectations"),
@@ -333,16 +341,16 @@ class InterventionPerinataleViewSet(SnippetViewSet):
             FieldPanel("number_of_children"),
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("beginning_of_follow_up",
-                       widget=DatalistInput(_BEGINNING_OF_FOLLOW_UP_CHOICE, "beginning_of_follow_up")),
+                       widget=DatalistInput(_BEGINNING_OF_FOLLOW_UP_CHOICES, "beginning_of_follow_up")),
             FieldPanel("referred_by"),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("birth_date"),
             FieldPanel("date_or_expected_date_of_event"),
             FieldPanel("birth_place",
-                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "birth_place")),
+                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "birth_place")),
             FieldPanel("follow_up_by"),
             FieldPanel("expected_people_at_childbirth",
-                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICE, "expected_people_at_childbirth")),
+                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICES, "expected_people_at_childbirth")),
             FieldPanel("special_conditions"),
             FieldPanel("pregnancy_related_concerns"),
             FieldPanel("service_expectations"),
@@ -376,11 +384,11 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
             InlinePanel(relation_name="children", label="Information sur l'enfant", max_num=10, min_num=0),
             FieldPanel("anticipated_new_born_delivery_date"),
             FieldPanel("place_of_delivery",
-                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICE, "place_of_delivery")),
+                       widget=DatalistInput(_PLACE_OF_HOSPITAL_CHOICES, "place_of_delivery")),
             FieldPanel("follow_up_by"),
             FieldPanel("referred_by"),
             FieldPanel("expected_people_at_childbirth",
-                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICE, "expected_people_at_childbirth")),
+                       widget=DatalistInput(_EXPECTED_PEOPLE_AT_BIRTH_CHOICES, "expected_people_at_childbirth")),
             FieldPanel("comments_on_childbirth"),
             FieldPanel("service_expectations"),
             FieldPanel("pregnancy_conditions"),
