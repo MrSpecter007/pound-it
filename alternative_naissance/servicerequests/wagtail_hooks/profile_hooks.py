@@ -1,4 +1,4 @@
-from typing import override
+from typing import override, Callable
 
 from django import forms
 from django.urls import reverse
@@ -9,9 +9,9 @@ from wagtail.snippets import widgets
 from wagtail.snippets.action_menu import ActionMenuItem
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .service_request_hooks import _BASE_REQUEST_PANELS
 from servicerequests.models import Naissance, Deuil, Relevailles, InterventionPerinatale, InterruptionGrossesse, \
-    RencontresVirtuelles, ServiceProfile, BaseServiceProfile
+    RencontresVirtuelles, ServiceProfile, BaseServiceProfile, ServiceStaff
+from .service_request_hooks import _BASE_REQUEST_PANELS
 
 _PLACE_OF_HOSPITAL_CHOICE = [  # Used by DatalistTextField widget
     "CHUM",
@@ -75,6 +75,25 @@ _PROGRAM_CHOICE = [
     "Marrainage",
 ]
 
+ACCOMPAGNANT_STATUS_CHOICE = [
+    "Accompagnant.e",
+    "Marraine",
+    "Marrainé.e",
+    "Relève",
+    "Stagiaire",
+    "Superviseur.e",
+]
+
+
+def _get_accompagnant_service_staff_names():
+    """Returns a list of full names of all service staff members that are accompagnant. Used in the ACCOMPAGNANT.E and INTERVENANT.E using DatalistInput widget."""
+    return list(ServiceStaff.objects.filter(is_accompagnant=True).values_list("full_name", flat=True))
+
+
+def _get_intervenant_service_staff_names():
+    """Returns a list of full names of all service staff members that are intervenant. Used in the INTERVENANT.E using DatalistInput widget."""
+    return list(ServiceStaff.objects.filter(is_intervenant=True).values_list("full_name", flat=True))
+
 
 class DatalistInput(forms.TextInput):
     """
@@ -87,16 +106,20 @@ class DatalistInput(forms.TextInput):
     Note: for strings inside data_list, make sure to escape any double quotation marks
     """
 
-    def __init__(self, data_list: list[str], name: str, *args, **kwargs):
+    def __init__(self, data_list: list[str], name: str, data_getter_func: Callable[[], list[str]] = None, *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         self._name = name
         self._list = data_list
+        self._data_getter_func = data_getter_func
         self.attrs.update({'list': f'list__{self._name}'})
 
     @override
     def render(self, name, value, attrs=None, renderer=None):
         text_html = super().render(name, value, attrs, renderer)
         data_list = f'<datalist id="list__{self._name}">'
+        if self._data_getter_func:
+            self._list = self._data_getter_func()
         for item in self._list:
             data_list += f'<option value="{item}">'
         data_list += '</datalist>'
@@ -148,6 +171,33 @@ _BASE_PROFILE_END_PANELS: list[FieldPanel] = [
     FieldPanel("program", widget=DatalistInput(_PROGRAM_CHOICE, "program")),
 ]
 
+_ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
+    MultiFieldPanel(heading="ACCOMPAGNANT.E PRINCIPAL.E", children=(
+        FieldPanel("principle_accompanying_person",
+                   widget=DatalistInput(_get_accompagnant_service_staff_names(), "principle_accompanying_person",
+                                        _get_accompagnant_service_staff_names)),
+        FieldPanel("principle_status",
+                   widget=DatalistInput(ACCOMPAGNANT_STATUS_CHOICE, "principle_status")),
+        FieldPanel("principle_trainee_paid_amount"),
+        FieldPanel("principle_balance_sheet_submission_date"),
+        FieldPanel("principle_amount_paid"),
+        FieldPanel("principle_payment_method"),
+    )),
+
+    MultiFieldPanel(heading="ACCOMPAGNANT.E SECONDAIRE", children=(
+        FieldPanel("secondary_accompanying_person",
+                   widget=DatalistInput(_get_accompagnant_service_staff_names(), "secondary_accompanying_person",
+                                        _get_accompagnant_service_staff_names)),
+        FieldPanel("secondary_status",
+                   widget=DatalistInput(ACCOMPAGNANT_STATUS_CHOICE, "secondary_status")),
+        FieldPanel("secondary_trainee_paid_amount"),
+        FieldPanel("secondary_balance_sheet_submission_date"),
+        FieldPanel("secondary_amount_paid"),
+        FieldPanel("secondary_payment_method"),
+    )),
+
+]
+
 _BASE_PROFILE_LIST_DISPLAY: list[str] = ["profile_code", "first_name", "last_name", "status", "tax_year"]
 _BASE_PROFILE_SEARCH_FIELDS: list[str] = ["profile_code", "first_name", "last_name", "email", "phone", "tax_year"]
 
@@ -177,7 +227,7 @@ class NaissanceModelViewSet(SnippetViewSet):
             FieldPanel("has_prenatal_classes"),
             FieldPanel("prenatal_classes_notes"),
         )),
-    ] + _BASE_PROFILE_END_PANELS)
+    ] + _ACCOMPAGNANT_PANELS + _BASE_PROFILE_END_PANELS)
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
     list_filter = ("status", "service_type")
@@ -199,9 +249,9 @@ class DeuilModelViewSet(SnippetViewSet):
             FieldPanel("special_condition"),
             FieldPanel("service_expectations"),
             FieldPanel("referred_by"),
+
         ))
-    ])
-    ] + _BASE_PROFILE_END_PANELS)
+    ] + _ACCOMPAGNANT_PANELS + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -228,7 +278,7 @@ class RelevaillesModelViewSet(SnippetViewSet):
             FieldPanel("postnatal_condition"),
             FieldPanel("service_expectations"),
         ))
-    ] + _BASE_PROFILE_END_PANELS)
+    ] + _ACCOMPAGNANT_PANELS + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -256,7 +306,7 @@ class InterruptionGrossesseViewSet(SnippetViewSet):
             FieldPanel("service_expectations"),
             FieldPanel("referred_by"),
         ))
-    ] + _BASE_PROFILE_END_PANELS)
+    ] + _ACCOMPAGNANT_PANELS + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY
@@ -291,6 +341,13 @@ class InterventionPerinataleViewSet(SnippetViewSet):
             FieldPanel("community_resources"),
             FieldPanel("support_network"),
         )),
+
+        MultiFieldPanel(heading="NTERVENANT.E PRINCIPAL.E", children=(
+            FieldPanel("principle_intervenant_person",
+                       widget=DatalistInput(_get_intervenant_service_staff_names(), "principle_intervention_person",
+                                            _get_intervenant_service_staff_names)
+                       ),
+        ))
     ] + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
@@ -324,7 +381,7 @@ class RencontresVirtuellesViewSet(SnippetViewSet):
             FieldPanel("has_prenatal_classes"),
             FieldPanel("prenatal_classes_notes"),
         )),
-    ] + _BASE_PROFILE_END_PANELS)
+    ] + _ACCOMPAGNANT_PANELS + _BASE_PROFILE_END_PANELS)
 
     icon = "user"
     list_display = _BASE_PROFILE_LIST_DISPLAY

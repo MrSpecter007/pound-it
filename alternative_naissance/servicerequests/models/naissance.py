@@ -40,16 +40,39 @@ class Naissance(BaseServiceProfile):
 
     prenatal_classes_notes = models.TextField(null=True, blank=True, verbose_name="Notes sur les cours prénataux")
 
+    ######## ACCOMPAGNANT.E PRINCIPAL.E
+    principle_accompanying_person = models.CharField(max_length=255, null=True, blank=True,
+                                                     verbose_name="Accompagnant.e principal.e")
+    principle_status = models.CharField(max_length=255, null=True, blank=True,
+                                        verbose_name="Statut de l'accompagnant.e principal.e")
+    principle_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+                                                        verbose_name="Montant payé par stagiaire (Si applicable)")
+    principle_balance_sheet_submission_date = models.DateField(null=True, blank=True,
+                                                               verbose_name="Date de remise du bilan")
+    principle_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    principle_payment_method = models.CharField(max_length=255, null=True, blank=True,
+                                                verbose_name="Méthod de paiement")
+
+    ######## ACCOMPAGNANT.E SECONDAIRE
+    secondary_accompanying_person = models.CharField(max_length=255, null=True, blank=True,
+                                                     verbose_name="Accompagnant.e secondaire")
+    secondary_status = models.CharField(max_length=255, null=True, blank=True,
+                                        verbose_name="Statut de l'accompagnant.e secondaire")
+    secondary_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+                                                        verbose_name="Montant payé par stagiaire (Si applicable)")
+    secondary_balance_sheet_submission_date = models.DateField(null=True, blank=True,
+                                                               verbose_name="Date de remise du bilan")
+    secondary_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    secondary_payment_method = models.CharField(max_length=255, null=True, blank=True,
+                                                verbose_name="Méthod de paiement")
 
     @property
     def profile_code_prefix(self) -> ProfileCodePrefix:
         return ProfileCodePrefix.NAISSANCE
 
-
     @property
     def profile_code(self) -> str:
         return self.profile_code_prefix.value + str(self.sub_id).zfill(7)
-
 
     @property
     def fields_needed_for_agent(self) -> list[list[str | Any]]:
@@ -72,7 +95,8 @@ class Naissance(BaseServiceProfile):
                     [self._meta.get_field("place_of_delivery").verbose_name, self.place_of_delivery],
                     [self._meta.get_field("follow_up_by").verbose_name, self.follow_up_by],
                     [self._meta.get_field("referred_by").verbose_name, self.referred_by],
-                    [self._meta.get_field("expected_people_at_childbirth").verbose_name, self.expected_people_at_childbirth],
+                    [self._meta.get_field("expected_people_at_childbirth").verbose_name,
+                     self.expected_people_at_childbirth],
                     [self._meta.get_field("comments_on_childbirth").verbose_name, self.comments_on_childbirth],
                     [self._meta.get_field("service_expectations").verbose_name, self.service_expectations],
                     [self._meta.get_field("pregnancy_conditions").verbose_name, self.pregnancy_conditions],
@@ -81,10 +105,14 @@ class Naissance(BaseServiceProfile):
                     [self._meta.get_field("baby_arrival_concerns").verbose_name, self.baby_arrival_concerns],
                     [self._meta.get_field("has_prenatal_classes").verbose_name, self.has_prenatal_classes],
                     [self._meta.get_field("prenatal_classes_notes").verbose_name, self.prenatal_classes_notes],
+                    ######## ACCOMPAGNANT.E
+                    [self._meta.get_field("principle_accompanying_person").verbose_name,
+                     self.principle_accompanying_person],
+                    [self._meta.get_field("secondary_accompanying_person").verbose_name,
+                     self.secondary_accompanying_person]
                 ]
                 ##
                 )
-
 
     class Meta:
         verbose_name = "Profil Naissance"

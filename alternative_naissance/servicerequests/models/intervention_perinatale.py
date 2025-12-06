@@ -24,7 +24,7 @@ class InterventionPerinatale(BaseServiceProfile):
                                    verbose_name="Référé par")
 
     anticipated_new_born_delivery_date = models.DateField(null=True, blank=True,
-                                                 verbose_name="Date prévue d'accouchement du/des nouveau/x-né/s")
+                                                          verbose_name="Date prévue d'accouchement du/des nouveau/x-né/s")
     birth_date = models.DateField(null=True, blank=True,
                                   verbose_name="Date de naissance du/des nouveau/x-né/s")
 
@@ -48,6 +48,10 @@ class InterventionPerinatale(BaseServiceProfile):
     support_network = models.TextField(null=True, blank=True,
                                        verbose_name="Réseau de soutien autour de la famille (amis, familles etc…)")
 
+    ####### INTERVENANT.E PRINCIPAL.E
+    principle_intervenant_person = models.CharField(max_length=255, null=True, blank=True,
+                                                    verbose_name="Nom de Intervenant.e")
+
     @property
     def profile_code_prefix(self) -> ProfileCodePrefix:
         return ProfileCodePrefix.INTERVENTION_PERINATALE
@@ -63,7 +67,7 @@ class InterventionPerinatale(BaseServiceProfile):
                 # INFORMATIONS SUR LA/LES GROSSESSE/S ET LE/LES ACCOUCHEMENT.S aux formulaires
                 [
                     [self._meta.get_field("number_of_pregnancies").verbose_name, self.number_of_pregnancies],
-                    [self._meta.get_field("number_of_children_exclude_deceased").verbose_name,
+                    [self._meta.get_field("number_of_children").verbose_name,
                      self.number_of_children]
                 ] +
                 [  # Get all the childinfo objects and append them to the list
@@ -72,7 +76,8 @@ class InterventionPerinatale(BaseServiceProfile):
                 + [
                     [self._meta.get_field("beginning_of_follow_up").verbose_name, self.beginning_of_follow_up],
                     [self._meta.get_field("referred_by").verbose_name, self.referred_by],
-                    [self._meta.get_field("anticipated_new_born_delivery_date").verbose_name, self.anticipated_new_born_delivery_date],
+                    [self._meta.get_field("anticipated_new_born_delivery_date").verbose_name,
+                     self.anticipated_new_born_delivery_date],
                     [self._meta.get_field("birth_date").verbose_name, self.birth_date],
                     [self._meta.get_field("date_or_expected_date_of_event").verbose_name,
                      self.date_or_expected_date_of_event],
@@ -86,7 +91,10 @@ class InterventionPerinatale(BaseServiceProfile):
                     [self._meta.get_field("service_expectations").verbose_name, self.service_expectations],
                     [self._meta.get_field("postnatal_needs").verbose_name, self.postnatal_needs],
                     [self._meta.get_field("community_resources").verbose_name, self.community_resources],
-                    [self._meta.get_field("support_network").verbose_name, self.support_network]
+                    [self._meta.get_field("support_network").verbose_name, self.support_network],
+                    ###### INTERVENANT.E PRINCIPAL.E'
+                    [self._meta.get_field("principle_intervenant_person").verbose_name,
+                     self.principle_intervenant_person],
                 ]
                 )
 

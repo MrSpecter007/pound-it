@@ -28,6 +28,32 @@ class Relevailles(BaseServiceProfile):
     service_expectations = models.TextField(null=True, blank=True,
                                             verbose_name="Attentes reliées au service d'accompagnement")
 
+    ######## ACCOMPAGNANT.E PRINCIPAL.E
+    principle_accompanying_person = models.CharField(max_length=255, null=True, blank=True,
+                                                     verbose_name="Accompagnant.e principal.e")
+    principle_status = models.CharField(max_length=255, null=True, blank=True,
+                                        verbose_name="Statut de l'accompagnant.e principal.e")
+    principle_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+                                                        verbose_name="Montant payé par stagiaire (Si applicable)")
+    principle_balance_sheet_submission_date = models.DateField(null=True, blank=True,
+                                                               verbose_name="Date de remise du bilan")
+    principle_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    principle_payment_method = models.CharField(max_length=255, null=True, blank=True,
+                                                verbose_name="Méthod de paiement")
+
+    ######## ACCOMPAGNANT.E SECONDAIRE
+    secondary_accompanying_person = models.CharField(max_length=255, null=True, blank=True,
+                                                     verbose_name="Accompagnant.e secondaire")
+    secondary_status = models.CharField(max_length=255, null=True, blank=True,
+                                        verbose_name="Statut de l'accompagnant.e secondaire")
+    secondary_trainee_paid_amount = models.IntegerField(null=True, blank=True,
+                                                        verbose_name="Montant payé par stagiaire (Si applicable)")
+    secondary_balance_sheet_submission_date = models.DateField(null=True, blank=True,
+                                                               verbose_name="Date de remise du bilan")
+    secondary_amount_paid = models.IntegerField(null=True, blank=True, verbose_name="Montant payé")
+    secondary_payment_method = models.CharField(max_length=255, null=True, blank=True,
+                                                verbose_name="Méthod de paiement")
+
     @property
     def profile_code_prefix(self) -> ProfileCodePrefix:
         return ProfileCodePrefix.RELEVAILLES
@@ -58,7 +84,12 @@ class Relevailles(BaseServiceProfile):
                     [self._meta.get_field("breastfeeding").verbose_name, self.breastfeeding],
                     [self._meta.get_field("referred_by").verbose_name, self.referred_by],
                     [self._meta.get_field("postnatal_condition").verbose_name, self.postnatal_condition],
-                    [self._meta.get_field("service_expectations").verbose_name, self.service_expectations]
+                    [self._meta.get_field("service_expectations").verbose_name, self.service_expectations],
+                    ######## ACCOMPAGNANT.E
+                    [self._meta.get_field("principle_accompanying_person").verbose_name,
+                     self.principle_accompanying_person],
+                    [self._meta.get_field("secondary_accompanying_person").verbose_name,
+                     self.secondary_accompanying_person]
                 ]
 
                 )
