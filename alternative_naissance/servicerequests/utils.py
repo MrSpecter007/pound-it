@@ -1,13 +1,14 @@
-import io
 import datetime
-from typing import Dict, Any, Optional
+import html
+import io
+from typing import Dict
 
-from django.core.mail import EmailMessage
 from django.conf import settings
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from django.core.mail import EmailMessage
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 from servicerequests.models import ServiceProfile, ServiceRequest
 
@@ -35,14 +36,41 @@ def generate_profile_pdf(service_profile: ServiceProfile) -> io.BytesIO:
     elements.append(Spacer(1, 20))
 
     # Add profile information as a table
-    data = service_profile.fields_needed_for_agent
+    raw_data = service_profile.fields_needed_for_agent
+    data = []
+
+    label_style = ParagraphStyle(
+        'LabelStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        leading=14,
+    )
+
+    value_style = ParagraphStyle(
+        'ValueStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        leading=14,
+    )
+
+    for row in raw_data:
+        # Escape HTML characters to avoid issues with Paragraph rendering
+        label_text = html.escape(str(row[0])).replace("\n", "<br/>")
+        value_text = html.escape(str(row[1])).replace("\n", "<br/>")
+
+        data.append([
+            Paragraph(label_text, label_style),
+            Paragraph(value_text, value_style)
+        ])
 
     table = Table(data, colWidths=[200, 300])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('FONTSIZE', (0, 0), (0, -1), 12),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
         ('BACKGROUND', (1, 0), (1, -1), colors.white),
