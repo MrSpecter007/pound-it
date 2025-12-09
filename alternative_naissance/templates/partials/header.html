@@ -51,7 +51,8 @@
                     </li>
 
                     <li>
-                        <a href="{{ settings.core.SiteSettings.contact_page.url }}" 
+{#                        <a href="{{ settings.core.SiteSettings.contact_page.url }}"#}
+                        <a href="{% url 'create_service_request' %}"
                            class="thm-btn-three main-menu-six__get-quote-btn">
                             <span>Demande de service</span>
                             <span class="fas fa-paper-plane"></span>

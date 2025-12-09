@@ -3,22 +3,19 @@
 
 {% block body_class %}template-homepage{% endblock %}
 
-{% block extra_css %}
-
-    <link rel="stylesheet" href="{% static 'css/service_requests.css' %}">
-{% endblock extra_css %}
-
 {% block content %}
 
-    <h1>Demandes de Service soumise avec succès</h1>
+    <div class="container">
+        <h1 class="mb-3">Demandes de Service soumise avec succès</h1>
 
-    <p>
-    Alternative Naissance vous remercie d’avoir rempli cette demande de service. Nous faisons toujours notre possible pour offrir des services à toutes les familles qui en ont besoin et œuvrons à vous répondre dans un délai de 5 jours ouvrables.
-    </p>
+        <p class="mb-2">
+            Alternative Naissance vous remercie d’avoir rempli cette demande de service. Nous faisons toujours notre possible pour offrir des services à toutes les familles qui en ont besoin et œuvrons à vous répondre dans un délai de 5 jours ouvrables.
+        </p>
 
-    <p>
-        Vous recevrez sous peu une confirmation de votre demande par courriel.
-    </p>
-    <a href="{% url 'create_service_request' %}">Retourner</a>
+        <p class="mb-5">
+            Vous recevrez sous peu une confirmation de votre demande par courriel.
+        </p>
+        <a href="{% url 'create_service_request' %}">Retourner</a>
+    </div>
 
 {% endblock content %}
