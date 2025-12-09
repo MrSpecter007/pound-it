@@ -1,0 +1,112 @@
+{% load static wagtailcore_tags wagtailsettings_tags %}
+{% get_settings %}
+
+<footer class="site-footer">
+    <div class="site-footer-bg">
+    </div>
+    <div class="container">
+        <div class="site-footer__top">
+            <div class="row">
+                <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="100ms">
+                    <div class="footer-widget__column footer-widget__about">
+                        <div class="footer-widget__logo">
+                            <a href="index"><img src="/static/images/update-17-06-2023\resources\Alt-Naissance-Couleur-small.png" width="220" alt="logo-alternative-naissance"></a>
+                        </div>
+                        <div class="footer-widget__about-text-box">
+                            <p class="footer-widget__about-text">{{ settings.core.SiteSettings.footer_text }}</p>
+                        </div>
+                        <div class="site-footer__social">
+                            <a href="{{ settings.core.SiteSettings.twitter_url }}"><i class="fab fa-twitter"></i></a>
+                            <a href="{{ settings.core.SiteSettings.facebook_url }}"><i class="fab fa-facebook"></i></a>
+                            <a href="{{ settings.core.SiteSettings.pinterest_url }}"><i class="fab fa-pinterest-p"></i></a>
+                            <a href="{{ settings.core.SiteSettings.instagram_url }}"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="500ms">
+                    <div class="footer-widget__column footer-widget__links">
+                        <h3 class="footer-widget__title">Liens utiles</h3>
+                        <ul class="footer-widget__contact-list list-unstyled clearfix">
+                            <li><a href="/faire-un-don" class="footer-widget__about-text">Faire un don</a></li>
+                            <li><a href="/inscription" class="footer-widget__about-text">S'inscrire</a></li>
+                            <li><a href="/mon-compte" class="footer-widget__about-text">Mon compte</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
+                <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="200ms">
+                    <div class="footer-widget__column footer-widget__contact clearfix">
+                        <h3 class="footer-widget__title">Contact</h3>
+                        <ul class="footer-widget__contact-list list-unstyled clearfix">
+
+                            {% if settings.core.SiteSettings.email %}
+                            <li>
+                                 <div class="icon">
+                                    <span class="icon-email"></span>
+                                </div>
+                                <div class="text">
+                                    <p><a href="mailto:{{ settings.core.SiteSettings.email }}"> {{ settings.core.SiteSettings.email }}</a></p>
+                                </div>
+
+                            </li>
+                            {% endif %}
+
+                 
+                            {% if settings.core.SiteSettings.phone_number %}
+                            <li>
+                                <div class="icon">
+                                    <span class="icon-telephone-call"></span>
+                                </div>
+                                <div class="text">
+                                    <p><a href="tel:{{ settings.core.SiteSettings.phone_number }}">{{ settings.core.SiteSettings.phone_number }}</a></p>
+                                </div>
+                            </li>
+                             {% endif %}
+
+                             
+                        </ul>
+                        <div class="footer-widget__open-hour">
+                            <h3 class="footer-widget__open-hour-title">Heures d'ouverture</h3>
+                            <h3 class="footer-widget__open-hour-text">{{ settings.core.SiteSettings.opening_hours|linebreaks }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="400ms">
+                    <div class="footer-widget__column footer-widget__newsletter">
+                        <h3 class="footer-widget__title">Infolettre</h3>
+                        <p class="footer-widget__newsletter-text">Abonnez-vous à notre lettre d'information pour recevoir nos <br> dernières mises à jour et nouvelles.</p>
+                        
+                        <form action="{% url 'subscribe_newsletter' %}" method="POST" class="footer-widget__newsletter-form">
+                            {% csrf_token %}
+                            <div class="footer-widget__newsletter-input-box">
+                                <input type="email" placeholder="Adresse courriel" name="email" required>
+                                <button type="submit" class="footer-widget__newsletter-btn">
+                                    <i class="far fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="site-footer__bottom">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="site-footer__bottom-inner">
+                        <p class="site-footer__bottom-text">© Touts droits réservés Alternative Naissance 2025. Site conçu par <a href="https://catalystdv.com">Catalystdev Design Web</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+

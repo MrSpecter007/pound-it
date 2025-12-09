@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h2>{{ page.title }}</h2>
+    {% if page.intro %}<p>{{ page.intro|richtext }}</p>{% endif %}
+
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Lieu</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for atelier in ateliers %}
+          <tr>
+            <td>{{ atelier.title }}</td>
+            <td>{{ atelier.description|richtext }}</td>
+            <td>{{ atelier.date }}</td>
+            <td>{{ atelier.location }}</td>
+            <td><a href="{{ atelier.url }}" class="btn btn-primary btn-sm">Voir</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">Aucun atelier disponible pour le moment.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

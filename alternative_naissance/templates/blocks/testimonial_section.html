@@ -1,0 +1,96 @@
+{% load wagtailimages_tags %}
+
+<section class="testimonial-one">
+    <div class="testimonial-one-shape-2 float-bob-y">
+        <img src="/static/images/shapes/testimonial-one-shape-2.png" alt="">
+    </div>
+    <div class="testimonial-one-shape-3 float-bob-y">
+        <img src="/static/images/shapes/testimonial-one-shape-3.png" alt="">
+    </div>
+    <div class="container">
+        <div class="testimonial-one__top">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="testimonial-one__top-left">
+                        <div class="section-title text-left">
+                            <div class="section-sub-title-box">
+                                <p class="section-sub-title">Témoignages</p>
+                                <div class="section-title-shape-1">
+                                    <img src="/static/images/shapes/section-title-shape-1.png" alt="">
+                                </div>
+                                <div class="section-title-shape-2">
+                                    <img src="/static/images/shapes/section-title-shape-2.png" alt="">
+                                </div>
+                            </div>
+                            <h2 class="section-title__title">Ce que nos<br>clients disent</h2>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="testimonial-one__bottom">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="owl-carousel owl-theme thm-owl__carousel testimonial-one__carousel"
+                         data-owl-options='{
+                            "loop": true,
+                            "autoplay": true,
+                            "margin": 30,
+                            "nav": false,
+                            "dots": false,
+                            "smartSpeed": 500,
+                            "autoplayTimeout": 10000,
+                            "navText": ["<span class=\"fa fa-angle-left\"></span>","<span class=\"fa fa-angle-right\"></span>"],
+                            "responsive": {
+                                "0": {"items": 1},
+                                "768": {"items": 2},
+                                "992": {"items": 2},
+                                "1200": {"items": 2}
+                            }
+                         }'>
+                        {# Si une catégorie est passée dans le contexte, filtre dessus #}
+                        {% if category %}
+                            {% for testimonial in self.section.items.all %}
+                                {% if testimonial.category == category %}
+                                    <div class="item">
+                                        <div class="testimonial-one__single">
+                                            <p><i>"{{ testimonial.client_text }}"</i></p>
+                                            <p><strong>{{ testimonial.client_name }}</strong></p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for testimonial in self.section.items.all %}
+                                <div class="item">
+                          
+                                    <div class="testimonial-one__single">
+                                        <div class="testimonial-one__single-inner">
+
+                                            <div class="testimonial-one__client-info">
+                                                <div class="">
+                                                    {% load static %}
+                                                    <img src="/static/images/icon/user-placeholder.svg" alt="Client" width="100" height="100" class="rounded-circle shadow-sm">                                         
+                                                </div>                               
+                                            </div>
+
+                                            <p class="testimonial-one__text"><i>" {{ testimonial.client_text }} "</i></p>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                
+                            {% endfor %}
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="policy-proposal py-5">
+  <div class="container">
+    <h2 class="mb-4">Mon compte</h2>
+
+    <div class="row mb-4">
+      <p>Ouvrir une session :</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" class="policy-proposal__form">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-xl-6">
+          <div class="policy-proposal__input-box">
+            <p class="policy-proposal__input-title">Pseudonyme ou courriel :</p>
+            <input type="text" name="username_or_email" required>
+          </div>
+        </div>
+
+        <div class="col-xl-6">
+          <div class="policy-proposal__input-box">
+            <p class="policy-proposal__input-title">Mot de passe :</p>
+            <input type="password" name="password" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-xl-12">
+          <button type="submit" class="thm-btn policy-proposal__btn">Soumettre</button>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-xl-12">
+          <p>
+            <a href="#" class="text-primary">Mot de passe oublié ?</a><br>
+            Vous n’avez pas de compte ?
+            <a href="{% url 'inscription' %}" class="text-primary">Cliquez ici pour devenir membre d’Alternative Naissance</a>.
+          </p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

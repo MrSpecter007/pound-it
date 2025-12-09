@@ -1,0 +1,40 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<!--CTA One Start-->
+<section class="cta-one cta-four">
+  
+    <div class="container">
+        <div class="cta-one__content">
+            <div class="cta-one__inner">
+                <div class="cta-one__left">
+                    <h3 class="cta-one__title">{{ value.title }}</h3>
+                </div>
+                <div class="cta-one__right">
+                    {% if value.phone_number %}
+                        <div class="cta-one__call">
+                            <div class="cta-one__call-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="cta-one__call-number">
+                                <a href="tel:{{ value.phone_number }}">{{ value.phone_number }}</a>
+                                {% if value.phone_text %}
+                                    <p>{{ value.phone_text }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="cta-one__btn-box">
+                        <a href="{{ value.button_link }}" class="thm-btn cta-one__btn">{{ value.button_text }}</a>
+                    </div>
+                </div>
+                {% if value.image %}
+                    <div class="cta-one__img">
+                        {% image value.image max-500x400 as img %}
+                        <img src="{{ img.url }}" alt="{{ value.title }}">
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+<!--CTA One End-->
