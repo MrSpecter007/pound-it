@@ -16,7 +16,7 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
 
-    path("service-request/", include(servicerequests_urls))
+    path("service-request/", include(servicerequests_urls)),
 
     path("", include("core.urls")),
 
