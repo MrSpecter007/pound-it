@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/service_requests.css' %}">
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-section h2 {
+            margin-top: 0;
+        }
+        .conditional-field {
+            display: none;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+        }
+        .checkbox-group {
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+        }
+        .required-field label:after {
+            content: " *";
+            color: red;
+        }
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="container">
+        <h1>Formulaire de demande de service</h1>
+        <p>Veuillez noter : </p>
+        <ul>
+            <li>
+                La disponibilité du service dépend du quartier où vous habitez, des situations auxquelles vous faites face et des autres demandes faites à l’organisme.
+            </li>
+            <li>
+                À cette étape du processus, nous ne pouvons pas garantir l’obtention du service demandé. Nous vous contacterons afin de confirmer votre obtention du service.
+            </li>
+            <li>
+                Toutes les informations demandées ci-dessous nous servent à déterminer notre capacité à vous offrir le service demandé.
+            </li>
+            <li>
+                Si vous avez des questions à propos de nos services ou du processus de demande de service, cliquez ici.
+            </li>
+        </ul>
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Veuillez corriger les erreurs ci-dessous:</p>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p>{{ field.label }}: {{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form action="{% url 'create_service_request' %}" method="post" id="service-request-form">
+            {% csrf_token %}
+            
+            <!-- Service Type Section -->
+            <div class="form-section">
+                <h2>Type de service</h2>
+                <div class="form-group required-field">
+                    <label for="{{ form.service_type.id_for_label }}">{{ form.service_type.label }}</label>
+                    {{ form.service_type }}
+                    {% if form.service_type.errors %}
+                        <div class="error-message">{{ form.service_type.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Conditional fields based on service type -->
+                <div id="expected-delivery-date-group" class="form-group conditional-field">
+                    <label for="{{ form.expected_delivery_date.id_for_label }}">{{ form.expected_delivery_date.label }}</label>
+                    {{ form.expected_delivery_date }}
+                    {% if form.expected_delivery_date.errors %}
+                        <div class="error-message">{{ form.expected_delivery_date.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div id="child-birth-date-group" class="form-group conditional-field">
+                    <label for="{{ form.child_birth_date.id_for_label }}">{{ form.child_birth_date.label }}</label>
+                    {{ form.child_birth_date }}
+                    {% if form.child_birth_date.errors %}
+                        <div class="error-message">{{ form.child_birth_date.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Personal Information Section -->
+            <div class="form-section">
+                <h2>Information personnelle</h2>
+                <div class="form-group required-field">
+                    <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="error-message">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group required-field">
+                    <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="error-message">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Address Section -->
+            <div class="form-section">
+                <h2>Adresse</h2>
+                <div class="form-group checkbox-group">
+                    <label for="{{ form.no_permanent_address.id_for_label }}">
+                        {{ form.no_permanent_address }}
+                        {{ form.no_permanent_address.label }}
+                    </label>
+                    {% if form.no_permanent_address.errors %}
+                        <div class="error-message">{{ form.no_permanent_address.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div id="address-fields">
+                    <div class="form-group">
+                        <label for="{{ form.street_address.id_for_label }}">{{ form.street_address.label }}</label>
+                        {{ form.street_address }}
+                        {% if form.street_address.errors %}
+                            <div class="error-message">{{ form.street_address.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="error-message">{{ form.city.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
+                        {{ form.province }}
+                        {% if form.province.errors %}
+                            <div class="error-message">{{ form.province.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="error-message">{{ form.postal_code.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information Section -->
+            <div class="form-section">
+                <h2>Information de contact</h2>
+                <p>Vous devez fournir au moins un moyen de contact (téléphone ou courriel).</p>
+                
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="error-message">{{ form.phone.errors }}</div>
+                    {% endif %}
+                    
+                    <div class="checkbox-group">
+                        <label for="{{ form.no_phone.id_for_label }}">
+                            {{ form.no_phone }}
+                            {{ form.no_phone.label }}
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="error-message">{{ form.email.errors }}</div>
+                    {% endif %}
+                    
+                    <div class="checkbox-group">
+                        <label for="{{ form.no_email.id_for_label }}">
+                            {{ form.no_email }}
+                            {{ form.no_email.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Languages Section -->
+            <div class="form-section">
+                <h2>Langues parlées</h2>
+                <div class="form-group">
+                    <label>{{ form.languages_choices.label }}</label>
+                    <div class="checkbox-group">
+                        {{ form.languages_choices }}
+                    </div>
+                    {% if form.languages_choices.errors %}
+                        <div class="error-message">{{ form.languages_choices.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.other_language.id_for_label }}">{{ form.other_language.label }}</label>
+                    {{ form.other_language }}
+                    {% if form.other_language.errors %}
+                        <div class="error-message">{{ form.other_language.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Citizenship Status Section -->
+            <div class="form-section">
+                <h2>Statut de citoyenneté</h2>
+                <div class="form-group required-field">
+                    <label for="{{ form.citizenship_status.id_for_label }}">{{ form.citizenship_status.label }}</label>
+                    {{ form.citizenship_status }}
+                    {% if form.citizenship_status.errors %}
+                        <div class="error-message">{{ form.citizenship_status.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Soumettre" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get form elements
+            const serviceTypeSelect = document.getElementById('{{ form.service_type.id_for_label }}');
+            const expectedDeliveryDateGroup = document.getElementById('expected-delivery-date-group');
+            const childBirthDateGroup = document.getElementById('child-birth-date-group');
+            const noPhoneCheckbox = document.getElementById('{{ form.no_phone.id_for_label }}');
+            const phoneInput = document.getElementById('{{ form.phone.id_for_label }}');
+            const noEmailCheckbox = document.getElementById('{{ form.no_email.id_for_label }}');
+            const emailInput = document.getElementById('{{ form.email.id_for_label }}');
+            const noPermanentAddressCheckbox = document.getElementById('{{ form.no_permanent_address.id_for_label }}');
+            const addressFields = document.getElementById('address-fields');
+            
+            // Function to handle service type change
+            function handleServiceTypeChange() {
+                const serviceType = serviceTypeSelect.value;
+                
+                // Hide all conditional fields first
+                expectedDeliveryDateGroup.style.display = 'none';
+                childBirthDateGroup.style.display = 'none';
+                
+                // Show relevant fields based on service type
+                if (serviceType === 'accompagnement_a_la_naissance') {
+                    expectedDeliveryDateGroup.style.display = 'block';
+                } else if (serviceType === 'accompagnement_aux_relevailles') {
+                    childBirthDateGroup.style.display = 'block';
+                }
+            }
+            
+            // Function to handle no phone checkbox
+            function handleNoPhoneChange() {
+                if (noPhoneCheckbox.checked) {
+                    phoneInput.disabled = true;
+                    phoneInput.value = '';
+                    
+                    // If both no phone and no email are checked, uncheck no email
+                    if (noEmailCheckbox.checked) {
+                        noEmailCheckbox.checked = false;
+                        emailInput.disabled = false;
+                    }
+                } else {
+                    phoneInput.disabled = false;
+                }
+            }
+            
+            // Function to handle no email checkbox
+            function handleNoEmailChange() {
+                if (noEmailCheckbox.checked) {
+                    emailInput.disabled = true;
+                    emailInput.value = '';
+                    
+                    // If both no phone and no email are checked, uncheck no phone
+                    if (noPhoneCheckbox.checked) {
+                        noPhoneCheckbox.checked = false;
+                        phoneInput.disabled = false;
+                    }
+                } else {
+                    emailInput.disabled = false;
+                }
+            }
+            
+            // Function to handle no permanent address checkbox
+            function handleNoPermanentAddressChange() {
+                if (noPermanentAddressCheckbox.checked) {
+                    addressFields.style.display = 'none';
+                    // Clear address fields
+                    document.getElementById('{{ form.street_address.id_for_label }}').value = '';
+                    document.getElementById('{{ form.city.id_for_label }}').value = '';
+                    document.getElementById('{{ form.province.id_for_label }}').value = '';
+                    document.getElementById('{{ form.postal_code.id_for_label }}').value = '';
+                } else {
+                    addressFields.style.display = 'block';
+                }
+            }
+            
+            // Add event listeners
+            serviceTypeSelect.addEventListener('change', handleServiceTypeChange);
+            noPhoneCheckbox.addEventListener('change', handleNoPhoneChange);
+            noEmailCheckbox.addEventListener('change', handleNoEmailChange);
+            noPermanentAddressCheckbox.addEventListener('change', handleNoPermanentAddressChange);
+            
+            // Initialize form state
+            handleServiceTypeChange();
+            handleNoPhoneChange();
+            handleNoEmailChange();
+            handleNoPermanentAddressChange();
+        });
+    </script>
+{% endblock content %}

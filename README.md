@@ -9,15 +9,15 @@ note: if you are using Nix package manager, install python by running `nix-shell
 
 ## Project Setup
 - Clone the repository and navigate to the root directory
-- Run `python -m venv .venv` if you use another python version it will be something like : `python3 -m venv .venv`
+- Run `python -m venv .venv`
 - Run `source .venv/bin/activate`
 - Run `cp .env.example .env`
-- Run `docker-compose up` if you get an error, use the new way of writing it  `docker compose up --build`
+- Run `docker-compose up` or `docker compose up`
 - Open a new terminal, and navigate to `Alternative-Naissance/alternative_naissance/` directory
 - Run `pip install -r requirements.txt`
-- Run `python manage.py makemigrations` if you use another python version it will be something like : `python3 manage.py makemigrations`
-- Run `python manage.py migrate` if you use another python version it will be something like : `python3 manage.py migrate`
-- Run `python manage.py runserver`  if you use another python version it will be something like : `python3 manage.py runserver`
+- Run `python manage.py makemigrations`
+- Run `python manage.py migrate`
+- Run `python manage.py runserver`
 
 ## Project Structure
 - The `core` app contains the main content pages of the website, such as landing page, about page, and contact page.
@@ -25,3 +25,7 @@ note: if you are using Nix package manager, install python by running `nix-shell
 - All the template files are under the alternative_naissance/templates directory, when creating new app, there will be template
 files generate in the app specific directory, move it to the main templates directory instead.
 - For workshops, forms, business related documents functionalities, each will be in their separate app (will be created later).
+
+
+**Note**
+Please run `python manage.py collectstatic` before running unit tests, otherwise some tests will fail
