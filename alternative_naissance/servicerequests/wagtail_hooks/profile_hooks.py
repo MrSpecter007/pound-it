@@ -92,16 +92,6 @@ _PAYMENT_METHOD_CHOICES = [
 ]
 
 
-def _get_accompagnant_service_staff_names():
-    """Returns a list of full names of all service staff members that are accompagnant. Used in the ACCOMPAGNANT.E and INTERVENANT.E using DatalistInput widget."""
-    return list(ServiceStaff.objects.filter(is_accompagnant=True).values_list("full_name", flat=True))
-
-
-def _get_intervenant_service_staff_names():
-    """Returns a list of full names of all service staff members that are intervenant. Used in the INTERVENANT.E using DatalistInput widget."""
-    return list(ServiceStaff.objects.filter(is_intervenant=True).values_list("full_name", flat=True))
-
-
 class DatalistInput(forms.TextInput):
     """
     Custom text widget that shows autocomplete suggestion using <datalist> tag in HTML.
@@ -190,8 +180,8 @@ _BASE_PROFILE_END_PANELS: list[FieldPanel] = [
 _ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
     MultiFieldPanel(heading="ACCOMPAGNANT.E PRINCIPAL.E", children=(
         FieldPanel("principle_accompanying_person",
-                   widget=DatalistInput(_get_accompagnant_service_staff_names(), "principle_accompanying_person",
-                                        _get_accompagnant_service_staff_names)),
+                   widget=DatalistInput([], "principle_accompanying_person",
+                                        ServiceStaff.get_accompagnant_service_staff_names)),
         FieldPanel("principle_status",
                    widget=DatalistInput(_ACCOMPAGNANT_STATUS_CHOICES, "principle_status")),
         FieldPanel("principle_trainee_paid_amount"),
@@ -202,8 +192,8 @@ _ACCOMPAGNANT_PANELS: list[FieldPanel | MultiFieldPanel] = [
 
     MultiFieldPanel(heading="ACCOMPAGNANT.E SECONDAIRE", children=(
         FieldPanel("secondary_accompanying_person",
-                   widget=DatalistInput(_get_accompagnant_service_staff_names(), "secondary_accompanying_person",
-                                        _get_accompagnant_service_staff_names)),
+                   widget=DatalistInput([], "secondary_accompanying_person",
+                                        ServiceStaff.get_accompagnant_service_staff_names)),
         FieldPanel("secondary_status",
                    widget=DatalistInput(_ACCOMPAGNANT_STATUS_CHOICES, "secondary_status")),
         FieldPanel("secondary_trainee_paid_amount"),
@@ -361,8 +351,8 @@ class InterventionPerinataleViewSet(SnippetViewSet):
 
         MultiFieldPanel(heading="NTERVENANT.E PRINCIPAL.E", children=(
             FieldPanel("principle_intervenant_person",
-                       widget=DatalistInput(_get_intervenant_service_staff_names(), "principle_intervention_person",
-                                            _get_intervenant_service_staff_names)
+                       widget=DatalistInput([], "principle_intervention_person",
+                                            ServiceStaff.get_intervenant_service_staff_names)
                        ),
         ))
     ] + _BASE_PROFILE_END_PANELS)
