@@ -106,14 +106,6 @@
                                     <img src="{{ img_one.url }}" alt="{{ img_one.alt }}">
                             {% endif %}
                         </div>
-                        <div class="about-one__img-two">
-                               {% image about.image_two original as img_two %}
-                                    <img src="{{ img_two.url }}" alt="{{ img_two.alt }}" width="360" height="350">
-                        </div>
-                        <div class="about-one__experience">
-                                <h2 class="about-one__experience-year">45</h2>
-                                <p class="about-one__experience-text">Années<br> d'Expérience</p>
-                        </div>
                         <div class="about-one__shape-1">
                             <img src="/static/images/shapes/about-one-shape-1.jpg" alt="">
                         </div>
@@ -201,15 +193,7 @@
                                     <img src="/static/images/shapes/section-title-shape-2.png" alt="">
                                 </div>
                             </div>
-                            <h2 class="section-title__title">Ce que nos<br>clients disent</h2>
                         </div>
-                    </div>
-                </div>
-                <div class="col-xl-6">
-                    <div class="testimonial-one__top-right">
-                        <p class="testimonial-one__top-text">
-                            {{ page.testimonials.first.top_text }}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -243,11 +227,43 @@
                                     <div class="testimonial-one__client-info">
                                         <div class="">
                                             {% load static %}
-                                            <img src="/static/images/icon/user-placeholder.svg" alt="Client" width="100" height="100" class="rounded-circle shadow-sm">                                         
+                                                <div class="testimonial-icon
+                                                    {% if forloop.counter|divisibleby:3 %}
+                                                            icon-blue
+                                                    {% elif forloop.counter|divisibleby:2 %}
+                                                            icon-purple
+                                                    {% else %}
+                                                            icon-pink
+                                                    {% endif %}">
+    
+                                                    <svg viewBox="0 0 120 120" class="icon-svg">
+                                                        <circle cx="60" cy="60" r="58"
+                                                            fill="currentColor"
+                                                            opacity="0.15"
+                                                            stroke="currentColor"
+                                                            stroke-width="2"/>
+
+                                                        <path d="M60 68a20 20 0 1 0-20-20 20 20 0 0 0 20 20z"
+                                                            fill="currentColor"/>
+
+                                                        <path d="M25 95c0-10 12-20 35-20s35 10 35 20v5H25z"
+                                                            fill="currentColor"/>
+
+                                                        <path d="M60 68a18 18 0 1 0-18-18 18 18 0 0 0 18 18z"
+                                                            fill="white"
+                                                            opacity="0.25"/>
+
+                                                        <path d="M28 96h64a2 2 0 0 1 2 2v1H26v-1a2 2 0 0 1 2-2z"
+                                                            fill="currentColor"
+                                                            opacity="0.4"/>
+                                                    </svg>
+
+                                                </div>                                           
                                         </div>                               
                                     </div>
 
                                     <p class="testimonial-one__text"><i>" {{ testimonial.client_text }} "</i></p>
+                                    <p class="testimonial-one__text"><b>{{ testimonial.get_category_display }}</b></p>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +310,7 @@
             </div>
             {% endif %}
             <div class="news-one__arrow-box">
-              <a href="{{ item.url }}" class="news-one__arrow">
+              <a href="{{ item.linked_page.url }}" class="news-one__arrow">
                 <span class="icon-right-arrow1"></span>
               </a>
             </div>
@@ -302,11 +318,11 @@
         
           <div class="news-one__content">
             <h3 class="news-one__title">
-              <a href="{{ item.url }}">{{ item.title }}</a>
+              <a href="{{ item.linked_page.url }}">{{ item.title }}</a>
             </h3>
             <p class="news-one__text">{{ item.text }}</p>
             <div class="news-one__read-more">
-              <a href="{{ item.url }}">Lire plus <i class="fas fa-angle-double-right"></i></a>
+              <a href="{{ item.linked_page.url }}">Lire plus <i class="fas fa-angle-double-right"></i></a>
             </div>
           </div>
         </div>
@@ -339,7 +355,7 @@
                 </div>
                 <div class="col-xl-7 col-lg-6">
                     <div class="services-one__top-right">
-                        <p class="services-one__top-text">Alternative Naissance offre une gamme complète de services couvrant l’accompagnement à la naissance et les interventions périnatales.</p>
+                        <p class="services-one__top-text">Alternative Naissance offre une gamme complète de services couvrant la périnatalité au lieu de la vôtre.</p>
                     </div>
                 </div>
             </div>

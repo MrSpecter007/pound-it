@@ -23,7 +23,7 @@
                   {% if atelier.date or atelier.location %}
                     <p class="text-muted small mb-2">
                       {% if atelier.date %}
-                        📅 {{ atelier.date }}
+                        📅 {{ atelier.date|date:"j F Y" }}
                       {% endif %}
                       {% if atelier.location %}
                         <br>📍 {{ atelier.location }}

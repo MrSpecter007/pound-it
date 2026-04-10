@@ -1,14 +1,17 @@
 from django.db import models
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from wagtail.models import Page, Orderable, Site
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, InlinePanel, PageChooserPanel
 from modelcluster.fields import ParentalKey
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
+from wagtail.search import index
 
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from django.core.validators import MinLengthValidator, RegexValidator
+from django.utils.html import format_html
 from wagtail import blocks
 import uuid
 from wagtail.images.blocks import ImageChooserBlock
@@ -118,34 +121,10 @@ class FeatureSection(Orderable):
         FieldPanel("description"),
     ]
 
-# --------------------------
-# Testimonial Section
-# --------------------------
 @register_snippet
-class TestimonialSection(ClusterableModel):
-
-    top_text = models.TextField(blank=True)
-
-    panels = [
-        FieldPanel("top_text"),
-        InlinePanel("items", label="Témoignages"),
-    ]
-
-    def __str__(self):
-        return f"Section Témoignages ({self.top_text[:30]})"
-    
-
-
-class Testimonial(Orderable):
-    section = ParentalKey(
-        "core.TestimonialSection",
-        related_name="items",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
-
+class Testimonial(index.Indexed, models.Model):
+   
     client_name = models.CharField(max_length=150, blank=True, null=True)
-    client_sub_title = models.CharField(max_length=150, blank=True, null=True)
     client_text = models.TextField(blank=True)
     client_image = models.ForeignKey(
         "wagtailimages.Image",
@@ -154,19 +133,39 @@ class Testimonial(Orderable):
         related_name="+"
     )
 
+    CATEGORY_CHOICES = [
+        ("ressourcement", "Activités de ressourcement"),
+        ("formation", "Formation"),
+        ("pret_materiel", "Prêt de matériel"),
+        ("perinatal", "Ateliers thématiques périnataux"),
+        ("atelier", "Ateliers-thématiques"),
+        ("ig", "IG"),
+        ("deuil", "Deuil"),
+        ("virtuel", "Virtuel"),
+        ("relevailles", "Relevailles"),
+        ("naissance", "Naissance"),
+    ]
+
     category = models.CharField(
+        "Catégorie",
         max_length=100,
-        blank=True,
-        null=True,
-        help_text="Catégorie ou page associée à ce témoignage (ex: Naissance, Relevailles, Accueil...)"
+        choices=CATEGORY_CHOICES
     )
+
+    is_approved = models.BooleanField("Approuvé", default=False)
+
+    search_fields = [
+        index.SearchField("client_text"),
+        index.SearchField("category"),
+    ]
 
     panels = [
         FieldPanel("client_text"),
         FieldPanel("category"), 
+        FieldPanel("is_approved"),
     ]
     def __str__(self):
-        return f"{self.client_name or 'Témoignage'} — {self.category or 'Général'}"
+        return f"{self.get_category_display()} — {self.client_text[:40]}"
     
 
 
@@ -231,9 +230,18 @@ class NewsItem(Orderable):
         related_name="news_items",
     )
     tag = models.CharField(max_length=100, blank=True)
-    url = models.URLField("Lien vers l’article", blank=True)
+
+    linked_page = models.ForeignKey(
+        Page,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+
     title = models.CharField(max_length=250)
     text = models.TextField(blank=True)
+
     image = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -244,12 +252,11 @@ class NewsItem(Orderable):
 
     panels = [
         FieldPanel("tag"),
-        FieldPanel("url"),
+        PageChooserPanel("linked_page"),
         FieldPanel("title"),
         FieldPanel("text"),
         FieldPanel("image"),
     ]
-
 
 # --------------------------
 # Service one section
@@ -306,6 +313,7 @@ class WhyChooseBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=True)
     subtitle = blocks.CharBlock(required=False)
     text = blocks.RichTextBlock(required=False, features=['bold', 'italic', 'link', 'h2', 'h3', 'ul', 'ol'])
+    text2 = blocks.RichTextBlock(required=False, features=['bold', 'italic', 'link', 'h2', 'h3', 'ul', 'ol'])
     image = ImageChooserBlock(required=False)
     layout = blocks.ChoiceBlock(
         choices=[
@@ -325,13 +333,120 @@ class WhyChooseBlock(blocks.StructBlock):
 # TESTIMONIALS CHOOSER BLOCK
 # --------------------------
 class TestimonialChooserBlock(blocks.StructBlock):
-    section = SnippetChooserBlock(TestimonialSection)
+
+    category = blocks.ChoiceBlock(
+        choices=Testimonial.CATEGORY_CHOICES,
+        label="Catégorie des témoignages"
+    )
+
+    def get_context(self, value, parent_context=None):
+
+        context = super().get_context(value, parent_context)
+
+        testimonials = Testimonial.objects.filter(
+            category=value["category"],
+            is_approved=True
+        )
+
+        context["testimonials"] = testimonials
+
+        return context
 
     class Meta:
         icon = "form"
-        label = "Section Témoignages"
+        label = "Témoignages"
         template = "blocks/testimonial_section.html"
 
+
+
+# --------------------------
+# FEEDBACK SNIPPET BLOCK
+# --------------------------
+
+@register_snippet
+class Feedback(index.Indexed, models.Model):
+
+    TYPE_CHOICES = [
+        ("suggestion", "Suggestion"),
+        ("plainte", "Plainte"),
+        ("commentaire", "Commentaire"),
+    ]
+
+    CATEGORY_CHOICES = [
+        ("ressourcement", "Activités de ressourcement"),
+        ("formation", "Formation"),
+        ("pret_materiel", "Prêt de matériel"),
+        ("perinatal", "Ateliers thématiques périnataux"),
+        ("atelier", "Ateliers-thématiques"),
+        ("ig", "IG"),
+        ("deuil", "Deuil"),
+        ("virtuel", "Virtuel"),
+        ("relevailles", "Relevailles"),
+        ("naissance", "Naissance"),
+    ]
+
+    # Infos client
+    name = models.CharField("Nom", max_length=150, blank=True)
+    email = models.EmailField("Courriel", blank=True)
+
+    # Contenu
+    type = models.CharField("Type", max_length=20, choices=TYPE_CHOICES)
+    category = models.CharField("Catégorie", max_length=100, choices=CATEGORY_CHOICES)
+    message = models.TextField("Message")
+
+    # Gestion interne
+    is_processed = models.BooleanField("Traité", default=False)
+    is_visible = models.BooleanField("Visible publiquement", default=False)
+
+    created_at = models.DateTimeField("Date", auto_now_add=True)
+
+    search_fields = [
+        index.SearchField("message"),
+        index.SearchField("category"),
+    ]
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("email"),
+        FieldPanel("type"),
+        FieldPanel("category"),
+        FieldPanel("message"),
+        FieldPanel("is_processed"),
+        FieldPanel("is_visible"),
+    ]
+
+    def __str__(self):
+        return f"{self.get_type_display()} — {self.category} — {self.created_at.strftime('%Y-%m-%d')}"
+    
+
+# --------------------------
+# FEEDBACK PAGE BLOCK
+# --------------------------
+
+class FeedbackPage(Page):
+    def get_context(self, request):
+        context = super().get_context(request)
+
+        from core.models import Feedback
+        context["categories"] = Feedback.CATEGORY_CHOICES
+        context["types"] = Feedback.TYPE_CHOICES
+
+        return context
+
+    def serve(self, request):
+        if request.method == "POST":
+            Feedback.objects.create(
+                name=request.POST.get("name"),
+                email=request.POST.get("email"),
+                type=request.POST.get("type"),
+                category=request.POST.get("category"),
+                message=request.POST.get("message"),
+            )
+
+            return redirect(request.path + "?success=1")
+
+        return super().serve(request)
+    
 
 # --------------------------
 # BENEFIT POINT BLOCK
@@ -457,9 +572,9 @@ class EventPage(Page):
     def upcoming_events():
         """Retourne uniquement les 3 prochains mois d’événements"""
         today = date.today()
-        three_months = date(today.year, today.month + 3 if today.month <= 9 else (today.month + 3) % 12, today.day)
+        six_months = today + timedelta(days=180)
         return EventPage.objects.live().public().filter(
-            date__gte=today, date__lte=three_months
+            date__gte=today, date__lte=six_months
         ).order_by("date")
 
 class CalendarBlock(blocks.StructBlock):
@@ -469,11 +584,11 @@ class CalendarBlock(blocks.StructBlock):
         context = super().get_context(value, parent_context)
 
         today = date.today()
-        three_months = today + timedelta(days=90)
+        six_months = today + timedelta(days=180)
 
         events_qs = EventPage.objects.live().public().filter(
             date__gte=today,
-            date__lte=three_months
+            date__lte=six_months
         ).order_by("date")
 
         events = [
@@ -525,6 +640,20 @@ class DynamicTableBlock(blocks.StructBlock):
         label = "Tableau dynamique"
 
 # --------------------------
+# 3 column BLOCK
+# --------------------------
+class ThreeColumnsBlock(blocks.StructBlock):
+    title = blocks.CharBlock(required=False)
+
+    col1 = blocks.RichTextBlock(required=False)
+    col2 = blocks.RichTextBlock(required=False)
+    col3 = blocks.RichTextBlock(required=False)
+
+    class Meta:
+        template = "blocks/columns_block.html"
+        icon = "placeholder"
+        label = "3 colonnes (Contact / Infos)"
+# --------------------------
 # ATELIER BLOCK
 # --------------------------
 class AtelierPage(Page):
@@ -537,10 +666,20 @@ class AtelierPage(Page):
         blank=True,
         help_text="Indiquez la récurrence de l’atelier (ex: 'Tous les 2 mois')"
     )
+
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+"
+    )
+
     
     
     content_panels = Page.content_panels + [
         FieldPanel("description"),
+        FieldPanel("image"),
         FieldPanel("date"),
         FieldPanel("location"),
         FieldPanel("lien"),
@@ -637,7 +776,115 @@ class Inscription(models.Model):
     def __str__(self):
         return f"{self.prenom} {self.nom} ({self.courriel})"
 
+# -------------------------
+# JOB
+#--------------------------
+class JobPage(Page):
 
+    position = models.CharField("Poste", max_length=255)
+
+    description = RichTextField(
+        blank=True,
+        verbose_name="Description du poste"
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Poste actif"
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("position"),
+        FieldPanel("description"),
+        FieldPanel("is_active"),
+    ]
+
+    parent_page_types = ["core.GenericPage"]
+
+    @property
+    def applications_count(self):
+        return self.applications.count()
+
+    def serve(self, request):
+
+        if request.method == "POST":
+
+            JobApplication.objects.create(
+                job=self,
+                first_name=request.POST.get("first_name"),
+                last_name=request.POST.get("last_name"),
+                email=request.POST.get("email"),
+                message=request.POST.get("message"),
+                cv=request.FILES.get("cv")
+            )
+
+            messages.success(
+                request,
+                "Votre candidature a été envoyée avec succès."
+            )
+
+            return redirect(self.url)
+        return super().serve(request)
+
+
+class JobApplication(models.Model):
+
+    job = models.ForeignKey(
+        JobPage,
+        on_delete=models.CASCADE,
+        related_name="applications"
+    )
+
+    first_name = models.CharField("Prénom", max_length=100)
+    last_name = models.CharField("Nom", max_length=100)
+    email = models.EmailField("Courriel")
+    message = models.TextField( "Message", blank=True)
+
+    cv = models.FileField("CV", upload_to="cv/", blank=True)
+    created_at = models.DateTimeField("Date de candidature", auto_now_add=True)
+    
+
+    class Meta:
+        verbose_name = "Candidature"
+        verbose_name_plural = "Candidatures"
+
+    def cv_link(self):
+        if self.cv:
+            return format_html(
+                '<a href="{}" target="_blank">Télécharger CV</a>',
+                self.cv.url
+            )
+        return "-"
+
+    cv_link.short_description = "CV"
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.job.title}"
+    
+
+class JobsBlock(blocks.StructBlock):
+
+    title = blocks.CharBlock(
+        required=False,
+        default="Postes disponibles"
+    )
+
+    def get_context(self, value, parent_context=None):
+
+        context = super().get_context(value, parent_context)
+
+        jobs = JobPage.objects.live().public().filter(
+            is_active=True
+        )
+
+        context["jobs"] = jobs
+
+        return context
+
+    class Meta:
+        template = "blocks/jobs_block.html"
+        icon = "user"
+        label = "Liste des emplois"
 # --------------------------
 # News letter
 # --------------------------
@@ -700,6 +947,8 @@ class GenericPage(Page):
         ("dynamic_table", DynamicTableBlock()),
         ("atelier", AtelierListBlock()),
         ('map', GoogleMapBlock()),
+        ("jobs", JobsBlock()),
+        ("three_columns", ThreeColumnsBlock()),
     ], 
     blank=True,
     null=True,
@@ -742,6 +991,8 @@ class SiteSettings(BaseSiteSetting):
     # Coordonnées
     phone_number = models.CharField(max_length=50, blank=True, help_text="Numéro de téléphone principal (ex: 514-274-1727)")
     email = models.EmailField(blank=True, help_text="Adresse email principale")
+    address = models.TextField(blank=True,help_text="Adresse complète de l'organisme (ex: 123 rue Exemple, Montréal, QC)"
+    )
 
     # Réseaux sociaux
     facebook_url = models.URLField(blank=True, null=True)
@@ -777,6 +1028,7 @@ class SiteSettings(BaseSiteSetting):
         FieldPanel("site_name"),
         FieldPanel("phone_number"),
         FieldPanel("email"),
+        FieldPanel("address"), 
         FieldPanel("facebook_url"),
         FieldPanel("twitter_url"),
         FieldPanel("instagram_url"),

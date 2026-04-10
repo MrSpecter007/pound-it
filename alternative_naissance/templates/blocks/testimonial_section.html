@@ -22,7 +22,6 @@
                                     <img src="/static/images/shapes/section-title-shape-2.png" alt="">
                                 </div>
                             </div>
-                            <h2 class="section-title__title">Ce que nos<br>clients disent</h2>
                         </div>
                     </div>
                 </div>
@@ -50,20 +49,7 @@
                                 "1200": {"items": 2}
                             }
                          }'>
-                        {# Si une catégorie est passée dans le contexte, filtre dessus #}
-                        {% if category %}
-                            {% for testimonial in self.section.items.all %}
-                                {% if testimonial.category == category %}
-                                    <div class="item">
-                                        <div class="testimonial-one__single">
-                                            <p><i>"{{ testimonial.client_text }}"</i></p>
-                                            <p><strong>{{ testimonial.client_name }}</strong></p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            {% for testimonial in self.section.items.all %}
+                            {% for testimonial in testimonials  %}
                                 <div class="item">
                           
                                     <div class="testimonial-one__single">
@@ -72,19 +58,54 @@
                                             <div class="testimonial-one__client-info">
                                                 <div class="">
                                                     {% load static %}
-                                                    <img src="/static/images/icon/user-placeholder.svg" alt="Client" width="100" height="100" class="rounded-circle shadow-sm">                                         
+                                                    <div class="testimonial-icon
+                                                        {% if forloop.counter|divisibleby:3 %}
+                                                            icon-blue
+                                                        {% elif forloop.counter|divisibleby:2 %}
+                                                            icon-purple
+                                                        {% else %}
+                                                            icon-pink
+                                                        {% endif %}">
+    
+                                                        <svg viewBox="0 0 120 120" class="icon-svg">
+                                                            <circle cx="60" cy="60" r="58"
+                                                                    fill="currentColor"
+                                                                    opacity="0.15"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="2"/>
+
+                                                            <path d="M60 68a20 20 0 1 0-20-20 20 20 0 0 0 20 20z"
+                                                                    fill="currentColor"/>
+
+                                                            <path d="M25 95c0-10 12-20 35-20s35 10 35 20v5H25z"
+                                                                    fill="currentColor"/>
+
+                                                            <path d="M60 68a18 18 0 1 0-18-18 18 18 0 0 0 18 18z"
+                                                                    fill="white"
+                                                                    opacity="0.25"/>
+
+                                                            <path d="M28 96h64a2 2 0 0 1 2 2v1H26v-1a2 2 0 0 1 2-2z"
+                                                                    fill="currentColor"
+                                                                    opacity="0.4"/>
+                                                        </svg>
+
+                                                    </div>                                         
                                                 </div>                               
                                             </div>
 
                                             <p class="testimonial-one__text"><i>" {{ testimonial.client_text }} "</i></p>
+
+                                            {% if testimonial.client_name %}
+                                            <p><strong>{{ testimonial.client_name }}</strong></p>
+                                            {% endif %}
+
+                                            <p class="testimonial-one__text"><b>{{ testimonial.get_category_display  }}</b></p>
                                         </div>
                                     </div>
 
                                 </div>
-
                                 
                             {% endfor %}
-                        {% endif %}
 
                     </div>
                 </div>

@@ -6,6 +6,7 @@ from django.contrib import messages
 from .forms import InscriptionForm
 from .forms import ProfilForm
 from .models import NewsletterSubscription
+from .models import Testimonial
 
 
 def inscription_view(request):
@@ -84,5 +85,21 @@ def subscribe_newsletter(request):
                 messages.info(request, "Vous êtes déjà inscrit(e).")
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+def testimonial_create(request):
+
+    if request.method == "POST":
+
+        Testimonial.objects.create(
+            client_text=request.POST.get("client_text"),
+            category=request.POST.get("category"),
+        )
+        messages.success(request, "Merci pour votre témoignages !")
+        return redirect("/")
+
+    return render(request, "core/testimonial_form.html", {
+        "categories": Testimonial.CATEGORY_CHOICES
+    })
 
 

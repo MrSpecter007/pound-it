@@ -22,7 +22,7 @@
           <tr>
             <td>{{ atelier.title }}</td>
             <td>{{ atelier.description|richtext }}</td>
-            <td>{{ atelier.date }}</td>
+            <td>{{ atelier.date|date:"j F Y" }}</td>
             <td>{{ atelier.location }}</td>
             <td><a href="{{ atelier.url }}" class="btn btn-primary btn-sm">Voir</a></td>
           </tr>

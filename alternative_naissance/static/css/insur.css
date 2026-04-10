@@ -16,6 +16,73 @@
 /*--------------------------------------------------------------
 # Additional CSS
 --------------------------------------------------------------*/
+.nous-joindre {
+  background: #fff8fa;
+}
+.career-description{
+  padding-top:25px;
+  padding-bottom:25px;
+}
+.cookie-modal {
+    display: none; /* caché par défaut */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* fond semi-transparent */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.cookie-modal-content {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+}
+
+.cookie-modal-content h2 {
+    margin-bottom: 15px;
+}
+
+.cookie-modal-content p {
+    margin-bottom: 20px;
+}
+.cookiebtn{
+    color: #fff !important;
+    background-color: #e5a28b !important;
+    border: 1px solid #e5a28b !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.testimonial-icon {
+    width: 100px;
+    height: 100px;
+}
+
+.icon-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.icon-pink {
+    color: #f4b6c2;
+}
+
+.icon-blue {
+    color: #b9dcff;
+}
+
+.icon-purple {
+    color: #d8c6f2;
+}
 .spacing{
   padding-bottom: 10px;
 }
@@ -55,6 +122,11 @@
 }
 
 /* ===== table styling ===== */
+.contact-card {
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+}
 .custom-table {
   border-radius: 0.75rem;
   overflow: hidden;
@@ -565,10 +637,11 @@ ul {
 .section-title__title {
   margin: 0;
   color: var(--insur-black);
-  font-size: 45px;
+  font-size: 43px;
   line-height: 55px;
   font-weight: 700;
   letter-spacing: var(--insur-letter-spacing);
+  padding-top: 10px;
 }
 
 .section-title__title2 {
@@ -11124,6 +11197,16 @@ ul {
   letter-spacing: var(--insur-letter-spacing);
 }
 
+.why-choose-two .row {
+    align-items: stretch;
+}
+
+.why-choose-two img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
 /*--------------------------------------------------------------
 # Site Footer
 --------------------------------------------------------------*/
@@ -11354,8 +11437,7 @@ ul {
   font-size: 18px;
   line-height: 34px;
   letter-spacing: var(--insur-letter-spacing);
-  padding-bottom: 50px;
-  padding-top: 10px;
+  padding-bottom: 20px;
   text-align: justify;
 }
 

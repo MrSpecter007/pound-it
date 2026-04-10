@@ -24,20 +24,21 @@
                         <h2 class="section-title__title">{{ self.title }}</h2>
                     </div>
                     <p class="feature-four__top-text">{{ self.text }}</p>
+                    <p class="feature-four__top-text">{{ self.text2 }}</p>
                 </div>
                 <!-- Image à droite -->
                 <div class="col-xl-6 col-lg-6 order-2">
                     {% if self.image %}
-                        {% image self.image fill-600x400 as img %}
-                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid">
+                        {% image self.image width-600 as img %}
+                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid h-100 object-fit-cover">
                     {% endif %}
                 </div>
             {% else %}
                 <!-- Image à gauche -->
-                <div class="col-xl-6 col-lg-6 order-1 image">
+              <div class="col-xl-6 col-lg-6 order-2">
                     {% if self.image %}
-                        {% image self.image fill-600x400 as img %}
-                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid">
+                        {% image self.image width-600 as img %}
+                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid h-100 object-fit-cover">
                     {% endif %}
                 </div>
                 <!-- Texte à droite -->

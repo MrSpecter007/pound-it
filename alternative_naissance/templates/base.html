@@ -45,6 +45,18 @@
     </div>
     {% endif %}
 
+    <!-- Cookie Consent Modal -->
+    <div id="cookieModal" class="cookie-modal">
+        <div class="cookie-modal-content">
+            <h2>Nous utilisons des cookies</h2>
+            <p>
+                Nous utilisons des cookies pour améliorer votre expérience sur notre site.
+                <a href="/politique-de-confidentialité/">En savoir plus</a>.
+            </p>
+            <button id="acceptCookies" class="cookiebtn">Accepter</button>
+        </div>
+    </div>
+
 
     {% block script %}
         <script src="{% static 'js/insur.js' %}"></script>
@@ -61,8 +73,31 @@
             navigation: { nextEl: '#main-slider__swiper-button-next', prevEl: '#main-slider__swiper-button-prev' },
         });
     </script>
-{% endblock %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modal = document.getElementById("cookieModal");
+        const acceptBtn = document.getElementById("acceptCookies");
 
+        // Afficher le modal seulement si l'utilisateur n'a pas encore accepté
+        if (!localStorage.getItem("cookiesAccepted")) {
+            modal.style.display = "flex";
+        }
+
+        acceptBtn.addEventListener("click", function() {
+            localStorage.setItem("cookiesAccepted", "true");
+            modal.style.display = "none";
+        });
+
+        // Optionnel : fermer si clic hors du contenu
+        modal.addEventListener("click", function(e) {
+            if (e.target === modal) {
+                modal.style.display = "flex"; // empêche de fermer par clic hors modal si tu veux forcer l'acceptation
+            }
+        });
+    });
+    </script>
+
+{% endblock %}
 
 </body>
 </html>

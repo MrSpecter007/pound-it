@@ -67,3 +67,23 @@ db\.sqlite3
 .venv
 .direnv
 .envrc
+# Environnement Python
+venv/
+*/venv/
+
+# Fichiers Python
+__pycache__/
+*.pyc
+
+# Fichiers locaux
+.python-version
+
+# Base de données / backup
+*.sql
+*.dump
+
+# Fichiers sensibles
+.env
+
+# Static collecté (optionnel selon config)
+staticfiles/

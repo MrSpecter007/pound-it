@@ -16,9 +16,7 @@
                             <p class="footer-widget__about-text">{{ settings.core.SiteSettings.footer_text }}</p>
                         </div>
                         <div class="site-footer__social">
-                            <a href="{{ settings.core.SiteSettings.twitter_url }}"><i class="fab fa-twitter"></i></a>
                             <a href="{{ settings.core.SiteSettings.facebook_url }}"><i class="fab fa-facebook"></i></a>
-                            <a href="{{ settings.core.SiteSettings.pinterest_url }}"><i class="fab fa-pinterest-p"></i></a>
                             <a href="{{ settings.core.SiteSettings.instagram_url }}"><i class="fab fa-instagram"></i></a>
                         </div>
                     </div>
@@ -29,6 +27,9 @@
                     <div class="footer-widget__column footer-widget__links">
                         <h3 class="footer-widget__title">Liens utiles</h3>
                         <ul class="footer-widget__contact-list list-unstyled clearfix">
+                            <li><a href="/politique-annulation" class="footer-widget__about-text">Politique d'annulation</a></li>
+                            <li><a href="/carrières" class="footer-widget__about-text">Carrières</a></li>
+                            <li><a href="/temoignages/nouveau" class="footer-widget__about-text">Laisser un témoignage</a></li>
                             <li><a href="/faire-un-don" class="footer-widget__about-text">Faire un don</a></li>
                             <li><a href="/inscription" class="footer-widget__about-text">S'inscrire</a></li>
                             <li><a href="/mon-compte" class="footer-widget__about-text">Mon compte</a></li>
@@ -66,6 +67,18 @@
                                 </div>
                             </li>
                              {% endif %}
+
+
+                             {% if settings.core.SiteSettings.address %}
+                            <li>
+                                <div class="icon">
+                                    <span class="icon-pin"></span>
+                                </div>
+                                <div class="text">
+                                    <p>{{ settings.core.SiteSettings.address|linebreaks }}</p>
+                                </div>
+                            </li>
+                            {% endif %}
 
                              
                         </ul>

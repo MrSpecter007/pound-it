@@ -35,14 +35,8 @@
 
                     <li>
                         <span class="text main-header-six__top-social">
-                            {% if settings.core.SiteSettings.twitter_url %}
-                                <a href="{{ settings.core.SiteSettings.twitter_url }}"><i class="fab fa-twitter"></i></a>
-                            {% endif %}
                             {% if settings.core.SiteSettings.facebook_url %}
                                 <a href="{{ settings.core.SiteSettings.facebook_url }}"><i class="fab fa-facebook"></i></a>
-                            {% endif %}
-                            {% if settings.core.SiteSettings.pinterest_url %}
-                                <a href="{{ settings.core.SiteSettings.pinterest_url }}"><i class="fab fa-pinterest-p"></i></a>
                             {% endif %}
                             {% if settings.core.SiteSettings.instagram_url %}
                                 <a href="{{ settings.core.SiteSettings.instagram_url }}"><i class="fab fa-instagram"></i></a>
@@ -51,12 +45,18 @@
                     </li>
 
                     <li>
-{#                        <a href="{{ settings.core.SiteSettings.contact_page.url }}"#}
+                        {#<a href="{{ settings.core.SiteSettings.contact_page.url }}"#}
                         <a href="{% url 'create_service_request' %}"
                            class="thm-btn-three main-menu-six__get-quote-btn">
                             <span>Demande de service</span>
                             <span class="fas fa-paper-plane"></span>
                         </a>
+                    </li>
+                    <li>
+                        <a href="/faire-un-don" class="thm-btn-three main-menu-six__get-quote-btn">
+                            <span>Faire un don</span>
+                            <span class="fas fa-hand-holding-heart"></span>
+                        </a>                                             
                     </li>
 
                 </ul>
@@ -120,7 +120,7 @@
                             </li>
 
                             <li class="dropdown">
-                                <a href="#">Bénévolat</a>                        
+                                <a href="#">Boîte à outils</a>                        
                             </li>
 
                             <li class="dropdown {% active_class '/nous-joindre' %}">
