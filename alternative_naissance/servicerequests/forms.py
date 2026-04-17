@@ -113,6 +113,15 @@ class ServiceRequestForm(forms.ModelForm):
             instance.save()
             
         return instance
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            if not isinstance(field.widget, forms.CheckboxInput) and not isinstance(field.widget, forms.CheckboxSelectMultiple):
+                field.widget.attrs.update({
+                    'class': 'form-control w-100'
+                })
 
 class RejectRequestForm(forms.Form):
     """The Admin facing form for rejecting a service request."""
@@ -121,3 +130,4 @@ class RejectRequestForm(forms.Form):
 class ShareForm(forms.Form):
     """The Admin facing form for sharing a service request with an agent."""
     email = forms.EmailField(label='Email of the agent to share with')
+    

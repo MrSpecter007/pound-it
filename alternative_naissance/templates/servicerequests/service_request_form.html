@@ -3,258 +3,224 @@
 
 {% block content %}
     <section class="policy-proposal py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-10 mx-auto">
-                <h2 class="mb-4">Formulaire de demande de service</h2>
-                <p class="spacing">Veuillez noter : </p>
-                <ul class="ms-4">
-                    <li>
-                        La disponibilité du service dépend du quartier où vous habitez, des situations auxquelles vous faites face et des autres demandes faites à l'organisme.
-                    </li>
-                    <li>
-                        À cette étape du processus, nous ne pouvons pas garantir l'obtention du service demandé. Nous vous contacterons afin de confirmer votre obtention du service.
-                    </li>
-                    <li>
-                        Toutes les informations demandées ci-dessous nous servent à déterminer notre capacité à vous offrir le service demandé.
-                    </li>
-                    <li>
-                        Si vous avez des questions à propos de nos services ou du processus de demande de service, cliquez ici.
-                    </li>
-                </ul>
+        <div class="container-fluid" id="custom-form-wrapper">
+            <div class="row mb-5">
+                <div class="col-lg-10 mx-auto">
+                    <h2 class="mb-4">Formulaire de demande de service</h2>
+                    <p class="spacing">Veuillez noter : </p>
+                    <ul class="ms-4">
+                        <li>
+                            La disponibilité du service dépend du quartier où vous habitez, des situations auxquelles vous faites face et des autres demandes faites à l'organisme.
+                        </li>
+                        <li>
+                            À cette étape du processus, nous ne pouvons pas garantir l'obtention du service demandé. Nous vous contacterons afin de confirmer votre obtention du service.
+                        </li>
+                        <li>
+                            Toutes les informations demandées ci-dessous nous servent à déterminer notre capacité à vous offrir le service demandé.
+                        </li>
+                        <li>
+                            Si vous avez des questions à propos de nos services ou du processus de demande de service, cliquez ici.
+                        </li>
+                    </ul>
 
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <p>Veuillez corriger les erreurs ci-dessous:</p>
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <p>{{ field.label }}: {{ error }}</p>
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <p>Veuillez corriger les erreurs ci-dessous:</p>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <p>{{ field.label }}: {{ error }}</p>
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-                        {% for error in form.non_field_errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <form action="{% url 'create_service_request' %}" method="post" class="policy-proposal__form" id="service-request-form">
-                    {% csrf_token %}
-                    <div class="row mb-3">
-                        <!-- Service Type Section -->
-                        <div class="col-xl-12">
-                            <h2>Type de service</h2>
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
                         </div>
+                    {% endif %}
+                </div>
+            </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.service_type.label }}</p>
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <form action="{% url 'create_service_request' %}" method="post" class="policy-proposal__form p-4 rounded shadow-sm" id="service-request-form">
+                        {% csrf_token %}
+
+                        <div class="row">
+
+                            <!-- TYPE DE SERVICE -->
+                            <div class="col-12">
+                                <h2 class="mt-4 mb-3 border-bottom pb-2">Type de service</h2>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.service_type.label }}</label>
                                 {{ form.service_type }}
                                 {% if form.service_type.errors %}
-                                    <div class="error-message">{{ form.service_type.errors }}</div>
+                                    <div class="text-danger small">{{ form.service_type.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
-                    </div>
-                <div>
 
-                        <!-- Conditional fields based on service type -->
-                        <div class="col-xl-6" id="expected-delivery-date-group">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.expected_delivery_date.label }}</p>
+                            <!-- CONDITIONAL -->
+                            <div class="col-md-6 mb-4" id="expected-delivery-date-group">
+                                <label class="form-label fw-semibold">{{ form.expected_delivery_date.label }}</label>
                                 {{ form.expected_delivery_date }}
                                 {% if form.expected_delivery_date.errors %}
-                                    <div class="error-message">{{ form.expected_delivery_date.errors }}</div>
+                                    <div class="text-danger small">{{ form.expected_delivery_date.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <div class="col-xl-6" id="child-birth-date-group">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.child_birth_date.label }}</p>
+                            <div class="col-md-6 mb-4" id="child-birth-date-group">
+                                <label class="form-label fw-semibold">{{ form.child_birth_date.label }}</label>
                                 {{ form.child_birth_date }}
                                 {% if form.child_birth_date.errors %}
-                                    <div class="error-message">{{ form.child_birth_date.errors }}</div>
+                                    <div class="text-danger small">{{ form.child_birth_date.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <!-- Personal Information Section -->
-                        <div class="col-xl-12">
-                            <h2>Information personnelle</h2>
-                        </div>
+                            <!-- INFO PERSO -->
+                            <div class="col-12">
+                                <h2 class="mt-5 mb-3 border-bottom pb-2">Information personnelle</h2>
+                            </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.first_name.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
                                 {{ form.first_name }}
                                 {% if form.first_name.errors %}
-                                    <div class="error-message">{{ form.first_name.errors }}</div>
+                                    <div class="text-danger small">{{ form.first_name.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.last_name.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
                                 {{ form.last_name }}
                                 {% if form.last_name.errors %}
-                                    <div class="error-message">{{ form.last_name.errors }}</div>
+                                    <div class="text-danger small">{{ form.last_name.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <!-- Address Section -->
-                        <div class="col-xl-12">
-                            <h2>Adresse</h2>
-                        </div>
+                            <!-- ADRESSE -->
+                            <div class="col-12">
+                                <h2 class="mt-5 mb-3 border-bottom pb-2">Adresse</h2>
+                            </div>
 
-                        <div class="col-xl-12">
-                            <div class="">
-                                <label for="{{ form.no_permanent_address.id_for_label }}">
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
                                     {{ form.no_permanent_address }}
-                                    {{ form.no_permanent_address.label }}
-                                </label>
-                                {% if form.no_permanent_address.errors %}
-                                    <div class="error-message">{{ form.no_permanent_address.errors }}</div>
-                                {% endif %}
+                                    <label class="form-check-label">
+                                        {{ form.no_permanent_address.label }}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div id="address-fields" style="display: contents;">
-                            <div class="col-xl-6">
-                                <div class="">
-                                    <p class="policy-proposal__input-title">{{ form.street_address.label }}</p>
+                            <div id="address-fields" class="row">
+                                <div class="col-md-6 col-12 mb-4">
+                                    <label class="form-label fw-semibold d-block">
+                                        {{ form.street_address.label }}
+                                    </label>
                                     {{ form.street_address }}
-                                    {% if form.street_address.errors %}
-                                        <div class="error-message">{{ form.street_address.errors }}</div>
-                                    {% endif %}
                                 </div>
-                            </div>
 
-                            <div class="col-xl-6">
-                                <div class="">
-                                    <p class="policy-proposal__input-title">{{ form.city.label }}</p>
+                                <div class="col-md-6 col-12 mb-4">
+                                    <label class="form-label fw-semibold d-block">
+                                        {{ form.city.label }}
+                                    </label>
                                     {{ form.city }}
-                                    {% if form.city.errors %}
-                                        <div class="error-message">{{ form.city.errors }}</div>
-                                    {% endif %}
                                 </div>
-                            </div>
 
-                            <div class="col-xl-6">
-                                <div class="">
-                                    <p class="policy-proposal__input-title">{{ form.province.label }}</p>
+                                <div class="col-md-6 col-12 mb-4">
+                                    <label class="form-label fw-semibold d-block">
+                                        {{ form.province.label }}
+                                    </label>
                                     {{ form.province }}
-                                    {% if form.province.errors %}
-                                        <div class="error-message">{{ form.province.errors }}</div>
-                                    {% endif %}
                                 </div>
-                            </div>
 
-                            <div class="col-xl-6">
-                                <div class="">
-                                    <p class="policy-proposal__input-title">{{ form.postal_code.label }}</p>
+                                <div class="col-md-6 col-12 mb-4">
+                                    <label class="form-label fw-semibold d-block">
+                                        {{ form.postal_code.label }}
+                                    </label>
                                     {{ form.postal_code }}
-                                    {% if form.postal_code.errors %}
-                                        <div class="error-message">{{ form.postal_code.errors }}</div>
-                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Contact Information Section -->
-                        <div class="col-xl-12">
-                            <h2>Information de contact</h2>
-                            <p class="policy-proposal__input-title">Vous devez fournir au moins un moyen de contact (téléphone ou courriel).</p>
-                        </div>
+                            <!-- CONTACT -->
+                            <div class="col-12">
+                                <h2 class="mt-5 mb-2 border-bottom pb-2">Information de contact</h2>
+                                <p class="text-muted mb-4">Vous devez fournir au moins un moyen de contact (téléphone ou courriel).</p>
+                            </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.phone.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.phone.label }}</label>
                                 {{ form.phone }}
                                 {% if form.phone.errors %}
-                                    <div class="error-message">{{ form.phone.errors }}</div>
+                                    <div class="text-danger small">{{ form.phone.errors }}</div>
                                 {% endif %}
 
-                                <label for="{{ form.no_phone.id_for_label }}">
+                                <div class="form-check mt-2">
                                     {{ form.no_phone }}
-                                    {{ form.no_phone.label }}
-                                </label>
+                                    <label class="form-check-label">{{ form.no_phone.label }}</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.email.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.email.label }}</label>
                                 {{ form.email }}
                                 {% if form.email.errors %}
-                                    <div class="error-message">{{ form.email.errors }}</div>
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
                                 {% endif %}
 
-                                <label for="{{ form.no_email.id_for_label }}">
+                                <div class="form-check mt-2">
                                     {{ form.no_email }}
-                                    {{ form.no_email.label }}
-                                </label>
+                                    <label class="form-check-label">{{ form.no_email.label }}</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Languages Section -->
-                        <div class="col-xl-12">
-                            <h2>Langues parlées</h2>
-                        </div>
+                            <!-- LANGUES -->
+                            <div class="col-12">
+                                <h2 class="mt-5 mb-3 border-bottom pb-2">Langues parlées</h2>
+                            </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.languages_choices.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.languages_choices.label }}</label>
                                 {{ form.languages_choices }}
                                 {% if form.languages_choices.errors %}
-                                    <div class="error-message">{{ form.languages_choices.errors }}</div>
+                                    <div class="text-danger small">{{ form.languages_choices.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.other_language.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.other_language.label }}</label>
                                 {{ form.other_language }}
                                 {% if form.other_language.errors %}
-                                    <div class="error-message">{{ form.other_language.errors }}</div>
+                                    <div class="text-danger small">{{ form.other_language.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <!-- Citizenship Status Section -->
-                        <div class="col-xl-12">
-                            <h2>Statut de citoyenneté</h2>
-                        </div>
+                            <!-- STATUT -->
+                            <div class="col-12">
+                                <h2 class="mt-5 mb-3 border-bottom pb-2">Statut de citoyenneté</h2>
+                            </div>
 
-                        <div class="col-xl-6">
-                            <div class="">
-                                <p class="policy-proposal__input-title">{{ form.citizenship_status.label }}</p>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">{{ form.citizenship_status.label }}</label>
                                 {{ form.citizenship_status }}
                                 {% if form.citizenship_status.errors %}
-                                    <div class="error-message">{{ form.citizenship_status.errors }}</div>
+                                    <div class="text-danger small">{{ form.citizenship_status.errors }}</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <div class="col-xl-12">
-                            <br>
-                            <div class="policy-proposal__messages-boxes">
-                                <button type="submit" class="thm-btn policy-proposal__btn">Soumettre</button>
+                            <!-- SUBMIT -->
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-primary px-5 py-2">
+                                    Soumettre
+                                </button>
                             </div>
+
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-
+    </section>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get form elements
