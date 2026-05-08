@@ -9,7 +9,7 @@ class ServiceRequest(models.Model):
     CITIZENSHIP_STATUS_CHOICES = _CITIZENSHIP_STATUS_CHOICES
     STATUS_CHOICES = [
         ("pending", "En attente"),
-        # ("accepted", "Accepted"),
+        ("accepted", "Accepted"),
         ("rejected", "Réfusé"),
     ]
 

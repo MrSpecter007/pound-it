@@ -19,16 +19,35 @@
       <div class="col-md-6">
         <h1>{{ page.title }}</h1>
 
-        {% if page.date %}
-          <p class="text-muted">
-            📅 {{ page.date|date:"j F Y"|capfirst }}
-            {% if page.location %}
-              — 📍 {{ page.location }}
-            {% endif %}
-          </p>
-        {% elif page.recurrence %}
-          <p class="text-muted">🔁 {{ page.recurrence }}</p>
-        {% endif %}
+          {% if page.dates.all %}
+
+          <div class="mb-3">
+
+              <p class="text-muted mb-1">
+                  📅 Dates des ateliers
+              </p>
+
+              <ul class="list-unstyled">
+
+                  {% for atelier_date in page.dates.all %}
+
+                      <li>
+                          {{ atelier_date.date|date:"j F Y"|capfirst }}
+                      </li>
+
+                  {% endfor %}
+
+              </ul>
+
+              {% if page.location %}
+                  <p class="text-muted">
+                      📍 {{ page.location }}
+                  </p>
+              {% endif %}
+
+          </div>
+
+          {% endif %}
 
         <div class="mt-3">
           {{ page.description|richtext }}

@@ -19,7 +19,7 @@ class TaxYearServiceRequestReport(ReportView):
     title = "Demandes de Services par Année Fiscale"
     page_title = "Demandes de Services par Année Fiscale"
     header_icon = "form"
-    list_export = ("tax_year", "tax_year_display", "rejected_count", "pending_count",)
+    list_export = ("tax_year", "tax_year_display", "rejected_count", "pending_count", "accepted_count", "total_count")
 
     @override
     def get_queryset(self) -> List[Dict[str, Any]]:
@@ -64,16 +64,27 @@ class TaxYearServiceRequestReport(ReportView):
             tax_year_end: date = date(year + 1, 4, 1)
 
             # Count pending and rejected requests for this tax year
-            pending_count: int = service_requests_ord.filter(
+            pending_count = service_requests_ord.filter(
                 status="pending",
-                created_at__gt=tax_year_start, # Effectively checking that it is after or during April 1st
-                created_at__lte=tax_year_end # Effectively checking that it is before and during March 31st
+                created_at__gt=tax_year_start,
+                created_at__lte=tax_year_end
             ).count()
 
-            rejected_count: int = service_requests_ord.filter(
+            rejected_count = service_requests_ord.filter(
                 status="rejected",
-                created_at__gt=tax_year_start, # Effectively checking that it is after or during April 1st
-                created_at__lte=tax_year_end # Effectively checking that it is before and during March 31st
+                created_at__gt=tax_year_start,
+                created_at__lte=tax_year_end
+            ).count()
+
+            accepted_count = service_requests_ord.filter(
+                status="accepted",
+                created_at__gt=tax_year_start,
+                created_at__lte=tax_year_end
+            ).count()
+
+            total_count = service_requests_ord.filter(
+                created_at__gt=tax_year_start,
+                created_at__lte=tax_year_end
             ).count()
 
             # Only include tax years with at least one request
@@ -83,6 +94,8 @@ class TaxYearServiceRequestReport(ReportView):
                     'tax_year_display': f"1 avril {year} - 31 mars {year + 1}",
                     'rejected_count': rejected_count,
                     'pending_count': pending_count,
+                    'accepted_count': accepted_count, 
+                    'total_count': total_count,   
                 })
 
         # Sort by tax year (most recent first)

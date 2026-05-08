@@ -16,6 +16,67 @@
 /*--------------------------------------------------------------
 # Additional CSS
 --------------------------------------------------------------*/
+.site-announcement {
+    background: linear-gradient(135deg, #e5a28b 0%, #efc2b2 100%);
+    padding: 24px 0;
+    border-radius: 0;
+}
+
+.site-announcement__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(6px);
+
+    padding: 24px;
+    border-radius: 16px;
+}
+
+.site-announcement__text {
+    flex: 1;
+    min-width: 280px;
+}
+
+.site-announcement__label {
+    display: block;
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    color: #7a2e1f;
+}
+
+.site-announcement p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+.site-announcement a {
+    background: #000;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+
+    transition: all 0.2s ease;
+}
+
+.site-announcement a:hover {
+    background: #222;
+    transform: translateY(-2px);
+}
+
 .form-control {
     width: 100%;
 }
@@ -197,8 +258,7 @@
 }
 /* ===== Atelier List Section ===== */
 section {
-  border-radius: 1rem;
-  padding: 3rem 0;
+  padding: 2rem 0;
   padding-bottom: 0px;
 }
 
@@ -212,7 +272,7 @@ section p.text-muted {
   color: #7a6f77;
 }
 .rich-text-content{
-  padding-bottom: 100px;
+  padding-bottom: 50px;
 }
 
 /* ===== Atelier Card ===== */
@@ -512,52 +572,6 @@ ul {
   opacity: 0.4;
   z-index: -1;
 }
-
-/*--------------------------------------------------------------
-# Custom Cursor
---------------------------------------------------------------*/
-.custom-cursor__cursor {
-  width: 25px;
-  height: 25px;
-  border-radius: 100%;
-  border: 1px solid var(--insur-base, #a47c68);
-  -webkit-transition: all 200ms ease-out;
-  transition: all 200ms ease-out;
-  position: fixed;
-  pointer-events: none;
-  left: 0;
-  top: 0;
-  -webkit-transform: translate(calc(-50% + 5px), -50%);
-  transform: translate(calc(-50% + 5px), -50%);
-  z-index: 999991;
-}
-
-.custom-cursor__cursor-two {
-  width: 10px;
-  height: 10px;
-  border-radius: 100%;
-  background-color: var(--insur-base);
-  opacity: .3;
-  position: fixed;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  -webkit-transition: width .3s, height .3s, opacity .3s;
-  transition: width .3s, height .3s, opacity .3s;
-  z-index: 999991;
-}
-
-.custom-cursor__hover {
-  background-color: var(--insur-base);
-  opacity: 0.4;
-}
-
-.custom-cursor__innerhover {
-  width: 25px;
-  height: 25px;
-  opacity: .4;
-}
-
 
 .thm-btn {
   position: relative;
@@ -9346,7 +9360,7 @@ ul {
 .thm-breadcrumb li {
   position: relative;
   display: inline-block;
-  color: var(--insur-gray);
+  color: var(--insur-black);
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -9362,7 +9376,7 @@ ul {
 .thm-breadcrumb li a {
   position: relative;
   display: inline-block;
-  color: var(--insur-gray);
+  color: var(--insur-black);
   font-size: 14px;
   font-weight: 400;
   -webkit-transition: all 500ms ease;
@@ -11277,6 +11291,7 @@ ul {
 .benefits-two__points {
   position: relative;
   display: block;
+  padding-bottom: 7rem;
 }
 
 .benefits-two__points li {

@@ -1,4 +1,5 @@
 {% load static wagtailcore_tags wagtailsettings_tags menu_tags %}
+
 {% if request %}
     {% get_settings %}
 {% else %}
@@ -78,56 +79,149 @@
                 <div class="main-menu-six__left">
                     <div class="main-menu-six__main-menu-box">
                         <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
-                        <ul class="main-menu__list">
-                            <li class="dropdown {% active_class '/mission' %}{% active_class '/cadre-pratique' %}{% active_class '/conseil-administration' %}{% active_class '/partenaires-financiers' %}">
-                                <a href="#">À propos</a>
-                                <ul>
-                                    <li class="dropdown {% active_class '/mission' %}"><a href="/mission">Mission, valeurs et engagement</a></li>
-                                    <li class="dropdown {% active_class '/cadre-pratique' %}"><a href="/cadre-pratique">Cadre de pratique de l’accompagnant.e</a></li>
-                                    <li class="dropdown {% active_class '/conseil-administration' %}"><a href="/conseil-administration">Conseil d’administration</a></li>
-                                    <li class="dropdown {% active_class '/partenaires-financiers' %}"><a href="/partenaires-financiers">Partenaires financiers</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown {% active_class '/naissance' %}{% active_class '/relevailles' %}{% active_class '/virtuel' %}{% active_class '/deuil' %}{% active_class '/ig' %}{% active_class '/intervention-périnatale' %}">
-                                <a href="#">Services d’accompagnement individuel</a>
-                                <ul>
-                                    <li class="dropdown {% active_class '/naissance' %}"><a href="/naissance">Naissance</a></li>
-                                    <li class="dropdown {% active_class '/relevailles' %}"><a href="/relevailles">Relevailles</a></li>
-                                    <li class="dropdown {% active_class '/virtuel' %}"><a href="/virtuel">Virtuel</a></li>
-                                    <li class="dropdown {% active_class '/deuil' %}"><a href="/deuil">Deuil</a></li>
-                                    <li class="dropdown {% active_class '/ig' %}"><a href="/ig">IG</a></li>
-                                    <li class="dropdown {% active_class '/intervention-périnatale' %}"><a href="/intervention-périnatale">Intervention périnatale</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown {% active_class '/ateliers-thématiques' %}{% active_class '/ateliers-deuil-périnatal' %}{% active_class '/groupe-de-soutien' %}{% active_class '/prêt-de-matériel' %}">
-                                <a href="#">Volet familles</a>
-                                <ul>
-                                    <li class="dropdown {% active_class '/ateliers-thématiques' %}"><a href="/ateliers-thématiques">Ateliers thématiques périnataux </a></li>
-                                    <li class="dropdown {% active_class '/ateliers-deuil-périnatal' %}"><a href="/ateliers-deuil-périnatal">Ateliers deuil périnatal </a></li>
-                                    <li class="dropdown {% active_class '/groupe-de-soutien' %}"><a href="/groupe-de-soutien">Groupes de soutien </a></li>
-                                    <li class="dropdown {% active_class '/prêt-de-matériel' %}"><a href="/prêt-de-matériel">Prêt de matériel </a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown {% active_class '/formations-de-base' %}{% active_class '/faire-un-stage' %}{% active_class '/formation-continue' %}{% active_class '/activités-de-ressourcement' %}{% active_class '/ressources-pour-les-travailleureuses-actifves' %}">
-                                <a href="#">Volet professionnel.le.s</a>
-                                <ul>
-                                    <li class="dropdown {% active_class '/formations-de-base' %}"><a href="/formations-de-base">Formations de base</a></li>
-                                    <li class="dropdown {% active_class '/faire-un-stage' %}"><a href="/faire-un-stage">Faire un stage</a></li>
-                                    <li class="dropdown {% active_class '/formation-continue' %}"><a href="/formation-continue">Formation continue</a></li>
-                                    <li class="dropdown {% active_class '/activités-de-ressourcement' %}"><a href="/activités-de-ressourcement">Activités de ressourcement</a></li>
-                                    <li class="dropdown {% active_class '/ressources-pour-les-travailleureuses-actifves' %}"><a href="/ressources-pour-les-travailleureuses-actifves">Ressources pour les travailleur.euse.s actif.ve.s</a></li>
-                                </ul>
-                            </li>
+                            <ul class="main-menu__list">
 
-                            <li class="dropdown">
-                                <a href="#">Boîte à outils</a>                        
-                            </li>
+                                <!-- À PROPOS -->
+                                <li class="dropdown">
 
-                            <li class="dropdown {% active_class '/nous-joindre' %}">
-                                <a href="/nous-joindre">Nous joindre</a>                        
-                            </li>
-                           
-                        </ul>
+                                    <a href="#">À propos</a>
+
+                                    <ul>
+                                        {% for item in main_menu.menu_items.all %}
+                                        
+                                        {% if item.slug == "about" %}
+
+                                            {% for child in item.children.all %}
+
+                                                <li>
+                                                    <a href="{{ child.get_link }}">
+                                                        {{ child.title }}
+                                                    </a>
+                                                </li>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+
+                                    {% endfor %}
+                                    </ul>
+
+                                </li>
+
+
+                                <!-- SERVICES -->
+                                <li class="dropdown">
+
+                                    <a href="#">Services d’accompagnement individuel</a>
+
+                                    <ul>
+                                        {% for item in main_menu.menu_items.all %}
+                                            {% if item.slug == "services" %}
+
+                                            {% for child in item.children.all %}
+
+                                                <li>
+                                                    <a href="{{ child.get_link }}">
+                                                        {{ child.title }}
+                                                    </a>
+                                                </li>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
+                                </li>
+
+                                <!-- VOLET FAMILLES -->
+                                <li class="dropdown">
+
+                                    <a href="#">Volet familles</a>
+
+                                    <ul>
+                                        {% for item in main_menu.menu_items.all %}
+                                            {% if item.slug == "familles" %}
+
+                                            {% for child in item.children.all %}
+
+                                                <li>
+                                                    <a href="{{ child.get_link }}">
+                                                        {{ child.title }}
+                                                    </a>
+                                                </li>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
+                                </li>
+
+
+                                <!-- VOLET PROFESSIONNEL -->
+                                <li class="dropdown">
+
+                                    <a href="#">Volet professionnel.le.s</a>
+
+                                    <ul>
+                                        {% for item in main_menu.menu_items.all %}
+                                            {% if item.slug == "professionnels" %}
+
+                                            {% for child in item.children.all %}
+
+                                                <li>
+                                                    <a href="{{ child.get_link }}">
+                                                        {{ child.title }}
+                                                    </a>
+                                                </li>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
+                                </li>
+
+
+                                <!-- Boîte à outils  -->
+                                <li class="dropdown">
+
+                                    <a href="#">Boîte à outils</a>
+
+                                    <ul>
+                                        {% for item in main_menu.menu_items.all %}
+                                            {% if item.slug == "outils" %}
+
+                                            {% for child in item.children.all %}
+
+                                                <li>
+                                                    <a href="{{ child.get_link }}">
+                                                        {{ child.title }}
+                                                    </a>
+                                                </li>
+
+                                            {% endfor %}
+
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
+                                </li>
+
+
+
+                                <!-- MENU SIMPLE -->
+                                <li>
+                                    <a href="/nous-joindre">
+                                        Nous joindre
+                                    </a>
+                                </li>
+
+                            </ul>
+                        
                     </div>
                 </div>
             </div>
@@ -137,35 +231,39 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-  const currentPath = window.location.pathname; // Chemin actuel
-  const routes = [
-    "/mission/",
-    "/cadre-pratique/",
-    "/conseil-administration/",
-    "/partenaires-financiers/"
-  ];
+    const currentPath = window.location.pathname.replace(/\/+$/, "");
 
-  document.querySelectorAll(".main-menu__list li").forEach(li => {
-    if (!li.classList.contains("current")) return;
+    // Reset des classes current
+    document.querySelectorAll(".main-menu__list li").forEach(li => {
+        li.classList.remove("current");
+    });
 
-    const link = li.querySelector("a");
-    if (!link) return;
+    // Cherche tous les liens enfants
+    document.querySelectorAll(".main-menu__list li ul li a").forEach(link => {
 
-    const linkText = link.textContent.trim();
+        const href = link.getAttribute("href");
 
-    // Si on est sur la page d'accueil, forcer current
-    if (currentPath === "/") {
-      li.classList.add("current");
-      return;
-    }
+        if (!href) return;
 
-    // Si le chemin actuel n’est pas dans la liste ET que le lien est "À propos"
-    if (!routes.includes(currentPath) && linkText === "À propos") {
-      li.classList.remove("current");
-    }
-  });
+        const normalizedHref = href.replace(/\/+$/, "");
+
+        // Si la page actuelle correspond
+        if (normalizedHref === currentPath) {
+
+            // Active le LI enfant
+            const childLi = link.parentElement;
+            childLi.classList.add("current");
+
+            // Active uniquement le parent direct
+            const parentUl = childLi.closest("ul");
+            const parentLi = parentUl.closest("li.dropdown");
+
+            if (parentLi) {
+                parentLi.classList.add("current");
+            }
+        }
+    });
 
 });
-
 </script>
 

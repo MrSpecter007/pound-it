@@ -1,7 +1,41 @@
 {% extends "base.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
-
 {% block content %}
+
+
+{% load wagtailsettings_tags %}
+{% get_settings %}
+{% if settings.core.sitesettings.show_announcement %}
+
+<section class="site-announcement">
+    <div class="container">
+
+        <div class="site-announcement__content">
+
+            <div class="site-announcement__text">
+
+                <span class="site-announcement__label">
+                    📢 Messages d’intérêt public
+                </span>
+
+                <p>
+                    {{ settings.core.sitesettings.announcement_text }}
+                </p>
+
+            </div>
+
+            {% if settings.core.sitesettings.announcement_link %}
+                <a href="{{ settings.core.sitesettings.announcement_link }}">
+                    {{ settings.core.sitesettings.announcement_button_text }}
+                </a>
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endif %}
 <!--SLIDER-->
 <section class="main-slider clearfix">
     <div class="swiper-container thm-swiper__slider" data-swiper-options='{
@@ -355,7 +389,7 @@
                 </div>
                 <div class="col-xl-7 col-lg-6">
                     <div class="services-one__top-right">
-                        <p class="services-one__top-text">Alternative Naissance offre une gamme complète de services couvrant la périnatalité au lieu de la vôtre.</p>
+                        <p class="services-one__top-text">Alternative Naissance offre une gamme complète de services couvrant la périnatalité.</p>
                     </div>
                 </div>
             </div>

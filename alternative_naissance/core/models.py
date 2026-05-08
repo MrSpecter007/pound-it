@@ -91,7 +91,12 @@ class CoreHomePageSlide(Orderable):
     subtitle = models.CharField(max_length=250, blank=True)
     text = RichTextField(blank=True)
     button_text = models.CharField(max_length=100, blank=True)
-    button_link = models.URLField(blank=True)
+    button_link = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Lien",
+        help_text="Exemple : /mission"
+    )
 
     panels = [
         FieldPanel("background_image"),
@@ -658,14 +663,8 @@ class ThreeColumnsBlock(blocks.StructBlock):
 # --------------------------
 class AtelierPage(Page):
     description = RichTextField(blank=True)
-    date = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=255, blank=True)
     lien = models.URLField(blank=True)
-    recurrence = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text="Indiquez la récurrence de l’atelier (ex: 'Tous les 2 mois')"
-    )
 
     image = models.ForeignKey(
         "wagtailimages.Image",
@@ -676,20 +675,36 @@ class AtelierPage(Page):
     )
 
     
-    
     content_panels = Page.content_panels + [
         FieldPanel("description"),
         FieldPanel("image"),
-        FieldPanel("date"),
         FieldPanel("location"),
         FieldPanel("lien"),
-        FieldPanel("recurrence"),
+        InlinePanel("dates", label="Dates des ateliers"),
     ]
     subpage_types = []
 
     class Meta:
         verbose_name = "Page Atelier"
 
+
+class AtelierDate(Orderable):
+
+    page = ParentalKey(
+        "core.AtelierPage",
+        related_name="dates",
+        on_delete=models.CASCADE
+    )
+
+    date = models.DateField("Date de l’atelier")
+
+    panels = [
+        FieldPanel("date"),
+    ]
+
+    def __str__(self):
+        return str(self.date)
+    
 
 class AtelierListBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, help_text="Titre de la section")
@@ -719,10 +734,9 @@ class AtelierListBlock(blocks.StructBlock):
             ateliers_sanitized.append({
                 "title": page.title,
                 "description": getattr(page, "description", ""),
-                "date": getattr(page, "date", None),
                 "location": getattr(page, "location", ""),
                 "url": getattr(page, "url", "#"),
-                "recurrence": getattr(page, "recurrence", ""),
+                "dates": page.dates.all(),
             })
 
         context["title"] = value.get("title")
@@ -980,13 +994,102 @@ class GenericPage(Page):
         context = super().get_context(request)
         context["category"] = self.title  # ou un champ personnalisé
         return context
+    
+# --------------------------
+# MENU  
+# --------------------------
+@register_snippet
+class Menu(ClusterableModel):
+    title = models.CharField(max_length=255, default="Menu principal")
 
+    panels = [
+        FieldPanel("title"),
+        InlinePanel("menu_items", label="Liens du menu"),
+    ]
+
+    def __str__(self):
+        return self.title
+
+class MenuItem(Orderable):
+    menu = ParentalKey(Menu, related_name="menu_items")
+
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True)
+
+    page = models.ForeignKey(
+        Page,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+
+    url = models.CharField(max_length=255, blank=True)
+
+    parent = models.ForeignKey(  
+        "self",
+        null=True,
+        blank=True,
+        related_name="children",
+        on_delete=models.CASCADE
+    )
+
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("page"),
+        FieldPanel("url"),
+        FieldPanel("parent"),
+        FieldPanel("slug"),
+    ]
+
+    def get_link(self):
+        if self.page:
+            return self.page.url
+
+        if self.url:
+            return self.url
+
+        return "#"
+
+    def __str__(self):
+        return self.title
+
+ 
+    
+    
 # --------------------------
 # Paramètres du site
 # --------------------------
 @register_setting
 class SiteSettings(BaseSiteSetting):
     site_name = models.CharField(max_length=255, default="Mon site")
+
+    # Public announcement
+    show_announcement = models.BooleanField(
+    default=False,
+    verbose_name="Afficher la bannière d'annonce"
+    )
+
+    announcement_text = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Message de l'annonce",
+        help_text="Exemple : Fermeture exceptionnelle lundi."
+    )
+
+    announcement_link = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Lien du bouton",
+        help_text="Exemple : /nous-joindre"
+    )
+
+    announcement_button_text = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Texte du bouton",
+        help_text="Exemple : En savoir plus"
+    )
+        
 
     # Coordonnées
     phone_number = models.CharField(max_length=50, blank=True, help_text="Numéro de téléphone principal (ex: 514-274-1727)")
@@ -1026,6 +1129,12 @@ class SiteSettings(BaseSiteSetting):
 
     panels = [
         FieldPanel("site_name"),
+        MultiFieldPanel([
+            FieldPanel("show_announcement"),
+            FieldPanel("announcement_text"),
+            FieldPanel("announcement_link"),
+            FieldPanel("announcement_button_text"),
+        ], heading="Annonce publique"),
         FieldPanel("phone_number"),
         FieldPanel("email"),
         FieldPanel("address"), 
@@ -1035,7 +1144,7 @@ class SiteSettings(BaseSiteSetting):
         FieldPanel("pinterest_url"),
         FieldPanel("contact_page"),
         FieldPanel("footer_text"),
-        FieldPanel("opening_hours"), 
+        FieldPanel("opening_hours"),
     ]
 
     class Meta:

@@ -19,6 +19,8 @@
                 <th class="type">
                     Demandes en attente
                 </th>
+                <th>Acceptées</th>
+                <th>Total</th>
                 {% block extra_columns %}
                 {% endblock %}
             </tr>
@@ -30,6 +32,8 @@
                 <td>{{ obj.tax_year_display }}</td>
                 <td>{{ obj.rejected_count }}</td>
                 <td>{{ obj.pending_count }}</td>
+                <td>{{ obj.accepted_count }}</td>
+                <td>{{ obj.total_count }}</td>
             </tr>
         {% endfor %}
         </tbody>
