@@ -1,0 +1,3 @@
+{% if studio.show_announcement and studio.announcement_text %}
+<aside class="pi-announcement" aria-label="Studio announcement"><div class="pi-container"><span class="pi-status-dot" aria-hidden="true"></span><p>{{ studio.announcement_text }}</p>{% if studio.announcement_url %}<a href="{{ studio.announcement_url }}">{{ studio.announcement_button_text|default:'Find out more' }} <span aria-hidden="true">↗</span></a>{% endif %}</div></aside>
+{% endif %}

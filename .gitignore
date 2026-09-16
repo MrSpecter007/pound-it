@@ -58,6 +58,9 @@ db\.sqlite3
 # Archivos css, por que estoy usando sass
 *.css
 *.css.map
+# ...but the Pound It stylesheets are hand-written, not compiled from
+# Sass, so they must be committed or a fresh clone has no styling.
+!alternative_naissance/static/poundit/*.css
 
 # JetBrains
 .idea

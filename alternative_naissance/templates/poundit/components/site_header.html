@@ -1,0 +1,26 @@
+{% load static wagtailimages_tags %}
+<header class="pi-header">
+  <div class="pi-container pi-header__inner">
+    <a class="pi-brand" href="{{ home_url }}" aria-label="{{ studio.studio_name }} — home">
+      {% if studio.logo %}{% image studio.logo max-144x144 alt="" %}{% else %}<img src="{% static 'poundit/images/logo.png' %}" width="72" height="72" alt="">{% endif %}
+      <span>POUND IT<span class="pi-brand__small">HIP HOP STUDIOS</span></span>
+    </a>
+    <button class="pi-menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
+    <nav class="pi-nav" id="primary-navigation" aria-label="Primary">
+      <details class="pi-nav__group">
+        <summary>Classes</summary>
+        <div class="pi-nav__submenu">
+          <a href="{{ home_url }}programs/">All programs</a>
+          <a href="{{ home_url }}programs/kids-teen/">Kids + teens</a>
+          <a href="{{ home_url }}programs/adult/">Adults</a>
+          <a href="{{ home_url }}programs/competitive/">Competitive crews</a>
+          <a href="{{ home_url }}programs/open-training/">Open training</a>
+        </div>
+      </details>
+      <a href="{{ home_url }}schedule/">Schedule</a>
+      <a href="{{ home_url }}faculty/">Faculty</a>
+      <a href="{{ home_url }}events/">What's on</a>
+      {% if studio.registration_url %}<a class="pi-button pi-button--small" href="{{ studio.registration_url }}">{{ studio.registration_cta_label|default:'Register' }} <span aria-hidden="true">↗</span></a>{% endif %}
+    </nav>
+  </div>
+</header>

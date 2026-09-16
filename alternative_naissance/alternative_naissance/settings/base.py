@@ -31,9 +31,12 @@ INSTALLED_APPS = [
     "core",
     "servicerequests",
     "emails",
+    "poundit",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.contrib.settings",
+    "wagtail.contrib.sitemaps",
+    "wagtail.contrib.routable_page",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
@@ -49,19 +52,26 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.sitemaps",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
+    # SecurityMiddleware must come first: it is what performs the HTTPS
+    # redirect and sets HSTS, and both are pointless if other middleware
+    # has already produced a response.
+    "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise serves collected static files. Django only routes /static/
+    # when DEBUG is on, so without this the production site has no CSS.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
@@ -126,9 +136,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "fr"
+LANGUAGE_CODE = "en-ca"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Edmonton"
 
 USE_I18N = True
 
@@ -164,9 +174,17 @@ STORAGES = {
     # (e.g. after a Wagtail upgrade).
     # See https://docs.djangoproject.com/en/5.2/ref/contrib/staticfiles/#manifeststaticfilesstorage
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # Hashed filenames plus pre-compressed copies, served by WhiteNoise.
+        # See alternative_naissance/storage.py for why it is the tolerant
+        # subclass rather than WhiteNoise's class directly.
+        "BACKEND": "alternative_naissance.storage.TolerantCompressedManifestStaticFilesStorage",
     },
 }
+
+# Defence in depth for the same vendor stylesheets described in storage.py: if
+# one of them ever fails to make it into the manifest at all, a {% static %}
+# lookup falls back to the plain filename instead of raising mid-request.
+WHITENOISE_MANIFEST_STRICT = False
 
 # Django sets a maximum of 1000 fields per form by default, but particularly complex page models
 # can exceed this limit within Wagtail's page editor.
@@ -187,7 +205,7 @@ WAGTAILSEARCH_BACKENDS = {
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
-WAGTAILADMIN_BASE_URL = "http://example.com"
+WAGTAILADMIN_BASE_URL = os.getenv("WAGTAILADMIN_BASE_URL", "http://localhost:8000")
 
 # Allowed file extensions for documents in the document library.
 # This can be omitted to allow all files, but note that this may present a security risk

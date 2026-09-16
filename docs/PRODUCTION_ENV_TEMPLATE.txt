@@ -1,0 +1,39 @@
+# Template for the production .env file. Copy to .env on the server
+# (next to docker-compose.prod.yaml) and fill in every value.
+
+# Copy to .env on the server, fill in, then: chmod 600 .env
+# Never commit the filled-in version. .gitignore already excludes .env
+
+# Generate with:
+#   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+SECRET_KEY=
+
+# Comma separated, no scheme. Both apex and www if you serve both.
+ALLOWED_HOSTS=pounditdj.com,www.pounditdj.com
+
+# Comma separated, WITH scheme. Required for admin login and the inquiry form.
+CSRF_TRUSTED_ORIGINS=https://pounditdj.com,https://www.pounditdj.com
+
+# Public origin, used in notification emails and some admin links.
+WAGTAILADMIN_BASE_URL=https://pounditdj.com
+
+# Start at 300 for the first day. Raise to 31536000 once TLS is proven.
+SECURE_HSTS_SECONDS=300
+
+# 1 vCPU: these cover I/O waits rather than adding parallelism.
+GUNICORN_WORKERS=3
+
+# Database. Generate a long random password; do not reuse the dev one.
+POSTGRES_DB=poundit
+POSTGRES_USER=poundit
+POSTGRES_PASSWORD=
+
+# SMTP relay. Without this, school inquiry notifications are logged and dropped
+# (the inquiry itself is still saved).
+EMAIL_HOST=
+EMAIL_PORT=587
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=true
+DEFAULT_FROM_EMAIL=noreply@pounditdj.com
+ADMIN_EMAIL=

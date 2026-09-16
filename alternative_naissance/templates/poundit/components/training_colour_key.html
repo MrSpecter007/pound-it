@@ -1,0 +1,1 @@
+{% if levels %}<ul class="pi-training-key" aria-label="Training categories">{% for level in levels %}<li data-training="{{ level.colour_identifier }}"><span class="pi-swatch" aria-hidden="true"></span><strong>{{ level.display_label }}</strong><span>{% firstof level.description level.age_label %}</span></li>{% endfor %}</ul>{% endif %}

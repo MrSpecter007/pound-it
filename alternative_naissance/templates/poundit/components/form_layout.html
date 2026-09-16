@@ -1,0 +1,9 @@
+{% if form %}
+<form class="pi-form" method="post"{% if action %} action="{{ action }}"{% endif %}{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+  {% csrf_token %}
+  {% if form.errors %}<div class="pi-form-errors" role="alert" tabindex="-1"><h2>Please check your details</h2>{{ form.non_field_errors }}<ul>{% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}</ul></div>{% endif %}
+  {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+  {% for field in form.visible_fields %}<div class="pi-field {% if field.errors %}pi-field--invalid{% endif %}">{{ field.as_field_group }}</div>{% endfor %}
+  <button class="pi-button pi-button--dark" type="submit">{{ submit_label|default:'Send inquiry' }} <span aria-hidden="true">↗</span></button>
+</form>
+{% endif %}

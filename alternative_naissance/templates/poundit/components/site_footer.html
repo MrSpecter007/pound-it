@@ -1,0 +1,17 @@
+{% load static wagtailimages_tags %}
+<footer class="pi-footer" id="contact">
+  <div class="pi-container">
+    <div class="pi-footer__top">
+      <div><p class="pi-eyebrow">{{ studio.tagline }}</p><h2>FIND YOUR PEOPLE.<br><span class="pi-yellow">FIND YOUR FLOW.</span></h2></div>
+      {% if studio.registration_url %}<a class="pi-button" href="{{ studio.registration_url }}">Join the movement <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+    <div class="pi-footer__grid">
+      <a class="pi-brand" href="{{ home_url }}" aria-label="{{ studio.studio_name }} — home">{% if studio.logo %}{% image studio.logo max-200x200 alt="" %}{% else %}<img src="{% static 'poundit/images/logo.png' %}" width="100" height="100" alt="">{% endif %}</a>
+      <div><h3 class="pi-eyebrow">Come through</h3>{% if studio.address %}<address>{{ studio.address|linebreaksbr }}</address>{% endif %}{% if studio.opening_hours %}<p>{{ studio.opening_hours|linebreaksbr }}</p>{% endif %}{% if studio.maps_url %}<a href="{{ studio.maps_url }}">Get directions ↗</a>{% endif %}</div>
+      <div><h3 class="pi-eyebrow">Get in touch</h3>{% if studio.phone_number %}<a href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a>{% endif %}{% if studio.public_email %}<a href="mailto:{{ studio.public_email }}">{{ studio.public_email }}</a>{% endif %}
+      {% if studio.instagram_url %}<a href="{{ studio.instagram_url }}">Instagram ↗</a>{% endif %}{% if studio.facebook_url %}<a href="{{ studio.facebook_url }}">Facebook ↗</a>{% endif %}{% if studio.tiktok_url %}<a href="{{ studio.tiktok_url }}">TikTok ↗</a>{% endif %}{% if studio.youtube_url %}<a href="{{ studio.youtube_url }}">YouTube ↗</a>{% endif %}</div>
+      <nav aria-label="Studio information"><h3 class="pi-eyebrow">The studio</h3><a href="{{ home_url }}about/">About us</a><a href="{{ home_url }}school-programs/">School residencies</a><a href="{{ home_url }}important-dates/">Important dates</a><a href="{% if studio.waiver_url %}{{ studio.waiver_url }}{% else %}{{ home_url }}legal/waiver/{% endif %}">Waiver</a>{% if studio.dancer_portal_url %}<a href="{{ studio.dancer_portal_url }}">Dancer portal ↗</a>{% endif %}</nav>
+    </div>
+    <div class="pi-footer__bottom"><span>© {% now 'Y' %} {{ studio.studio_name }}</span><div><a href="{{ home_url }}legal/privacy/">Privacy</a><a href="{{ home_url }}legal/refund-policy/">Refund policy</a><a href="{{ home_url }}legal/terms/">Terms</a></div>{% if studio.footer_copy %}<span>{{ studio.footer_copy }}</span>{% endif %}</div>
+  </div>
+</footer>

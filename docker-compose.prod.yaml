@@ -1,0 +1,94 @@
+# Production stack for a single small VPS (Hostinger KVM 1: 1 vCPU, 4 GB, 50 GB).
+#
+# Differences from docker-compose.yaml, all deliberate:
+#   - no pgadmin, and no mailhog
+#   - Postgres publishes no ports; it is reachable only on the compose network
+#   - the app publishes no ports; Caddy reaches it on the compose network
+#   - every credential comes from .env, none are written here
+#   - restart policies, so a reboot brings the site back
+#   - migrations are NOT run on start; see the runbook
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yaml up -d --build
+#   docker compose -f docker-compose.prod.yaml run --rm app python manage.py migrate
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Tuned for a dedicated 4 GB box. The defaults assume something much
+    # smaller is sharing the machine.
+    command: >
+      postgres
+      -c shared_buffers=512MB
+      -c effective_cache_size=2GB
+      -c work_mem=16MB
+      -c maintenance_work_mem=128MB
+      -c max_connections=50
+
+  app:
+    build: .
+    environment:
+      DJANGO_SETTINGS_MODULE: alternative_naissance.settings.production
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
+      WAGTAILADMIN_BASE_URL: ${WAGTAILADMIN_BASE_URL}
+      SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-300}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-true}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+    volumes:
+      # Uploaded images and documents. Must survive a rebuild, and is the one
+      # directory Caddy also reads.
+      - ./media:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5).status < 500 else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./media:/srv/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

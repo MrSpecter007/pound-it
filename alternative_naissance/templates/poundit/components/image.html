@@ -1,0 +1,24 @@
+{% load wagtailimages_tags static %}
+{% if image %}
+  {% if ratio == 'hero' %}
+    {% image image fill-800x864 as desktop_small %}{% image image fill-1600x1728 as desktop_large %}
+    <picture><source media="(min-width: 801px)" srcset="{{ desktop_small.url }} 800w, {{ desktop_large.url }} 1600w" sizes="50vw">
+  {% endif %}
+  {% if ratio == 'portrait' %}
+    {% image image fill-480x600 as small %}{% image image fill-960x1200 as large %}
+  {% elif ratio == 'square' %}
+    {% image image fill-480x480 as small %}{% image image fill-960x960 as large %}
+  {% elif ratio == 'poster' %}
+    {% image image width-480 as small %}{% image image width-960 as large %}
+  {% elif ratio == 'hero' %}
+    {% image image fill-800x600 as small %}{% image image fill-1600x1200 as large %}
+  {% elif ratio == 'wide' %}
+    {% image image fill-800x400 as small %}{% image image fill-1600x800 as large %}
+  {% else %}
+    {% image image fill-640x480 as small %}{% image image fill-1280x960 as large %}
+  {% endif %}
+  <img class="pi-image pi-image--{{ ratio|default:'landscape' }}" src="{{ large.url }}" srcset="{{ small.url }} {{ small.width }}w, {{ large.url }} {{ large.width }}w" sizes="{{ sizes|default:'(min-width: 1024px) 50vw, 100vw' }}" width="{{ large.width }}" height="{{ large.height }}" alt="{{ alt|default:image.title }}" {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+  {% if ratio == 'hero' %}</picture>{% endif %}
+{% elif fallback %}
+  <img class="pi-image pi-image--{{ ratio|default:'landscape' }}" src="{% static fallback %}" width="{{ width|default:'1200' }}" height="{{ height|default:'900' }}" alt="{% firstof alt fallback_alt %}" {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+{% endif %}

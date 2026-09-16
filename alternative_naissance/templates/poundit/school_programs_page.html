@@ -1,0 +1,13 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}school-programs{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow='Bring hip hop to your school' introduction=page.introduction back_url=home_url %}
+{% if page.hero_image %}<div class="pi-container pi-section">{% include 'poundit/components/image.html' with image=page.hero_image ratio='wide' eager=True only %}</div>{% endif %}
+{% if page.grade_range or page.duration_label %}<div class="pi-container pi-section"><dl class="pi-metadata">{% if page.grade_range %}<div><dt>Grades</dt><dd>{{ page.grade_range }}</dd></div>{% endif %}{% if page.duration_label %}<div><dt>Format</dt><dd>{{ page.duration_label }}</dd></div>{% endif %}</dl></div>{% endif %}
+{% include_block page.body %}
+{% if page.show_inquiry_form %}<section class="pi-section pi-paper" id="inquiry"><div class="pi-container pi-split">
+  <div><p class="pi-eyebrow">Let's make it happen</p><h2>{{ page.inquiry_heading|default:'School inquiry' }}</h2>{% if page.inquiry_intro %}<p class="pi-lead">{{ page.inquiry_intro }}</p>{% endif %}{% if studio.phone_number %}<p>Prefer to call? <a href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a></p>{% endif %}</div>
+  <div>{% if submitted %}<div class="pi-form-success" role="status"><h3>Thank you.</h3><p>{{ page.inquiry_success_message }}</p></div>{% else %}{% with action=page.url|add:'#inquiry' %}{% include 'poundit/components/form_layout.html' with submit_label=page.inquiry_button_label %}{% endwith %}{% endif %}</div>
+</div></section>{% endif %}
+{% endblock %}

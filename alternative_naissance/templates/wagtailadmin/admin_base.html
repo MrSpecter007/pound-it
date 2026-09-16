@@ -1,0 +1,11 @@
+{% extends "wagtailadmin/admin_base.html" %}
+{% load static %}
+{% block branding_title %}Pound It Studio Admin{% endblock %}
+{% block branding_favicon %}
+    <link rel="icon" type="image/png" href="{% static 'poundit/images/logo.png' %}">
+    <meta name="theme-color" content="#131514">
+{% endblock %}
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'poundit/admin.css' %}">
+{% endblock %}

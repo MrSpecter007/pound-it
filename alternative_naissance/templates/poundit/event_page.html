@@ -1,0 +1,27 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags tz %}
+{% block body_class %}event{% endblock %}
+{% block content %}
+{% with back_url=home_url|add:'events/' %}{% include 'poundit/components/page_hero.html' with eyebrow=page.event_type.name introduction=page.short_description back_label='All events' %}{% endwith %}
+<article class="pi-container pi-section" data-status="{{ page.status }}">
+  <div class="pi-detail-grid">
+    <div>{% if page.hero_image %}{% include 'poundit/components/image.html' with image=page.hero_image eager=True only %}{% endif %}{% if page.poster_image %}<figure class="pi-event-poster">{% include 'poundit/components/image.html' with image=page.poster_image ratio='poster' only %}</figure>{% endif %}</div>
+    <aside class="pi-facts">
+      {% if page.is_past %}<p class="pi-tag">Past event</p>{% endif %}{% if page.status != 'scheduled' %}<p class="pi-tag">{{ page.get_status_display }}</p>{% endif %}
+      <dl class="pi-metadata">
+        <div><dt>Date</dt><dd><time datetime="{{ page.start_datetime|date:'c' }}">{{ page.date_display }}</time></dd></div>
+        <div><dt>Time</dt><dd>{{ page.start_datetime|localtime|date:'g:i A' }}{% if page.end_datetime %} – {% if page.is_multi_day %}{{ page.end_datetime|localtime|date:'M j, Y' }} {% endif %}{{ page.end_datetime|localtime|date:'g:i A' }}{% endif %} {{ page.start_datetime|localtime|date:'T' }}</dd></div>
+        {% if page.venue_name %}<div><dt>Venue</dt><dd>{{ page.venue_name }}{% if page.venue_address %}<br>{{ page.venue_address|linebreaksbr }}{% endif %}</dd></div>{% elif page.venue_address %}<div><dt>Address</dt><dd>{{ page.venue_address|linebreaksbr }}</dd></div>{% endif %}
+        {% if page.price_display %}<div><dt>Admission</dt><dd>{{ page.price_display }}</dd></div>{% endif %}
+        {% if page.age_label %}<div><dt>Ages</dt><dd>{{ page.age_label }}</dd></div>{% endif %}
+        {% if page.capacity %}<div><dt>Capacity</dt><dd>{{ page.capacity }}</dd></div>{% endif %}
+      </dl>
+      {% if not page.is_past and page.status == 'scheduled' and page.registration_url %}<a class="pi-button pi-button--dark" href="{{ page.registration_url }}">Register ↗</a>{% endif %}
+      {% if page.external_url %}<a class="pi-text-link" href="{{ page.external_url }}">Event website ↗</a>{% endif %}
+      {% if page.related_faculty.all %}<h3>Instructors</h3><ul>{% for member in page.related_faculty.all %}<li><a href="{{ home_url }}faculty/#faculty-{{ member.slug }}">{{ member.display_name }}</a></li>{% endfor %}</ul>{% endif %}
+      {% if page.related_styles.all %}<ul class="pi-tags">{% for style in page.related_styles.all %}<li class="pi-tag">{{ style.name }}</li>{% endfor %}</ul>{% endif %}
+    </aside>
+  </div>
+</article>
+{% include_block page.body %}
+{% endblock %}

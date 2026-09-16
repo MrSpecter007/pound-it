@@ -3,12 +3,31 @@
 /static/
 *.sqlite3
 
+# Database dumps must never enter the image. dump.sql and
+# backup_before_home.sql sit inside the copied application directory and carry
+# auth_user password hashes plus the core_inscription table (names, emails,
+# postal addresses, phone numbers).
+*.sql
+*.dump
+*.sql.gz
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Source images supplied for a one-off import. Needed on disk at import time,
+# not in every build of the image.
+/alternative_naissance/poundit/images/
+
 # Python and others
 __pycache__
 *.pyc
 .DS_Store
 *.swp
 /venv/
+/.venv/
+/alternative_naissance/.venv/
 /tmp/
 /.vagrant/
 /Vagrantfile.local

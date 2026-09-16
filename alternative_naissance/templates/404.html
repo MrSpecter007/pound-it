@@ -1,11 +1,17 @@
-{% extends "base.html" %}
-
+{% extends "poundit/base.html" %}
+{% block body_class %}error{% endblock %}
 {% block title %}Page not found{% endblock %}
-
-{% block body_class %}template-404{% endblock %}
-
 {% block content %}
-<h1>Page not found</h1>
-
-<h2>Sorry, this page could not be found.</h2>
+<div class="pi-container pi-section pi-readable">
+  <p class="pi-eyebrow">404</p>
+  <h1>THAT PAGE ISN'T HERE.</h1>
+  <p>The page you were looking for has moved or never existed. The links below cover most of what people come here for.</p>
+  <nav class="pi-filters" aria-label="Main sections">
+    <a href="{{ home_url }}">Home</a>
+    <a href="{{ home_url }}programs/">Programs</a>
+    <a href="{{ home_url }}schedule/">Schedule</a>
+    <a href="{{ home_url }}faculty/">Faculty</a>
+    <a href="{{ home_url }}events/">What's on</a>
+  </nav>
+</div>
 {% endblock %}

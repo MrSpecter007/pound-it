@@ -7,12 +7,15 @@ RUN useradd wagtail
 # Port used by this container to serve HTTP.
 EXPOSE 8000
 
-# Set environment variables.
 # 1. Force Python stdout and stderr streams to be unbuffered.
-# 2. Set PORT variable that is used by Gunicorn. This should match "EXPOSE"
-#    command.
+# 2. PORT matches EXPOSE above.
+# 3. Default to PRODUCTION settings. wsgi.py falls back to the dev module via
+#    setdefault, so without this line a deployed container would run with
+#    DEBUG=True, a committed SECRET_KEY and ALLOWED_HOSTS=["*"]. The safe
+#    setting has to be the default; the environment can still override it.
 ENV PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=8000 \
+    DJANGO_SETTINGS_MODULE=alternative_naissance.settings.production
 
 # Install system packages required by Wagtail and Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
@@ -25,7 +28,9 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
  && rm -rf /var/lib/apt/lists/*
 
 # Install the application server.
-RUN pip install "gunicorn==20.0.4"
+# (pinned to a modern release: gunicorn 20.0.4 depends on pkg_resources,
+# which recent setuptools no longer ships.)
+RUN pip install "gunicorn==23.0.0"
 
 # Install the project requirements.
 COPY alternative_naissance/requirements.txt /
@@ -34,9 +39,6 @@ RUN pip install -r /requirements.txt
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
 
-# Set this directory to be owned by the "wagtail" user. This Wagtail project
-# uses SQLite, the folder needs to be owned by the user that
-# will be writing to the database file.
 RUN chown wagtail:wagtail /app
 
 # Copy the source code of the project into the container.
@@ -45,16 +47,24 @@ COPY --chown=wagtail:wagtail alternative_naissance .
 # Use user "wagtail" to run the build commands below and the server itself.
 USER wagtail
 
-# Collect static files.
-RUN python manage.py collectstatic --noinput --clear
+# Collect static files, hashed and compressed by WhiteNoise.
+# SECRET_KEY is required for the settings module to import at all; this value
+# is used only by this build step and never at runtime.
+RUN SECRET_KEY="build-step-only-not-used-at-runtime" \
+    python manage.py collectstatic --noinput --clear
 
-# Runtime command that executes when "docker run" is called, it does the
-# following:
-#   1. Migrate the database.
-#   2. Start the application server.
-# WARNING:
-#   Migrating database at the same time as starting the server IS NOT THE BEST
-#   PRACTICE. The database should be migrated manually or using the release
-#   phase facilities of your hosting platform. This is used only so the
-#   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; python manage.py migrate --noinput; gunicorn alternative_naissance.wsgi:application
+# Runtime command.
+#
+# Migrations are NOT run here. Running them on every container start races with
+# anything else starting at the same time, and makes rollbacks awkward. Run
+# them as an explicit step in the deploy:
+#     docker compose -f docker-compose.prod.yaml run --rm app python manage.py migrate
+#
+# Workers: on a single vCPU these cover I/O waits rather than adding
+# parallelism, so three is a reasonable ceiling.
+CMD gunicorn alternative_naissance.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers ${GUNICORN_WORKERS:-3} \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile -

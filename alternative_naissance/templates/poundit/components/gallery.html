@@ -1,0 +1,1 @@
+<div class="pi-gallery">{% for item in items %}<figure>{% include 'poundit/components/image.html' with image=item.image alt=item.alt ratio=item.ratio only %}{% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div>

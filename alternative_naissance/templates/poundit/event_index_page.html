@@ -1,0 +1,12 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}events{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow='Battles. Workshops. Community.' introduction=page.introduction back_url=home_url %}
+<div class="pi-container pi-section">
+  <nav class="pi-filters" aria-label="Event types"><a href="{{ page.url }}"{% if not active_type %} aria-current="page"{% endif %}>All events</a>{% for event_type in event_types %}<a href="{{ page.url }}{{ event_type.slug }}/"{% if active_type == event_type.slug %} aria-current="page"{% endif %}>{{ event_type.name }}</a>{% endfor %}</nav>
+  <section class="pi-listing-section"><div class="pi-section-heading"><h2>Upcoming</h2></div><div class="pi-grid pi-grid--three">{% for event in upcoming %}{% include 'poundit/components/event_card.html' %}{% empty %}<p>No upcoming events. New dates will be posted here.</p>{% endfor %}</div></section>
+  {% if past %}<section class="pi-listing-section"><div class="pi-section-heading"><h2>From the archive</h2></div><div class="pi-grid pi-grid--three">{% for event in past %}{% include 'poundit/components/event_card.html' %}{% endfor %}</div></section>{% endif %}
+</div>
+{% include_block page.body %}
+{% endblock %}

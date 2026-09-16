@@ -1,0 +1,26 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}content{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with introduction=page.introduction back_url=home_url %}
+{% if page.hero_image %}<div class="pi-container pi-section">{% include 'poundit/components/image.html' with image=page.hero_image ratio='wide' eager=True only %}</div>{% endif %}
+<article class="pi-content-body">{% include_block page.body %}</article>
+{% if not page.body %}
+<div class="pi-container pi-section pi-prose">
+  {% if page.slug == 'waiver' %}
+    <p>Read and complete the studio's current waiver before participating.</p>{% if studio.waiver_url %}<a class="pi-button pi-button--dark" href="{{ studio.waiver_url }}">View the waiver ↗</a>{% elif studio.phone_number %}<p>Ask the studio for the current waiver: <a class="pi-text-link" href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a></p>{% endif %}
+  {% elif page.slug == 'privacy' %}
+    <p>The studio's privacy policy is available on request.</p>{% if studio.public_email %}<p><a class="pi-text-link" href="mailto:{{ studio.public_email }}">{{ studio.public_email }}</a></p>{% elif studio.phone_number %}<p><a class="pi-text-link" href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a></p>{% endif %}
+  {% elif page.slug == 'refund-policy' %}
+    <p>The studio's refund policy is available on request.</p>{% if studio.public_email %}<p><a class="pi-text-link" href="mailto:{{ studio.public_email }}">{{ studio.public_email }}</a></p>{% elif studio.phone_number %}<p><a class="pi-text-link" href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a></p>{% endif %}
+  {% elif page.slug == 'terms' %}
+    <p>Contact the studio for the terms and conditions that apply to your program.</p>{% if studio.phone_number %}<a class="pi-text-link" href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a>{% endif %}
+  {% elif page.slug == 'contact' %}
+    {% if studio.address %}<address>{{ studio.address|linebreaksbr }}</address>{% endif %}{% if studio.opening_hours %}<p>{{ studio.opening_hours|linebreaksbr }}</p>{% endif %}{% if studio.phone_number %}<p><a class="pi-text-link" href="tel:{{ studio.phone_number }}">{{ studio.phone_number }}</a></p>{% endif %}{% if studio.public_email %}<p><a href="mailto:{{ studio.public_email }}">{{ studio.public_email }}</a></p>{% endif %}
+  {% elif page.slug == 'about' %}
+    <p>{{ studio.tagline }}</p><a class="pi-text-link" href="{{ home_url }}faculty/">Meet the people behind Pound It →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% with children=page.get_children.live %}{% if children %}<nav class="pi-container pi-section pi-filters" aria-label="{{ page.title }} pages">{% for child in children %}<a href="{% pageurl child %}">{{ child.title }}</a>{% endfor %}</nav>{% endif %}{% endwith %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% load static wagtailsettings_tags wagtailimages_tags %}{% get_settings %}
+<span class="pi-admin-brand">
+    {% with logo=settings.poundit.PounditSettings.logo %}
+        {% if logo %}{% image logo max-192x192 class="pi-admin-logo" alt="Pound It Hip Hop Studios" %}{% else %}<img class="pi-admin-logo" src="{% static 'poundit/images/logo.png' %}" width="96" height="96" alt="Pound It Hip Hop Studios">{% endif %}
+    {% endwith %}
+    <span class="pi-admin-wordmark" aria-hidden="true">POUND IT<span>HIP HOP STUDIOS</span></span>
+</span>

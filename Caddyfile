@@ -1,0 +1,29 @@
+# Replace both hostnames with the real domain before deploying.
+# Caddy obtains and renews certificates automatically, but the DNS A record
+# must already resolve to this server or the first request will fail.
+
+pounditdj.com, www.pounditdj.com {
+	encode gzip zstd
+
+	# Uploaded media is served straight from disk. Static files are handled
+	# inside the app by WhiteNoise, so they are not listed here.
+	handle_path /media/* {
+		root * /srv/media
+		file_server
+		header Cache-Control "public, max-age=2592000"
+	}
+
+	handle {
+		reverse_proxy app:8000 {
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MB
+			roll_keep 5
+		}
+	}
+}

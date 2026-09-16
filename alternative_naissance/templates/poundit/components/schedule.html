@@ -1,0 +1,7 @@
+{% if schedule_days %}
+<div class="pi-schedule" data-schedule>
+  <div class="pi-schedule__filters" hidden><label for="schedule-day">Choose a day</label><select id="schedule-day" data-day-filter><option value="all">All days</option>{% for day in schedule_days %}<option value="{{ forloop.counter }}">{{ day.label }}</option>{% endfor %}</select></div>
+  <p class="pi-sr-only" aria-live="polite" data-schedule-status></p>
+  <div class="pi-schedule__days">{% for day in schedule_days %}<section class="pi-schedule__day" data-day="{{ forloop.counter }}"><h2>{{ day.label }}</h2><ul>{% for session in day.sessions %}<li class="pi-session" data-training="{{ session.training_colour|default:'black' }}"><p class="pi-session__time">{{ session.time_label }}</p><h3>{% if session.url %}<a href="{{ session.url }}">{{ session.title }}</a>{% else %}{{ session.title }}{% endif %}</h3><p>{{ session.age_label }}</p><p class="pi-session__level"><span class="pi-swatch" aria-hidden="true"></span>{{ session.training_label }}</p>{% if session.instructor %}<p>{{ session.instructor }}</p>{% endif %}{% if session.room %}<p>{{ session.room }}</p>{% endif %}</li>{% empty %}<li class="pi-empty">No classes scheduled.</li>{% endfor %}</ul></section>{% endfor %}</div>
+</div>
+{% else %}<div class="pi-empty"><h2>Plan your next session</h2><p>The class timetable is being updated. Check the studio schedule for current times.</p><a class="pi-button pi-button--dark" href="{{ home_url }}schedule/">View the full schedule</a></div>{% endif %}

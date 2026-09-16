@@ -1,0 +1,5 @@
+{% load wagtailsettings_tags %}{% get_settings %}
+<section class="pi-section pi-dark"><div class="pi-container pi-cta">
+  <div>{% if value.heading %}<h2>{{ value.heading }}</h2>{% endif %}{% if value.text %}<p class="pi-lead">{{ value.text }}</p>{% endif %}</div>
+  {% if value.button_label %}{% if value.button_url or settings.poundit.PounditSettings.registration_url %}<a class="pi-button" href="{% firstof value.button_url settings.poundit.PounditSettings.registration_url %}">{{ value.button_label }} ↗</a>{% endif %}{% endif %}
+</div></section>

@@ -1,0 +1,13 @@
+{% load wagtailcore_tags %}
+<article class="pi-card pi-event-card" data-event-type="{{ event.event_type.slug }}">
+  {% if event.hero_image %}<div class="pi-card__media">{% include 'poundit/components/image.html' with image=event.hero_image sizes='(min-width: 1024px) 33vw, 100vw' only %}</div>{% elif event.poster_image %}<div class="pi-card__media pi-poster">{% include 'poundit/components/image.html' with image=event.poster_image ratio='poster' only %}</div>{% endif %}
+  <div class="pi-card__body">
+    <p class="pi-eyebrow">{% if event.is_past %}From the archive{% else %}{{ event.event_type.name|default:'At the studio' }}{% endif %}</p>
+    <h3><a href="{% pageurl event %}">{{ event.title }} <span aria-hidden="true">↗</span></a></h3>
+    <p><time datetime="{{ event.start_datetime|date:'c' }}">{{ event.date_display }}</time></p>
+    {% if event.status != 'scheduled' %}<p class="pi-tag">{{ event.get_status_display }}</p>{% endif %}
+    {% if event.venue_name %}<p>{{ event.venue_name }}</p>{% endif %}
+    {% if event.price_display %}<p>{{ event.price_display }}</p>{% endif %}
+    {% if event.short_description %}<p>{{ event.short_description }}</p>{% endif %}
+  </div>
+</article>

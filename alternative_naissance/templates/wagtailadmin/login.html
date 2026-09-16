@@ -1,10 +1,9 @@
 {% extends "wagtailadmin/login.html" %}
-{% load static %}
-{% block branding_login %}Sign in to Alternative Naissance{% endblock %}
-{% block branding_logo %}
-    <img src="{% static 'images/logo/Alt_naissance_Couleur_Full.svg' %}" alt="Alternative Naissance" width="800" />
+{% block branding_login %}
+    {% include "wagtailadmin/shared/poundit_logo.html" %}
+    <span class="pi-admin-login-title">Studio sign in</span>
 {% endblock %}
-
-{% block branding_favicon %}
-    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+{% block above_login %}
+    <p class="pi-admin-login-intro">Your crews. Your community. Your studio.</p>
 {% endblock %}
+{% block branding_logo %}{% endblock %}

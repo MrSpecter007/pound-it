@@ -1,0 +1,11 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}programs{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow='Find your crew' introduction=page.introduction back_url=home_url %}
+<div class="pi-container pi-section">
+  <nav class="pi-filters" aria-label="Program categories"><a href="{{ page.url }}"{% if not active_category %} aria-current="page"{% endif %}>All programs</a>{% for category in all_categories %}<a href="{{ page.url }}{{ category.slug }}/"{% if active_category == category.slug %} aria-current="page"{% endif %}>{{ category.name }}</a>{% endfor %}</nav>
+  {% for category, programs in programs_by_category %}<section class="pi-listing-section" data-category="{{ category.slug }}"><div class="pi-section-heading"><h2>{{ category.name }}</h2>{% if category.short_description %}<p>{{ category.short_description }}</p>{% endif %}</div><div class="pi-grid pi-grid--three">{% for program in programs %}{% include 'poundit/components/program_card.html' %}{% empty %}<p>Nothing in this category yet. Explore the other programs above.</p>{% endfor %}</div></section>{% empty %}<p>Programs will be announced here.</p>{% endfor %}
+</div>
+{% include_block page.body %}
+{% endblock %}

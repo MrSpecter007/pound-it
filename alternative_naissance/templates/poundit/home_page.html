@@ -1,0 +1,62 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}home{% endblock %}
+{% block content %}
+<section class="pi-hero">
+  <div class="pi-container pi-hero__grid">
+    <div class="pi-hero__copy">
+      {% if page.hero_eyebrow %}<p class="pi-eyebrow"><span class="pi-status-dot" aria-hidden="true"></span>{{ page.hero_eyebrow }}</p>{% endif %}
+      <h1>POUND IT<span>HIP HOP<br> STUDIOS.</span></h1>
+      {% if page.hero_title %}<p class="pi-hero__headline">{{ page.hero_title }}</p>{% endif %}
+      {% if page.hero_text %}<p class="pi-hero__intro">{{ page.hero_text }}</p>{% endif %}
+      <div class="pi-actions">
+        {% if page.primary_cta_url or studio.registration_url %}<a class="pi-button" href="{% firstof page.primary_cta_url studio.registration_url %}">{% firstof page.primary_cta_label studio.registration_cta_label 'Register' %} <span aria-hidden="true">↗</span></a>{% endif %}
+        <a class="pi-text-link" href="{{ home_url }}programs/">Find your class <span aria-hidden="true">→</span></a>
+      </div>
+      <p class="pi-hero__location">RED DEER, ALBERTA <span aria-hidden="true">/</span> ROOTED IN HIP HOP CULTURE</p>
+    </div>
+    <figure class="pi-hero__media">
+      {% include 'poundit/components/image.html' with image=page.hero_image fallback='poundit/images/crew.jpg' fallback_alt='Pound It crew performing together on a purple-lit stage' ratio='hero' eager=True only %}
+      <span class="pi-hero__stamp" aria-hidden="true">MOVE.<br>CONNECT.<br>GROW.</span>
+      <figcaption><span>THE CULTURE. THE COMMUNITY. THE CREW.</span>{% if season %}<span>{{ season.label }}</span>{% endif %}</figcaption>
+    </figure>
+  </div>
+</section>
+<div class="pi-culture-strip"><div class="pi-container"><span>HIP HOP</span><span aria-hidden="true">✳</span><span>BREAKING</span><span aria-hidden="true">✳</span><span>POPPING</span><span aria-hidden="true">✳</span><span>HOUSE</span><span aria-hidden="true">✳</span><span>COMMUNITY</span></div></div>
+<section class="pi-section pi-paper">
+  <div class="pi-container">
+    <div class="pi-section-heading"><div><p class="pi-eyebrow">There's a place for you here</p><h2>{{ page.programs_section_title|default:'FIND YOUR CREW.' }}</h2></div>{% if page.programs_section_text %}<p>{{ page.programs_section_text }}</p>{% endif %}</div>
+    <div class="pi-entry-grid">
+      <a class="pi-entry" href="{{ home_url }}programs/kids-teen/"><div class="pi-entry__image">{% include 'poundit/components/image.html' with fallback='poundit/images/kids.jpg' fallback_alt='Chicos crew posing together at Pound It' ratio='portrait' only %}<span class="pi-entry__number">01</span></div><div class="pi-entry__label"><h3>KIDS + TEENS</h3><span aria-hidden="true">↗</span></div></a>
+      <a class="pi-entry" href="{{ home_url }}programs/adult/"><div class="pi-entry__image">{% include 'poundit/components/image.html' with fallback='poundit/images/adults.jpg' fallback_alt='Adult dancers together in the studio' ratio='portrait' only %}<span class="pi-entry__number">02</span></div><div class="pi-entry__label"><h3>ADULTS</h3><span aria-hidden="true">↗</span></div></a>
+      <a class="pi-entry" href="{{ home_url }}programs/competitive/"><div class="pi-entry__image">{% include 'poundit/components/image.html' with fallback='poundit/images/crew.jpg' fallback_alt='Pound It competitive crew performing on stage' ratio='portrait' only %}<span class="pi-entry__number">03</span></div><div class="pi-entry__label"><h3>COMPETITIVE CREWS</h3><span aria-hidden="true">↗</span></div></a>
+    </div>
+    {% if featured_programs %}<div class="pi-home-programs"><div class="pi-section-heading"><h3>IN THE STUDIO</h3><a class="pi-text-link" href="{{ home_url }}programs/">Explore all programs →</a></div><div class="pi-grid pi-grid--three">{% for program in featured_programs %}{% include 'poundit/components/program_card.html' with compact=True %}{% endfor %}</div></div>{% endif %}
+  </div>
+</section>
+<section class="pi-section pi-dark pi-training"><div class="pi-container pi-split">
+  <figure class="pi-training__photo">{% include 'poundit/components/image.html' with fallback='poundit/images/training.jpg' fallback_alt='Difficult C demonstrating a dance movement in a blue cap' ratio='portrait' only %}<figcaption>FOUNDATIONS FIRST. YOUR EXPRESSION ALWAYS.</figcaption></figure>
+  <div><p class="pi-eyebrow">Build your foundation</p><h2>MORE THAN<br><span class="pi-yellow">THE MOVES.</span></h2>{% if page.intro_copy %}<p class="pi-lead">{{ page.intro_copy }}</p>{% endif %}{% include 'poundit/components/training_colour_key.html' with levels=training_levels %}<a class="pi-button" href="{{ home_url }}schedule/">Find your training time →</a></div>
+</div></section>
+<section class="pi-section pi-paper"><div class="pi-container">
+  <div class="pi-section-heading"><div><p class="pi-eyebrow">Beyond the studio</p><h2>LIVE THE CULTURE.</h2></div><a class="pi-text-link" href="{{ home_url }}events/">Explore what's on →</a></div>
+  <div class="pi-culture-grid">
+    <article class="pi-culture-story pi-culture-story--large">{% include 'poundit/components/image.html' with fallback='poundit/images/battles.jpeg' fallback_alt='Dancer performing a floor move inside an outdoor battle circle' ratio='portrait' only %}<p class="pi-eyebrow">Step into the circle</p><h3>BATTLES + CYPHERS</h3><p>Music, movement and individual expression. Experience hip hop with the community.</p></article>
+    <article class="pi-culture-story">{% include 'poundit/components/image.html' with fallback='poundit/images/community.jpeg' fallback_alt='The community gathered around a colourful outdoor dance floor' only %}<p class="pi-eyebrow">Find your people</p><h3>BUILT ON COMMUNITY.</h3></article>
+    <article class="pi-culture-story">{% include 'poundit/components/image.html' with fallback='poundit/images/competitions.jpg' fallback_alt='Pound It dancers celebrating with a first-place trophy' only %}<p class="pi-eyebrow">Grow together</p><h3>TAKE IT TO THE STAGE.</h3></article>
+  </div>
+</div></section>
+{% if page.hero_video_url %}<section class="pi-tour pi-dark"><div class="pi-tour__image">{% include 'poundit/components/image.html' with fallback='poundit/images/studio.jpg' fallback_alt='Pound It dancers moving together in a mural-lined alley' only %}</div><div class="pi-container pi-tour__content"><p class="pi-eyebrow">Get to know Pound It</p><h2>THIS IS<br>OUR PLACE.</h2><a class="pi-button" href="{{ page.hero_video_url }}">Watch the video <span aria-hidden="true">↗</span></a></div></section>{% endif %}
+<section class="pi-section"><div class="pi-container">
+  <div class="pi-section-heading"><div><p class="pi-eyebrow">Learn from the community</p><h2>{{ page.faculty_section_title }}</h2></div><a class="pi-text-link" href="{{ home_url }}faculty/">Meet the faculty →</a></div>
+  {% if page.faculty_section_text %}<p class="pi-lead pi-section-intro">{{ page.faculty_section_text }}</p>{% endif %}
+  <div class="pi-grid pi-grid--three">{% for member in featured_faculty %}{% include 'poundit/components/faculty_card.html' with compact=True %}{% empty %}<p>The faculty roster will be announced here.</p>{% endfor %}</div>
+</div></section>
+<section class="pi-section pi-paper"><div class="pi-container">
+  <div class="pi-section-heading"><div><p class="pi-eyebrow">Save the date</p><h2>{{ page.events_section_title }}</h2></div><a class="pi-text-link" href="{{ home_url }}important-dates/">Full calendar →</a></div>
+  {% if page.events_section_text %}<p class="pi-lead pi-section-intro">{{ page.events_section_text }}</p>{% endif %}
+  {% if upcoming_events %}<div class="pi-grid pi-grid--three">{% for event in upcoming_events %}{% include 'poundit/components/event_card.html' %}{% endfor %}</div>{% endif %}
+  <ul class="pi-date-list">{% for entry in upcoming_dates %}<li><time datetime="{{ entry.start_date|date:'Y-m-d' }}">{{ entry.date_display }}</time><div><h3>{% if entry.related_event %}<a href="{% pageurl entry.related_event %}">{{ entry.title }}</a>{% else %}{{ entry.title }}{% endif %}</h3>{% if entry.is_tentative %}<span class="pi-tag">Tentative</span>{% endif %}</div></li>{% empty %}{% if not upcoming_events %}<li>New dates will be posted here. Check back for the next studio event.</li>{% endif %}{% endfor %}</ul>
+</div></section>
+{% include_block page.body %}
+{% endblock %}

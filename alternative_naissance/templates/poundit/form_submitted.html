@@ -1,0 +1,1 @@
+{% extends 'poundit/base.html' %}{% load wagtailcore_tags %}{% block content %}{% include 'poundit/components/page_hero.html' with title='THANK YOU.' %}<section class="pi-section"><div class="pi-container pi-readable"><div class="pi-prose">{{ page.thank_you_text|richtext }}</div><a class="pi-button pi-button--dark" href="/">Back to the studio ←</a></div></section>{% endblock %}

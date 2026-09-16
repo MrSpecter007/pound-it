@@ -1,0 +1,12 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}important-dates{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow=season.label introduction=page.introduction back_url=home_url %}
+<div class="pi-container pi-section">
+  {% if has_tentative %}<p class="pi-notice">Some dates below are tentative and may change.</p>{% endif %}
+  <nav class="pi-filters" aria-label="Calendar categories"><a href="{{ page.url }}"{% if not active_category %} aria-current="page"{% endif %}>All dates</a>{% for category in categories %}<a href="?category={{ category.slug|urlencode }}"{% if active_category == category.slug %} aria-current="page"{% endif %}>{{ category.name }}</a>{% endfor %}</nav>
+  {% for month, entries in entries_by_month.items %}<section class="pi-listing-section"><h2>{{ month|date:'F Y' }}</h2><ul class="pi-date-list">{% for entry in entries %}<li data-category="{{ entry.category_slug }}"><time datetime="{{ entry.start_date|date:'Y-m-d' }}">{{ entry.date_display }}</time><div><h3>{% if entry.related_event %}<a href="{% pageurl entry.related_event %}">{{ entry.title }}</a>{% else %}{{ entry.title }}{% endif %}</h3>{% if entry.is_tentative %}<span class="pi-tag">Tentative</span>{% endif %}{% if entry.is_past %}<span class="pi-tag">Past date</span>{% endif %}{% if entry.description %}<p>{{ entry.description|linebreaksbr }}</p>{% endif %}</div></li>{% endfor %}</ul></section>{% empty %}<p>No dates published for this season and category yet.</p>{% endfor %}
+</div>
+{% include_block page.body %}
+{% endblock %}

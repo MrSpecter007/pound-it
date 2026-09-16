@@ -1,0 +1,23 @@
+{% load static wagtailcore_tags wagtailuserbar wagtailsettings_tags %}{% get_settings %}{% wagtail_site as current_site %}{% pageurl current_site.root_page as home_url %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% firstof page.seo_title page.title %}{% endblock %}{% block title_suffix %} | {{ settings.poundit.PounditSettings.studio_name }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ page.search_description }}{% endblock %}">
+  <link rel="preload" href="{% static 'poundit/fonts/Anton-Regular.ttf' %}" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="{% static 'poundit/poundit.css' %}">
+  {% block styles %}{% endblock %}
+</head>
+<body class="pi-site poundit poundit--{% block body_class %}{% endblock %}">
+  <a class="pi-skip" href="#main-content">Skip to content</a>
+  {% wagtailuserbar %}
+  {% with studio=settings.poundit.PounditSettings %}
+    {% include 'poundit/components/announcement_bar.html' %}
+    {% include 'poundit/components/site_header.html' %}
+    <main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
+    {% include 'poundit/components/site_footer.html' %}
+  {% endwith %}
+  <script src="{% static 'poundit/poundit.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

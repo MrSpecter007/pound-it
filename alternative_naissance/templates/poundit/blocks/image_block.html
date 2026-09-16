@@ -1,0 +1,1 @@
+<figure class="{% if not value.full_bleed %}pi-container {% endif %}pi-body-block pi-full-bleed">{% include 'poundit/components/image.html' with image=value.image ratio='poster' sizes='100vw' only %}{% if value.caption %}<figcaption class="{% if value.full_bleed %}pi-container{% endif %}">{{ value.caption }}</figcaption>{% endif %}</figure>

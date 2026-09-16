@@ -1,4 +1,14 @@
-version: '3.8'
+# Local development stack.
+#
+# Two ways to run the site are supported and both work against the same
+# database container:
+#
+#   1. In Docker:   docker compose up -d --build     -> http://localhost:8000
+#   2. On the host: manage.py runserver, with .env pointing POSTGRES_HOST at
+#      localhost and POSTGRES_PORT at 25432 (see .env.example)
+#
+# For the production stack, see docker-compose.prod.yaml. This file is
+# deliberately permissive: published ports, committed credentials, DEBUG on.
 
 services:
   postgres:
@@ -11,10 +21,50 @@ services:
       - '25432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     profiles:
       - ""
       - "test"
       - "mailhog"
+
+  app:
+    build: .
+    # The Dockerfile defaults to production settings so that a deployed
+    # container is safe by default. Development opts back out, here.
+    environment:
+      DJANGO_SETTINGS_MODULE: alternative_naissance.settings.dev
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      WAGTAILADMIN_BASE_URL: http://localhost:8000
+    ports:
+      - '8000:8000'
+    volumes:
+      # Uploaded images and documents, so they survive a rebuild.
+      - ./alternative_naissance/media:/app/media
+      # Source images for `import_poundit_images`. Excluded from the built
+      # image by .dockerignore, mounted here so the importer can still be
+      # re-run locally.
+      - ./alternative_naissance/poundit/images:/app/poundit/images:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Migrations on start are fine locally. Do not copy this into production:
+    # two containers starting at once will race each other.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn alternative_naissance.wsgi:application
+             --bind 0.0.0.0:8000
+             --workers 2
+             --timeout 60
+             --access-logfile -
+             --error-logfile -"
 
   pgadmin:
     image: dpage/pgadmin4
@@ -34,6 +84,6 @@ services:
       - "28025:8025"
     profiles:
       - "mailhog"
-    
+
 volumes:
   db_data:

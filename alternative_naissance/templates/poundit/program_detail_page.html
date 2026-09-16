@@ -1,0 +1,17 @@
+{% extends 'poundit/base.html' %}{% load wagtailcore_tags %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow=page.category_label introduction=page.summary %}
+<section class="pi-section"><div class="pi-container pi-detail-grid"><div>
+  {% if page.hero_image %}{% include 'poundit/components/image.html' with image=page.hero_image ratio='landscape' alt=page.image_alt eager=True only %}{% endif %}
+  <div class="pi-prose">{{ page.description|richtext }}</div>
+  {% if page.training_inclusions %}<h2 class="pi-detail-heading">What's included</h2><div class="pi-prose">{{ page.training_inclusions|richtext }}</div>{% endif %}
+  {% if page.performances %}<h2 class="pi-detail-heading">Beyond the studio</h2><div class="pi-prose">{{ page.performances|richtext }}</div>{% endif %}
+  {% include 'poundit/components/tag_list.html' with tags=styles %}
+</div><aside class="pi-facts"><p class="pi-eyebrow">Your program, at a glance</p><h2>THE DETAILS.</h2><dl class="pi-metadata">
+  {% if page.age_label %}<div><dt>Ages</dt><dd>{{ page.age_label }}</dd></div>{% endif %}
+  {% if schedules %}<div><dt>Schedule</dt><dd><ul>{% for session in schedules %}<li>{{ session.day_label }} · {{ session.time_label }}{% if session.room %} · {{ session.room }}{% endif %}</li>{% endfor %}</ul></dd></div>{% endif %}
+  {% if page.tuition %}<div><dt>Tuition</dt><dd>{{ page.tuition }}</dd></div>{% endif %}
+  {% if page.audition_label %}<div><dt>Audition</dt><dd>{{ page.audition_label }}</dd></div>{% endif %}
+</dl>{% if page.registration_url %}<a class="pi-button pi-button--dark" href="{{ page.registration_url }}">{{ page.registration_label|default:'Join this crew' }} <span aria-hidden="true">↗</span></a>{% endif %}{% if page.registration_note %}<p>{{ page.registration_note }}</p>{% endif %}</aside></div></section>
+{% if faculty %}<section class="pi-section pi-dark"><div class="pi-container">{% include 'poundit/components/section_heading.html' with title='WHO YOU TRAIN WITH.' only %}{% include 'poundit/components/faculty_grid.html' %}</div></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}faculty{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow='Meet your teachers' introduction=page.introduction back_url=home_url %}
+<div class="pi-container pi-section">
+  <div class="pi-grid pi-grid--three">{% for member in faculty %}{% include 'poundit/components/faculty_card.html' %}{% empty %}<p>The faculty roster will be announced here.</p>{% endfor %}</div>
+  {% if occasional_faculty %}<section class="pi-listing-section"><div class="pi-section-heading"><h2>Occasional instructors</h2></div><div class="pi-grid pi-grid--three">{% for member in occasional_faculty %}{% include 'poundit/components/faculty_card.html' %}{% endfor %}</div></section>{% endif %}
+</div>
+{% include_block page.body %}
+{% endblock %}

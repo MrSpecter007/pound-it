@@ -1,0 +1,22 @@
+{% extends "poundit/base.html" %}
+{% load wagtailcore_tags %}
+{% block body_class %}schedule{% endblock %}
+{% block content %}
+{% include 'poundit/components/page_hero.html' with eyebrow=season.label introduction=page.introduction back_url=home_url %}
+<div class="pi-container pi-section">
+  {% if page.show_legend %}{% include 'poundit/components/training_colour_key.html' %}{% endif %}
+  <div class="pi-schedule" data-schedule>
+    <div class="pi-schedule__filters" hidden><label for="schedule-day">Choose a day</label><select id="schedule-day" data-day-filter><option value="all">All days</option>{% for day in schedule %}<option value="{{ day.weekday }}">{{ day.label }}</option>{% endfor %}</select></div>
+    <p class="pi-sr-only" data-schedule-status aria-live="polite"></p>
+    <div class="pi-schedule__days">
+      {% for day in schedule %}<section class="pi-schedule__day" data-day="{{ day.weekday }}">
+        <h2>{{ day.label }}</h2>
+        {% for column in day.rooms %}<div class="pi-schedule__room" data-room="{{ column.room.slug }}"><h3>{{ column.room.name }}</h3><ul>
+          {% for entry in column.entries %}<li class="pi-session" data-training="{{ entry.level_colour }}"><p class="pi-session__time">{{ entry.time_display }}</p><h4><a href="{{ home_url }}programs/{% if entry.program.category %}{{ entry.program.category.slug }}/{% endif %}#program-{{ entry.program.slug }}">{{ entry.display_label }}</a></h4>{% if entry.program.level %}<p class="pi-session__level">{{ entry.program.level.display_label }}</p>{% endif %}{% if entry.instructor_display %}<p>{{ entry.instructor_display }}</p>{% endif %}{% if entry.notes %}<p>{{ entry.notes }}</p>{% endif %}</li>{% empty %}<li class="pi-schedule__empty">No classes in this room.</li>{% endfor %}
+        </ul></div>{% endfor %}
+      </section>{% empty %}<p>No sessions scheduled for this season yet.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% include_block page.body %}
+{% endblock %}
