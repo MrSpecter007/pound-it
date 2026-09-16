@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:500px;margin:auto;padding:2rem;text-align:center;">
+    <h2>Vous avez été déconnecté.</h2>
+    <p>Merci d’avoir visité votre espace membre.</p>
+    <a href="{% url 'mon-compte' %}">Se reconnecter</a>
+</div>
+{% endblock %}

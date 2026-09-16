@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+
+
+<section class="career-detail py-5">
+  <div class="container">
+
+    <h1 class="mb-3">{{ page.position }}</h1>
+
+    {% if page.description %}
+      <div class="career-description">
+        {{ page.description|richtext }}
+      </div>
+    {% endif %}
+
+    <hr class="my-5">
+
+    <h3>Postuler à ce poste</h3>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+                <label>Nom</label>
+                <input type="text" name="last_name" class="form-control" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Prénom</label>
+                <input type="text" name="first_name" class="form-control" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Courriel</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>CV</label>
+                <input type="file" name="cv" class="form-control" required>
+            </div>
+
+            <div class="col-12 mb-3">
+                <label>Message</label>
+                <textarea name="message" class="form-control"></textarea>
+            </div>
+
+        </div>
+
+        <button type="submit" class="cookiebtn">
+            Envoyer ma candidature
+        </button>
+
+    </form>
+
+  </div>
+</section>
+
+{% include "partials/footer.html" %}
+
+{% endblock %}

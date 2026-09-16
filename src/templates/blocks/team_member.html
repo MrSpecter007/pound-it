@@ -1,0 +1,41 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<!--Team Page Start-->
+<section class="team-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-4 col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="100ms">
+                <div class="team-one__single">
+                    <div class="team-one__img">
+                        <div class="team-one__img-box">
+                            {% image value.image original as img %}
+                            <img src="{{ img.url }}" alt="{{ value.name }}">
+                        </div>
+                        <ul class="list-unstyled team-one__social">
+                            {% if value.facebook %}
+                                <li><a href="{{ value.facebook }}"><i class="fab fa-facebook-f"></i></a></li>
+                            {% endif %}
+                            {% if value.twitter %}
+                                <li><a href="{{ value.twitter }}"><i class="fab fa-twitter"></i></a></li>
+                            {% endif %}
+                            {% if value.linkedin %}
+                                <li><a href="{{ value.linkedin }}"><i class="fab fa-linkedin-in"></i></a></li>
+                            {% endif %}
+                            {% if value.instagram %}
+                                <li><a href="{{ value.instagram }}"><i class="fab fa-instagram"></i></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="team-one__content">
+                        <p class="team-one__sub-title">{{ value.role }}</p>
+                        <h3 class="team-one__name"><a href="">{{ value.name }}</a></h3>
+                        <ul class="list-unstyled team-one__social-two">
+                            <li><a href="#"><i class="fas fa-share-alt"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Team Page End-->

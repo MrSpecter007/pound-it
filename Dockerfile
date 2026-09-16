@@ -15,7 +15,7 @@ EXPOSE 8000
 #    setting has to be the default; the environment can still override it.
 ENV PYTHONUNBUFFERED=1 \
     PORT=8000 \
-    DJANGO_SETTINGS_MODULE=alternative_naissance.settings.production
+    DJANGO_SETTINGS_MODULE=config.settings.production
 
 # Install system packages required by Wagtail and Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
@@ -33,7 +33,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
 RUN pip install "gunicorn==23.0.0"
 
 # Install the project requirements.
-COPY alternative_naissance/requirements.txt /
+COPY src/requirements.txt /
 RUN pip install -r /requirements.txt
 
 # Use /app folder as a directory where the source code is stored.
@@ -42,7 +42,7 @@ WORKDIR /app
 RUN chown wagtail:wagtail /app
 
 # Copy the source code of the project into the container.
-COPY --chown=wagtail:wagtail alternative_naissance .
+COPY --chown=wagtail:wagtail src .
 
 # Use user "wagtail" to run the build commands below and the server itself.
 USER wagtail
@@ -62,7 +62,7 @@ RUN SECRET_KEY="build-step-only-not-used-at-runtime" \
 #
 # Workers: on a single vCPU these cover I/O waits rather than adding
 # parallelism, so three is a reasonable ceiling.
-CMD gunicorn alternative_naissance.wsgi:application \
+CMD gunicorn config.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers ${GUNICORN_WORKERS:-3} \
     --timeout 60 \

@@ -21,6 +21,7 @@ and every page still returns 200 under production settings.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -122,8 +123,44 @@ def premove_path(root: Path, rel: str) -> Path:
 
 def run(cmd: list[str], dry_run: bool) -> None:
     print("   ", " ".join(cmd))
-    if not dry_run:
-        subprocess.run(cmd, check=True)
+    if dry_run:
+        return
+    # On Windows, `git mv` on a directory another process has open fails and
+    # then prompts "Should I try again? (y/n)" in a loop. Retrying never helps
+    # -- the lock has to be released first -- so suppress the prompt and say
+    # what actually needs to happen.
+    env = {**os.environ, "GIT_ASK_YESNO": "false"}
+    result = subprocess.run(cmd, env=env, capture_output=True, text=True)
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode != 0:
+        if "source directory is empty" in (result.stderr or ""):
+            print(
+                "\n"
+                "    That is an index problem, not a lock: the files are on disk but\n"
+                "    git still has them recorded at their old paths. Run\n"
+                "\n"
+                "      git add -A\n"
+                "\n"
+                "    and then run this script again.\n",
+                file=sys.stderr,
+            )
+            raise SystemExit(1)
+        print(
+            "\n"
+            "    That move failed. On Windows this almost always means another\n"
+            "    process is holding a file inside the directory. The usual two:\n"
+            "\n"
+            "      docker compose down     # the compose file bind-mounts media/\n"
+            "                              # and poundit/images/ from that folder\n"
+            "      close VS Code           # or any editor/terminal rooted there\n"
+            "\n"
+            "    Then run this script again. It resumes from wherever it stopped.\n",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
 
 
 def rename_core_app(root: Path, dry_run: bool) -> None:
@@ -195,6 +232,87 @@ def rename_core_app(root: Path, dry_run: bool) -> None:
     print(f"    patch  {NEW_APP}/migrations/  ({touched} file(s) with a dotted block path)")
 
 
+def move_outer(root: Path, dry_run: bool) -> bool:
+    """Move the project root to src/, falling back to moving its contents.
+
+    Windows refuses to rename a directory that any process holds open -- a
+    shell whose working directory is inside it, Docker Desktop's file sharing,
+    a file watcher. The handle is usually on the directory itself rather than
+    on the files, so moving the children one at a time succeeds where renaming
+    the parent does not, and when it does not, it names the file that is stuck
+    instead of failing anonymously.
+    """
+    src = root / OLD_OUTER
+    dst = root / NEW_OUTER
+
+    print(f"    git mv {OLD_OUTER} {NEW_OUTER}")
+    if dry_run:
+        return True
+
+    env = {**os.environ, "GIT_ASK_YESNO": "false"}
+    if subprocess.run(["git", "mv", OLD_OUTER, NEW_OUTER], env=env).returncode == 0:
+        return True
+
+    print(f"\n    Renaming the directory was refused. Moving its contents into "
+          f"{NEW_OUTER}/ instead.")
+    dst.mkdir(exist_ok=True)
+    stuck = []
+    for child in sorted(src.iterdir()):
+        target = dst / child.name
+        if target.exists():
+            # The source and the destination both hold this name. Skipping would
+            # silently abandon the real content; overwriting could destroy work.
+            # Neither is a decision this script gets to make.
+            print(f"      CONFLICT: {NEW_OUTER}/{child.name} already exists while "
+                  f"{OLD_OUTER}/{child.name} is still here", file=sys.stderr)
+            stuck.append((child.name, None))
+            continue
+        try:
+            child.rename(target)
+            print(f"      moved: {child.name}")
+        except OSError as exc:
+            stuck.append((child.name, exc))
+            print(f"      LOCKED: {child.name} -- {exc.strerror or exc}")
+
+    # Stage what did move before returning either way. These were filesystem
+    # renames, so until they are staged git still believes the files live at
+    # their old paths, and a later `git mv` fails with the thoroughly unhelpful
+    # "source directory is empty".
+    subprocess.run(["git", "add", "-A"], env=env)
+
+    if stuck:
+        locked = [name for name, exc in stuck if exc is not None]
+        clashed = [name for name, exc in stuck if exc is None]
+        if locked:
+            print(
+                "\n    These are held by another process: " + ", ".join(locked) + "\n"
+                "    Close whatever has them open -- quit Docker Desktop entirely\n"
+                "    (not just `compose down`), close every editor and shell rooted\n"
+                "    in this folder -- or reboot, then run this script again. It\n"
+                "    resumes from here.\n",
+                file=sys.stderr,
+            )
+        if clashed:
+            print(
+                "\n    These exist in BOTH places: " + ", ".join(clashed) + "\n"
+                f"    That usually means an earlier run was interrupted and left a\n"
+                f"    partial {NEW_OUTER}/. Compare the two, keep the one you want,\n"
+                f"    delete the other, then run this script again. Nothing was\n"
+                f"    overwritten.\n",
+                file=sys.stderr,
+            )
+        return False
+
+    try:
+        src.rmdir()
+        print(f"      removed the empty {OLD_OUTER}/")
+    except OSError as exc:
+        print(f"      note: {OLD_OUTER}/ could not be removed yet ({exc.strerror});"
+              f" it is empty and harmless, delete it later.")
+    subprocess.run(["git", "add", "-A"], env=env)
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true",
@@ -209,23 +327,47 @@ def main() -> int:
         print("error: run this from the repository root", file=sys.stderr)
         return 1
 
-    already_done = (root / NEW_OUTER / NEW_PKG).is_dir()
-    if already_done:
+    # Work out which of the two moves have already happened, so that an
+    # interrupted run -- a failed `git mv`, a closed terminal -- can be resumed
+    # by running the script again rather than unpicked by hand.
+    # Detect progress by a marker file, not by a bare directory: a leftover
+    # src/ holding nothing but a virtualenv would otherwise read as "done".
+    inner_done = ((root / NEW_OUTER / NEW_PKG / "settings").is_dir()
+                  or (root / OLD_OUTER / NEW_PKG / "settings").is_dir())
+    old_root = root / OLD_OUTER
+    leftovers = sorted(c.name for c in old_root.iterdir()) if old_root.is_dir() else []
+    # manage.py having arrived is not enough: an interrupted contents-move can
+    # leave entries behind, and treating that as "done" orphans them silently.
+    outer_done = (root / NEW_OUTER / "manage.py").is_file() and not leftovers
+    if leftovers and (root / NEW_OUTER / "manage.py").is_file():
+        print(f"    resuming: {OLD_OUTER}/ still holds {', '.join(leftovers)}")
+
+    if inner_done and outer_done:
         print(f"{NEW_OUTER}/{NEW_PKG}/ already exists -- nothing to move.")
     else:
-        if not (root / OLD_OUTER / OLD_PKG).is_dir():
+        if not inner_done and not (root / OLD_OUTER / OLD_PKG).is_dir():
             print(f"error: expected {OLD_OUTER}/{OLD_PKG}/ -- is this the right repo?",
                   file=sys.stderr)
             return 1
+        # Only require a clean tree on a fresh run. A resumed run is dirty by
+        # definition: the move that already succeeded is staged.
+        fresh = not inner_done and not outer_done
         dirty = subprocess.run(["git", "status", "--porcelain"],
                                capture_output=True, text=True).stdout.strip()
-        if dirty and not args.dry_run:
+        if fresh and dirty and not args.dry_run:
             print("error: commit or stash your changes first. This rewrites files\n"
                   "       and you want a clean diff to review.", file=sys.stderr)
             return 1
         print("Moving directories:")
-        run(["git", "mv", f"{OLD_OUTER}/{OLD_PKG}", f"{OLD_OUTER}/{NEW_PKG}"], args.dry_run)
-        run(["git", "mv", OLD_OUTER, NEW_OUTER], args.dry_run)
+        if not inner_done:
+            run(["git", "mv", f"{OLD_OUTER}/{OLD_PKG}", f"{OLD_OUTER}/{NEW_PKG}"], args.dry_run)
+        else:
+            print(f"    already done: {NEW_PKG}/")
+        if not outer_done:
+            if not move_outer(root, args.dry_run):
+                return 1
+        else:
+            print(f"    already done: {NEW_OUTER}/")
 
     print("\nRewriting references:")
     for rel, patterns in REWRITES:

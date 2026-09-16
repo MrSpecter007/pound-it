@@ -1,0 +1,53 @@
+{% load wagtailcore_tags %}
+
+<section class="py-5">
+  <div class="container">
+
+    {% if title %}
+      <h2 class="mb-4 text-center">{{ title }}</h2>
+    {% endif %}
+
+    {% if intro %}
+      <p class="text-muted text-center mb-5">{{ intro }}</p>
+    {% endif %}
+
+    {% if ateliers %}
+      <div class="row g-4">
+        {% for atelier in ateliers %}
+          <div class="col-md-4 col-sm-6">
+            <a href="{{ atelier.url }}" class="text-decoration-none text-dark">
+              <div class="card h-100 shadow-sm hover-shadow transition-all">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">{{ atelier.title }}</h5>
+
+                  {% if atelier.date or atelier.location %}
+                    <p class="text-muted small mb-2">
+                      {% if atelier.date %}
+                        📅 {{ atelier.date|date:"j F Y" }}
+                      {% endif %}
+                      {% if atelier.location %}
+                        <br>📍 {{ atelier.location }}
+                      {% endif %}
+                    </p>
+                  {% endif %}
+
+                  {% if atelier.description %}
+                    <div class="card-text small mb-3">
+                      {{ atelier.description|richtext }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="card-footer bg-white border-0 text-center pb-3">
+                  <span class="btn btn-outline-primary btn-sm">Voir l’atelier</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted text-center">Aucun atelier sélectionné.</p>
+    {% endif %}
+
+  </div>
+</section>

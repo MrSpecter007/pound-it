@@ -1,5 +1,5 @@
 # Django project
-/alternative_naissance/media/
+/src/media/
 /static/
 *.sqlite3
 
@@ -18,7 +18,7 @@
 
 # Source images supplied for a one-off import. Needed on disk at import time,
 # not in every build of the image.
-/alternative_naissance/poundit/images/
+/src/poundit/images/
 
 # Python and others
 __pycache__
@@ -27,7 +27,7 @@ __pycache__
 *.swp
 /venv/
 /.venv/
-/alternative_naissance/.venv/
+/src/.venv/
 /tmp/
 /.vagrant/
 /Vagrantfile.local

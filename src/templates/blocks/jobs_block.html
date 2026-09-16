@@ -1,0 +1,52 @@
+{% load wagtailcore_tags %}
+
+<section class="careers-section py-5">
+  <div class="container">
+
+    {% if self.title %}
+      <div class="section-title text-center mb-5">
+        <h2>{{ self.title }}</h2>
+      </div>
+    {% endif %}
+
+    {% if jobs %}
+
+      <div class="row">
+        {% for job in jobs %}
+
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="career-card shadow-sm p-4 bg-white rounded">
+
+            
+            <h4 href="{{ job.url }}" class="career-title">{{ job.position }}</h4>
+
+            <p>
+              {{ job.applications_count }} candidature(s)
+            </p>
+
+            <div class="career-description">
+              {{ job.description|richtext }}
+            </div>
+
+            <a href="{{ job.url }}" class="cookiebtn">
+              Voir le poste
+            </a>
+
+          </div>
+        </div>
+
+        {% endfor %}
+      </div>
+
+    {% else %}
+
+      <div class="text-center">
+        <p class="text-muted">
+          Il n’y a pas de postes en affichage en ce moment.
+        </p>
+      </div>
+
+    {% endif %}
+
+  </div>
+</section>
