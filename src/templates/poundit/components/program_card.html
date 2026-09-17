@@ -7,7 +7,7 @@
     {% if program.short_description %}<p>{{ program.short_description }}</p>{% endif %}
     <dl class="pi-mini-meta">
       {% if program.schedule_display %}<div><dt>When</dt><dd>{{ program.schedule_display }}</dd></div>{% endif %}
-      {% if program.tuition_display %}<div><dt>Tuition</dt><dd>{{ program.tuition_display }}</dd></div>{% endif %}
+      {% if program.tuition_display %}<div><dt>Tuition</dt><dd>{{ program.tuition_display }} + GST</dd></div>{% endif %}
       {% if program.audition_required %}<div><dt>Audition</dt><dd>Required</dd></div>{% endif %}
     </dl>
     {% if not compact %}
@@ -18,7 +18,7 @@
         {% if program.styles.all %}<h4>Styles</h4><ul class="pi-tags">{% for style in program.styles.all %}<li class="pi-tag">{{ style.name }}</li>{% endfor %}</ul>{% endif %}
         {% if program.faculty.all %}<h4>Faculty</h4><p>{% for member in program.faculty.all %}<a href="{{ home_url }}faculty/#faculty-{{ member.slug }}">{{ member.display_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
         {% if program.inclusions.all %}<h4>What's included</h4><ul>{% for inclusion in program.inclusions.all %}<li>{{ inclusion.text }}</li>{% endfor %}</ul>{% endif %}
-        {% if program.tuition_options.all %}<h4>Tuition options</h4><ul>{% for option in program.tuition_options.all %}<li><strong>{{ option.label }}: {{ option.display }}</strong>{% if option.note %}<br>{{ option.note }}{% endif %}</li>{% endfor %}</ul>{% endif %}
+        {% if program.tuition_options.all %}<h4>Tuition options</h4><ul>{% for option in program.tuition_options.all %}<li><strong>{{ option.label }}: {{ option.display }} + GST</strong>{% if option.note %}<br>{{ option.note }}{% endif %}</li>{% endfor %}</ul>{% endif %}
         {% if program.tuition_note %}<p>{{ program.tuition_note|linebreaksbr }}</p>{% endif %}
         {% if program.competition_info %}<div class="pi-prose">{{ program.competition_info|richtext }}</div>{% endif %}
       </details>

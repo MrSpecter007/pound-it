@@ -7,7 +7,7 @@
     <p><time datetime="{{ event.start_datetime|date:'c' }}">{{ event.date_display }}</time></p>
     {% if event.status != 'scheduled' %}<p class="pi-tag">{{ event.get_status_display }}</p>{% endif %}
     {% if event.venue_name %}<p>{{ event.venue_name }}</p>{% endif %}
-    {% if event.price_display %}<p>{{ event.price_display }}</p>{% endif %}
+    {% if event.price_display %}<p>{{ event.price_display }} + GST</p>{% endif %}
     {% if event.short_description %}<p>{{ event.short_description }}</p>{% endif %}
   </div>
 </article>

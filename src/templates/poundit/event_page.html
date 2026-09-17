@@ -12,7 +12,7 @@
         <div><dt>Date</dt><dd><time datetime="{{ page.start_datetime|date:'c' }}">{{ page.date_display }}</time></dd></div>
         <div><dt>Time</dt><dd>{{ page.start_datetime|localtime|date:'g:i A' }}{% if page.end_datetime %} – {% if page.is_multi_day %}{{ page.end_datetime|localtime|date:'M j, Y' }} {% endif %}{{ page.end_datetime|localtime|date:'g:i A' }}{% endif %} {{ page.start_datetime|localtime|date:'T' }}</dd></div>
         {% if page.venue_name %}<div><dt>Venue</dt><dd>{{ page.venue_name }}{% if page.venue_address %}<br>{{ page.venue_address|linebreaksbr }}{% endif %}</dd></div>{% elif page.venue_address %}<div><dt>Address</dt><dd>{{ page.venue_address|linebreaksbr }}</dd></div>{% endif %}
-        {% if page.price_display %}<div><dt>Admission</dt><dd>{{ page.price_display }}</dd></div>{% endif %}
+        {% if page.price_display %}<div><dt>Admission</dt><dd>{{ page.price_display }} + GST</dd></div>{% endif %}
         {% if page.age_label %}<div><dt>Ages</dt><dd>{{ page.age_label }}</dd></div>{% endif %}
         {% if page.capacity %}<div><dt>Capacity</dt><dd>{{ page.capacity }}</dd></div>{% endif %}
       </dl>
