@@ -3,6 +3,15 @@
 Target: `https://new.pounditdj.com` on `2.25.225.27`.
 The apex and `www` stay on Wix until a separate approved cutover.
 
+Verified on 2026-09-17: staging is live over HTTPS. Application release `a8c26fe`
+includes frontend/admin branding and `+ GST` labels on displayed program and event
+prices. Seventeen routes and 35 assets passed HTTP checks; real admin sign-in with
+CSRF, the HTTPS redirect and custom 404 passed. Mobile navigation works without
+horizontal overflow; six faculty portraits render. Django production checks passed.
+The first backup was restored into a separate temporary database and verified:
+34 programs, 15 page-tree records (including the root), one admin, zero legacy
+registrations. The temporary restore database was removed after verification.
+
 The server uses Ubuntu 26.04, Docker's official apt repository, PostgreSQL 16,
 Gunicorn and Caddy. SSH keys work for `deploy` and `root`; SSH password login is
 disabled. Hostinger's console still supports the root password.
@@ -62,6 +71,8 @@ the app to it; do not restore over the running database.
 
 SMTP credentials and a sender address are required for notification and password
 reset delivery. Saved school inquiries can still be managed in the admin.
+Legal pages currently have no entered body copy; complete these and review the
+tentative calendar dates and remaining faculty content before the main-domain launch.
 Staging emits `X-Robots-Tag: noindex, nofollow`. Remove that header during the
 approved production-domain cutover and update Caddy, allowed hosts, CSRF origins,
 the admin base URL and Wagtail Site together.
