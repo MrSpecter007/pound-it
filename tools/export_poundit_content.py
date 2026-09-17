@@ -72,6 +72,10 @@ for record in data:
         fields["locked_at"] = None
     if record["model"] == "wagtailcore.site":
         fields.update(hostname="new.pounditdj.com", port=443, is_default_site=True)
+    # Site relations use (hostname, port) natural keys, so update references
+    # together with the Site row when moving from localhost to staging.
+    if fields.get("site") == list(site.natural_key()):
+        fields["site"] = ["new.pounditdj.com", 443]
 fixture = destination / "content.json"
 fixture.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 with tarfile.open(destination / "media.tar.gz", "w:gz") as archive:
