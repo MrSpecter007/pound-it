@@ -67,7 +67,18 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5).status < 500 else 1)\""]
+      # Simulate the trusted TLS proxy without following a redirect out to DNS.
+      # The TCP connection stays inside this container; Host still uses the
+      # configured public origin so ALLOWED_HOSTS remains restrictive.
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import os, sys, urllib.request, urllib.parse;
+          host = urllib.parse.urlsplit(os.environ['WAGTAILADMIN_BASE_URL']).netloc;
+          request = urllib.request.Request('http://127.0.0.1:8000/', headers={'Host': host, 'X-Forwarded-Proto': 'https'});
+          sys.exit(0 if urllib.request.urlopen(request, timeout=5).status == 200 else 1)
       interval: 30s
       timeout: 10s
       retries: 3

@@ -11,7 +11,7 @@ import os
 import sys
 
 sys.path.insert(0, os.getcwd())
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "alternative_naissance.settings.dev")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
 import django
 django.setup()
 from bs4 import BeautifulSoup

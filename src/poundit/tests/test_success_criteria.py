@@ -317,13 +317,8 @@ class CodexGetsSemanticData(TestCase):
 class FitsTheExistingArchitecture(TestCase):
     """11. The implementation fits the local system rather than fighting it."""
 
-    # The two tests that used to live here asserted that poundit.EventPage and
-    # the Alternative Naissance EventPage could coexist. That app has been
-    # split out of this repository, so there is no second EventPage left to
-    # collide with. What still matters is the fix itself: the explicit parent
-    # link below is the reason the collision was survivable, and it must not be
-    # quietly dropped, because any future app adding an EventPage would break
-    # the same way.
+    # Alternative Naissance still shares this installation. Pound It's explicit
+    # parent link keeps both EventPage models accessible without a name clash.
 
     def test_event_page_owns_an_explicit_parent_link(self) -> None:
         link = EventPage._meta.get_field("page_ptr")
@@ -332,13 +327,12 @@ class FitsTheExistingArchitecture(TestCase):
         self.assertEqual(link.remote_field.related_name, "poundit_eventpage")
         self.assertEqual(EventPage._meta.app_label, "poundit")
 
-    def test_page_has_no_unqualified_eventpage_accessor(self) -> None:
+    def test_event_page_accessors_resolve_to_their_own_apps(self) -> None:
+        from altnaissance.models import EventPage as LegacyEventPage
         from wagtail.models import Page
 
-        # Django's default would have been Page.eventpage, which is exactly the
-        # name two apps would fight over.
-        self.assertFalse(hasattr(Page, "eventpage"))
-        self.assertTrue(hasattr(Page, "poundit_eventpage"))
+        self.assertIs(Page._meta.get_field("eventpage").related_model, LegacyEventPage)
+        self.assertIs(Page._meta.get_field("poundit_eventpage").related_model, EventPage)
 
     def test_poundit_has_no_dependency_on_the_split_out_app(self) -> None:
         sources = list((APP_ROOT / "models").glob("*.py")) + [

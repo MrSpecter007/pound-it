@@ -60,7 +60,7 @@ db\.sqlite3
 *.css.map
 # ...but the Pound It stylesheets are hand-written, not compiled from
 # Sass, so they must be committed or a fresh clone has no styling.
-!alternative_naissance/static/poundit/*.css
+!src/static/poundit/*.css
 
 # JetBrains
 .idea

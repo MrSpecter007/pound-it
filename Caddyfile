@@ -1,9 +1,10 @@
-# Replace both hostnames with the real domain before deploying.
+# Staging first. Change the hostname only when the production cutover is approved.
 # Caddy obtains and renews certificates automatically, but the DNS A record
 # must already resolve to this server or the first request will fail.
 
-pounditdj.com, www.pounditdj.com {
+new.pounditdj.com {
 	encode gzip zstd
+	header X-Robots-Tag "noindex, nofollow"
 
 	# Uploaded media is served straight from disk. Static files are handled
 	# inside the app by WhiteNoise, so they are not listed here.

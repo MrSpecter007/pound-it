@@ -9,13 +9,13 @@
 SECRET_KEY=
 
 # Comma separated, no scheme. Both apex and www if you serve both.
-ALLOWED_HOSTS=pounditdj.com,www.pounditdj.com
+ALLOWED_HOSTS=new.pounditdj.com
 
 # Comma separated, WITH scheme. Required for admin login and the inquiry form.
-CSRF_TRUSTED_ORIGINS=https://pounditdj.com,https://www.pounditdj.com
+CSRF_TRUSTED_ORIGINS=https://new.pounditdj.com
 
 # Public origin, used in notification emails and some admin links.
-WAGTAILADMIN_BASE_URL=https://pounditdj.com
+WAGTAILADMIN_BASE_URL=https://new.pounditdj.com
 
 # Start at 300 for the first day. Raise to 31536000 once TLS is proven.
 SECURE_HSTS_SECONDS=300
