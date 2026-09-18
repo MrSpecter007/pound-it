@@ -301,7 +301,10 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
 .pi-schedule__day { min-width: 0; }
 .pi-schedule__day > h2 { font-size: 1.8rem; background: var(--pi-ink); color: var(--pi-white); padding: 1rem; }
 .pi-schedule__day > ul { list-style: none; padding: 0; }
-.pi-session { background: var(--pi-paper); border: var(--pi-border); border-left: 5px solid var(--pi-training-color); padding: 1.25rem; margin-top: .75rem; }
+.pi-session { background: var(--pi-training-color); color: var(--pi-white); border: 1px solid var(--pi-training-color); border-left-width: 5px; padding: 1.25rem; margin-top: .75rem; }
+.pi-session[data-training='age-6-9'], .pi-session[data-training='yellow'],
+.pi-session[data-training='age-10-15'], .pi-session[data-training='red'] { color: var(--pi-black); }
+.pi-session :focus-visible { outline-color: currentColor; }
 .pi-session h3 { font: 700 1rem/1.4 var(--pi-body); }
 .pi-session h3 + p { margin-top: .5rem; }
 .pi-session h3 a { text-decoration: none; }
@@ -444,4 +447,5 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
   .pi-site h1 { font-size: 32pt; }
   .pi-section { padding-block: 1rem; }
   .pi-session, .pi-card { break-inside: avoid; }
+  .pi-session { background: #fff; color: #000; }
 }
