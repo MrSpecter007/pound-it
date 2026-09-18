@@ -1,7 +1,17 @@
-# Pound It staging deployment
+# Pound It deployment
 
-Target: `https://new.pounditdj.com` on `2.25.225.27`.
-The apex and `www` stay on Wix until a separate approved cutover.
+Primary: `https://pounditdj.com` on `2.25.225.27`.
+`www.pounditdj.com` redirects permanently to the primary, preserving paths and queries.
+`https://new.pounditdj.com` remains available as requested, serving the same app and
+database. It is an alternate address, not an independent server or backup.
+
+Main-domain cutover verified on 2026-09-18 UTC: DNS resolves to the VPS, both
+main-domain certificates are active, and pages and real admin sign-in work on both
+the primary and alternate domains. Wagtail Site and WAGTAILADMIN_BASE_URL use
+`pounditdj.com`. The alternate domain retains `noindex, nofollow`; public HTML on
+the primary is indexable. Sitemap URLs use the primary domain. Email DNS was retained.
+A post-cutover backup was taken. App code release: `29f96e5`; domain configuration:
+`e161eaa`. Admin credentials are unchanged by the cutover.
 
 Verified on 2026-09-17: staging is live over HTTPS. Application release `a8c26fe`
 includes frontend/admin branding and `+ GST` labels on displayed program and event
@@ -72,7 +82,8 @@ the app to it; do not restore over the running database.
 SMTP credentials and a sender address are required for notification and password
 reset delivery. Saved school inquiries can still be managed in the admin.
 Legal pages currently have no entered body copy; complete these and review the
-tentative calendar dates and remaining faculty content before the main-domain launch.
-Staging emits `X-Robots-Tag: noindex, nofollow`. Remove that header during the
-approved production-domain cutover and update Caddy, allowed hosts, CSRF origins,
-the admin base URL and Wagtail Site together.
+tentative calendar dates and remaining faculty content. The main domain was switched
+at the user's explicit request with these content items still pending.
+Keep `X-Robots-Tag: noindex, nofollow` scoped to the alternate hostname. Do not apply
+it to public HTML on the primary domain. Admin and sitemap responses may independently
+carry noindex headers from Django/Wagtail.
