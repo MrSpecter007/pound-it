@@ -5,11 +5,12 @@
 {% include 'poundit/components/page_hero.html' with eyebrow=season.label introduction=page.introduction back_url=home_url %}
 <div class="pi-container pi-section">
   {% if page.show_legend %}{% include 'poundit/components/training_colour_key.html' %}{% endif %}
-  <div class="pi-schedule" data-schedule>
+  <div class="pi-schedule" data-schedule data-view="all">
     <p class="pi-schedule__intro">Two studios, one timetable. Compare classes side by side at each time.</p>
-    <div class="pi-schedule__filters" hidden><label for="schedule-day">Choose a day</label><select id="schedule-day" data-day-filter><option value="all">All days</option>{% for day in schedule %}<option value="{{ day.weekday }}">{{ day.label }}</option>{% endfor %}</select></div>
+    <div class="pi-schedule__filters" hidden><label for="schedule-day">Choose a day</label><select id="schedule-day" data-day-filter><option value="all">All days — side by side</option>{% for day in schedule %}<option value="{{ day.weekday }}">{{ day.label }}</option>{% endfor %}</select></div>
+    <p class="pi-schedule__week-hint" id="schedule-week-hint">Scroll across for more days and down for later classes. Both studios appear within each day.</p>
     <p class="pi-sr-only" data-schedule-status aria-live="polite"></p>
-    <div class="pi-schedule__days">
+    <div class="pi-schedule__days" role="region" aria-label="Class timetable" aria-describedby="schedule-week-hint" tabindex="0">
       {% for day in timelines %}<section class="pi-schedule__day" data-day="{{ day.weekday }}" aria-labelledby="day-{{ day.weekday }}" style="--studio-count: {{ day.rooms|length }}">
         <div class="pi-schedule__heading">
           <h2 id="day-{{ day.weekday }}">{{ day.label }}</h2>

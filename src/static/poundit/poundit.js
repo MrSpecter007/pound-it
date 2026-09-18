@@ -48,9 +48,17 @@
     const filters = schedule.querySelector('.pi-schedule__filters');
     const days = [...schedule.querySelectorAll('[data-day]')];
     const status = schedule.querySelector('[data-schedule-status]');
+    const timetable = schedule.querySelector('.pi-schedule__days');
     if (!select || !filters || !days.length) return;
     filters.hidden = false;
     const filterDays = () => {
+      const showAll = select.value === 'all';
+      schedule.dataset.view = showAll ? 'all' : 'day';
+      timetable.tabIndex = showAll ? 0 : -1;
+      if (showAll) timetable.setAttribute('aria-describedby', 'schedule-week-hint');
+      else timetable.removeAttribute('aria-describedby');
+      timetable.scrollLeft = 0;
+      timetable.scrollTop = 0;
       days.forEach(day => { day.hidden = select.value !== 'all' && day.dataset.day !== select.value; });
       const visibleDays = days.filter(day => !day.hidden);
       const classCount = visibleDays.reduce((count, day) => count + day.querySelectorAll('.pi-session').length, 0);

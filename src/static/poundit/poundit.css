@@ -311,6 +311,29 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
 .pi-timetable__tick > span { display: block; width: var(--time-width); padding-top: .35rem; }
 .pi-timetable .pi-session { position: relative; min-width: 0; margin: 0 0 .4rem; padding: .9rem; overflow-wrap: anywhere; align-self: stretch; }
 .pi-timetable .pi-schedule__empty { margin: 0; background: var(--pi-paper); align-self: stretch; }
+/* The whole week is a horizontal, keyboard-scrollable board. Each day retains
+   its two studio columns and shared time grid. Single-day view stays full width. */
+.pi-schedule__week-hint { display: none; margin-bottom: 1rem !important; font-size: .85rem; }
+.pi-schedule[data-view='all'] .pi-schedule__week-hint { display: block; }
+.pi-schedule[data-view='all'] .pi-schedule__days {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(min(100%, 360px), 1fr);
+  gap: 1rem;
+  align-items: start;
+  max-height: 75vh;
+  overflow: auto;
+  padding-bottom: 1rem;
+}
+.pi-schedule[data-view='all'] .pi-schedule__day { --time-width: 3.4rem; --studio-gap: .35rem; }
+.pi-schedule[data-view='all'] .pi-schedule__heading { top: 0; }
+.pi-site .pi-schedule[data-view='all'] .pi-timetable__head h3 { font-size: .8rem; }
+.pi-schedule[data-view='all'] .pi-timetable__tick { font-size: .65rem; }
+.pi-schedule[data-view='all'] .pi-session { padding: .6rem .4rem; border-left-width: 2px; }
+.pi-schedule[data-view='all'] .pi-session h4 { font-size: .85rem; }
+.pi-schedule[data-view='all'] .pi-session p { font-size: .72rem; }
+.pi-schedule[data-view='all'] .pi-session .pi-session__time { font-size: .67rem; }
+.pi-schedule[data-view='all'] .pi-schedule__empty { padding: .6rem; }
 .pi-session { background: var(--pi-training-color); color: var(--pi-white); border: 1px solid var(--pi-training-color); border-left-width: 5px; padding: 1.25rem; margin-top: .75rem; }
 .pi-session[data-training='age-6-9'], .pi-session[data-training='yellow'],
 .pi-session[data-training='piba'],
@@ -465,6 +488,8 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
   .pi-site, .pi-dark, .pi-page-hero { background: #fff; color: #000; }
   .pi-schedule__day[hidden] { display: block !important; }
   .pi-schedule__heading { position: static; }
+  .pi-schedule[data-view='all'] .pi-schedule__days { display: block; max-height: none; overflow: visible; }
+  .pi-schedule__week-hint { display: none !important; }
   .pi-facts { position: static; }
   .pi-site h1 { font-size: 32pt; }
   .pi-section { padding-block: 1rem; }
