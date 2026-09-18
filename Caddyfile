@@ -1,10 +1,11 @@
-# Staging first. Change the hostname only when the production cutover is approved.
+# Production domain with the staging hostname retained for preview access.
 # Caddy obtains and renews certificates automatically, but the DNS A record
 # must already resolve to this server or the first request will fail.
 
-new.pounditdj.com {
+pounditdj.com, new.pounditdj.com {
 	encode gzip zstd
-	header X-Robots-Tag "noindex, nofollow"
+	@staging host new.pounditdj.com
+	header @staging X-Robots-Tag "noindex, nofollow"
 
 	# Uploaded media is served straight from disk. Static files are handled
 	# inside the app by WhiteNoise, so they are not listed here.
@@ -27,4 +28,8 @@ new.pounditdj.com {
 			roll_keep 5
 		}
 	}
+}
+
+www.pounditdj.com {
+	redir https://pounditdj.com{uri} permanent
 }
