@@ -6,14 +6,24 @@
 <div class="pi-container pi-section">
   {% if page.show_legend %}{% include 'poundit/components/training_colour_key.html' %}{% endif %}
   <div class="pi-schedule" data-schedule>
+    <p class="pi-schedule__intro">Two studios, one timetable. Compare classes side by side at each time.</p>
     <div class="pi-schedule__filters" hidden><label for="schedule-day">Choose a day</label><select id="schedule-day" data-day-filter><option value="all">All days</option>{% for day in schedule %}<option value="{{ day.weekday }}">{{ day.label }}</option>{% endfor %}</select></div>
     <p class="pi-sr-only" data-schedule-status aria-live="polite"></p>
     <div class="pi-schedule__days">
-      {% for day in schedule %}<section class="pi-schedule__day" data-day="{{ day.weekday }}">
-        <h2>{{ day.label }}</h2>
-        {% for column in day.rooms %}<div class="pi-schedule__room" data-room="{{ column.room.slug }}"><h3>{{ column.room.name }}</h3><ul>
-          {% for entry in column.entries %}<li class="pi-session" data-training="{{ entry.level_colour }}"><p class="pi-session__time">{{ entry.time_display }}</p><h4><a href="{{ home_url }}programs/{% if entry.program.category %}{{ entry.program.category.slug }}/{% endif %}#program-{{ entry.program.slug }}">{{ entry.display_label }}</a></h4>{% if entry.program.level %}<p class="pi-session__level">{{ entry.program.level.display_label }}</p>{% endif %}{% if entry.instructor_display %}<p>{{ entry.instructor_display }}</p>{% endif %}{% if entry.notes %}<p>{{ entry.notes }}</p>{% endif %}</li>{% empty %}<li class="pi-schedule__empty">No classes in this room.</li>{% endfor %}
-        </ul></div>{% endfor %}
+      {% for day in timelines %}<section class="pi-schedule__day" data-day="{{ day.weekday }}" aria-labelledby="day-{{ day.weekday }}" style="--studio-count: {{ day.rooms|length }}">
+        <div class="pi-schedule__heading">
+          <h2 id="day-{{ day.weekday }}">{{ day.label }}</h2>
+          <div class="pi-timetable__head">
+            <span>Time</span>
+            {% for column in day.rooms %}<h3 id="room-{{ day.weekday }}-{{ column.room.slug }}">{{ column.room.name }}</h3>{% endfor %}
+          </div>
+        </div>
+        <div class="pi-timetable" style="grid-template-rows: {{ day.row_sizes }}">
+          {% for tick in day.ticks %}<div class="pi-timetable__tick" style="grid-row: {{ tick.row }}" aria-hidden="true"><span>{{ tick.label }}</span></div>{% endfor %}
+          {% for column in day.rooms %}<ul class="pi-timetable__room" role="list" data-room="{{ column.room.slug }}" aria-labelledby="room-{{ day.weekday }}-{{ column.room.slug }}">
+            {% for session in column.sessions %}{% with entry=session.entry %}<li class="pi-session" data-training="{{ entry.level_colour }}" style="grid-column: {{ column.column }}; grid-row: {{ session.start_row }} / {{ session.end_row }}"><p class="pi-session__time">{{ entry.time_display }}</p><h4><a href="{{ home_url }}programs/{% if entry.program.category %}{{ entry.program.category.slug }}/{% endif %}#program-{{ entry.program.slug }}">{{ entry.display_label }}</a></h4>{% if entry.program.level %}<p class="pi-session__level">{{ entry.program.level.display_label }}</p>{% endif %}{% if entry.instructor_display %}<p>{{ entry.instructor_display }}</p>{% endif %}{% if entry.notes %}<p>{{ entry.notes }}</p>{% endif %}</li>{% endwith %}{% empty %}<li class="pi-schedule__empty" style="grid-column: {{ column.column }}; grid-row: 1 / -1">No classes in this studio.</li>{% endfor %}
+          </ul>{% endfor %}
+        </div>
       </section>{% empty %}<p>No sessions scheduled for this season yet.</p>{% endfor %}
     </div>
   </div>

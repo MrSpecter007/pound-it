@@ -253,6 +253,13 @@ class SchedulePageTests(TestCase):
         self.assertContains(response, "5:15-6:00 PM")
         self.assertContains(response, "Lil Cuz")
 
+    def test_shared_timetable_and_empty_studio_render(self) -> None:
+        response = self.client.get(self.page.url)
+        self.assertContains(response, 'class="pi-timetable"')
+        self.assertContains(response, "No classes in this studio.")
+        self.assertContains(response, 'aria-labelledby="room-0-notorious-big"')
+        self.assertEqual(len(response.context["timelines"][0]["rooms"]), 2)
+
 
 class ProgramIndexPageTests(TestCase):
     @override

@@ -272,10 +272,13 @@ class SchedulePage(Page):
             for value in sorted(grid.keys())
         ]
 
+        from poundit.schedule import build_timelines
+
         context.update(
             {
                 "grid": grid,
                 "schedule": schedule,
+                "timelines": build_timelines(schedule),
                 "rooms": rooms,
                 "levels": TrainingLevel.objects.filter(show_in_legend=True),
                 "season": season,

@@ -50,12 +50,16 @@
     const status = schedule.querySelector('[data-schedule-status]');
     if (!select || !filters || !days.length) return;
     filters.hidden = false;
-    select.addEventListener('change', () => {
+    const filterDays = () => {
       days.forEach(day => { day.hidden = select.value !== 'all' && day.dataset.day !== select.value; });
       const visibleDays = days.filter(day => !day.hidden);
       const classCount = visibleDays.reduce((count, day) => count + day.querySelectorAll('.pi-session').length, 0);
       status.textContent = `${select.selectedOptions[0].textContent}: ${classCount} ${classCount === 1 ? 'class' : 'classes'} shown.`;
-    });
+    };
+    select.addEventListener('change', filterDays);
+    // Keep both studios in view; all days remain available without JavaScript.
+    select.value = days[0].dataset.day;
+    filterDays();
   });
 
   const errors = document.querySelector('.pi-form-errors');
