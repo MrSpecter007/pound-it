@@ -16,6 +16,10 @@ def _csv(name: str) -> list[str]:
 
 DEBUG = False
 
+# The deployed studio uses Pound It navigation; the shared development install
+# can still manage the original Alternative Naissance site and its records.
+POUNDIT_ADMIN_ONLY = True
+
 # No fallback. Django raises ImproperlyConfigured on an empty key, which is the
 # failure we want: loud, at startup, rather than a site signing cookies weakly.
 SECRET_KEY = os.getenv("SECRET_KEY", "")

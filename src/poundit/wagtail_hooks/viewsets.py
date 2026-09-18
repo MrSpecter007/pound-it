@@ -6,6 +6,7 @@ across the sidebar, which also keeps it clear of Alternative Naissance's own
 sections. Order runs from what staff touch daily down to what they set up once.
 """
 
+from django.conf import settings
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
@@ -201,6 +202,16 @@ class PounditGroup(SnippetViewSetGroup):
     menu_label = "Pound It"
     menu_icon = "group"
     menu_order = 290
+
+    def get_submenu_items(self):
+        if not getattr(settings, "POUNDIT_ADMIN_ONLY", False):
+            return super().get_submenu_items()
+        return [
+            viewset.get_menu_item(order=index)
+            for index, viewset in enumerate(self.registerables, start=1)
+            if not isinstance(viewset, ImportLedgerViewSet)
+        ]
+
     items = (
         # Daily
         ProgramViewSet,
