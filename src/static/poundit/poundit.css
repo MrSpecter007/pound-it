@@ -19,6 +19,7 @@
   --pi-line-on-dark: #44473e;
   --pi-red: #ed1c24;
   --pi-green: #1c7d33;
+  --pi-orange: #f7931e;
   --pi-display: Anton, Impact, 'Arial Narrow', sans-serif;
   --pi-body: Arial, Helvetica, sans-serif;
   --pi-space-1: .25rem;
@@ -83,7 +84,8 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
 [data-training='crew'] { --pi-training-color: var(--pi-black); }
 [data-training='age-6-9'] { --pi-training-color: var(--pi-yellow); }
 [data-training='age-10-15'] { --pi-training-color: var(--pi-red); }
-[data-training='piba'], [data-training='open'] { --pi-training-color: var(--pi-green); }
+[data-training='piba'] { --pi-training-color: var(--pi-orange); }
+[data-training='open'] { --pi-training-color: var(--pi-green); }
 .pi-site .pi-hero__headline { font-weight: 700; font-size: 1.1rem; margin-top: 1.5rem; }
 .pi-site .pi-hero__intro { margin-top: .75rem; }
 .pi-home-programs { margin-top: 4rem; }
@@ -303,6 +305,7 @@ body.pi-site { margin: 0; background: var(--pi-white); color: var(--pi-ink); fon
 .pi-schedule__day > ul { list-style: none; padding: 0; }
 .pi-session { background: var(--pi-training-color); color: var(--pi-white); border: 1px solid var(--pi-training-color); border-left-width: 5px; padding: 1.25rem; margin-top: .75rem; }
 .pi-session[data-training='age-6-9'], .pi-session[data-training='yellow'],
+.pi-session[data-training='piba'],
 .pi-session[data-training='age-10-15'], .pi-session[data-training='red'] { color: var(--pi-black); }
 .pi-session :focus-visible { outline-color: currentColor; }
 .pi-session h3 { font: 700 1rem/1.4 var(--pi-body); }
